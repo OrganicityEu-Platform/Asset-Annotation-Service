@@ -1,0 +1,11 @@
+{
+  "realm": "organicity",
+  "realm-public-key": "xxxxxxxx",
+  "auth-server-url": "https://accounts.organicity.eu",
+  "ssl-required": "external",
+  "resource": "xxxxxxxx",
+  "credentials": {
+    "secret": "xxxxxxxx"
+  },
+  "principal-attribute": "email"
+}
