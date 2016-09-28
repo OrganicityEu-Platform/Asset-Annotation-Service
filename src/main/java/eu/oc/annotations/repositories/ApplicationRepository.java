@@ -11,14 +11,14 @@ import java.util.List;
 public interface ApplicationRepository extends GraphRepository<Application> {
     @Override
     @RestResource(exported = false)
-    public Application save(Application entity);
+    Application save(Application entity);
 
     /*******************************************************************************
      ********************************************************************************/
 
     @Override
     @RestResource(exported = false)
-    public Application findOne(Long id);
+    Application findOne(Long id);
 
 
     //@Query("MATCH (n) WHERE urn(n)={0} RETURN n")
@@ -27,13 +27,13 @@ public interface ApplicationRepository extends GraphRepository<Application> {
     Application findByUrn(String Urn);
 
     @RestResource(exported = false)
-    public List<Application> findAll();
+    List<Application> findAll();
 
     @Override
     @RestResource(exported = false)
-    public long count();
+    long count();
 
     @Override
     @RestResource(exported = false)
-    public void delete(Long id);
+    void delete(Long id);
 }

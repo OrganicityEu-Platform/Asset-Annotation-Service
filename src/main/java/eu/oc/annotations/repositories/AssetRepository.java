@@ -10,14 +10,14 @@ import org.springframework.data.rest.core.annotation.RestResource;
 public interface AssetRepository extends GraphRepository<Asset> {
     @Override
     @RestResource(exported = false)
-    public Asset save(Asset entity);
+    Asset save(Asset entity);
 
     /*******************************************************************************
      ********************************************************************************/
 
     @Override
     @RestResource(exported = false)
-    public Asset findOne(Long id);
+    Asset findOne(Long id);
 
 
 
@@ -31,9 +31,9 @@ public interface AssetRepository extends GraphRepository<Asset> {
 
     @Override
     @RestResource(exported = false)
-    public long count();
+    long count();
 
     @Override
     @RestResource(exported = false)
-    public void delete(Long id);
+    void delete(Long id);
 }

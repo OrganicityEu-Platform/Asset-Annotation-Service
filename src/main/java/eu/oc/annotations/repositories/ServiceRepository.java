@@ -11,14 +11,14 @@ import java.util.List;
 public interface ServiceRepository extends GraphRepository<Service> {
     @Override
     @RestResource(exported = false)
-    public Service save(Service entity);
+    Service save(Service entity);
 
     /*******************************************************************************
      ********************************************************************************/
 
     @Override
     @RestResource(exported = false)
-    public Service findOne(Long id);
+    Service findOne(Long id);
 
     //@Query("MATCH (n) WHERE urn(n)={0} RETURN n")
     @RestResource(exported = false)
@@ -27,13 +27,13 @@ public interface ServiceRepository extends GraphRepository<Service> {
 
     @Override
     @RestResource(exported = false)
-    public List<Service> findAll();
+    List<Service> findAll();
 
     @Override
     @RestResource(exported = false)
-    public long count();
+    long count();
 
     @Override
     @RestResource(exported = false)
-    public void delete(Long id);
+    void delete(Long id);
 }

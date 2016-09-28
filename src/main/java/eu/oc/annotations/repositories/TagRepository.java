@@ -11,14 +11,14 @@ import java.util.List;
 public interface TagRepository extends GraphRepository<Tag> {
     @Override
     @RestResource(exported = false)
-    public Tag save(Tag entity);
+    Tag save(Tag entity);
 
     /*******************************************************************************
      ********************************************************************************/
 
     @Override
     @RestResource(exported = false)
-    public Tag findOne(Long id);
+    Tag findOne(Long id);
 
     //@Query("MATCH (n) WHERE urn(n)={0} RETURN n")
     @RestResource(exported = false)
@@ -27,15 +27,15 @@ public interface TagRepository extends GraphRepository<Tag> {
 
     @Override
     @RestResource(exported = false)
-    public List<Tag> findAll();
+    List<Tag> findAll();
 
     @Override
     @RestResource(exported = false)
-    public long count();
+    long count();
 
     @Override
     @RestResource(exported = false)
-    public void delete(Long id);
+    void delete(Long id);
 
 
 }

@@ -225,7 +225,7 @@ public class TagDomainManager {
         if (s == null) {
             throw new RestException("Service Not Found");
         }
-        List<TagDomain> asnwer = tagDomainRepository.findAllByService(s.getUrn());;
+        List<TagDomain> asnwer = tagDomainRepository.findAllByService(s.getUrn());
         return asnwer;
     }
 
