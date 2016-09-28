@@ -5,18 +5,11 @@ package eu.oc.annotations.domain;
  */
 
 public class Annotation {
-
-
     private Long annotationId;
-
     private String assetUrn;
-
     private String tagUrn;
-
     private String datetime;
-
     private String user;
-
     private String application;
     private Double numericValue;
     private String textValue;

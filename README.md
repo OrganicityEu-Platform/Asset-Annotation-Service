@@ -16,6 +16,94 @@ Data Model Entities:
 ![alt text](annotation_model.png "Logo Title Text 1")
 
 
+### Tag
+
+    {
+      "id": 0,
+      "name": "string",
+      "urn": "string"
+    }
+
+### TagDomain
+
+    {
+      "description": "string",
+      "id": 0,
+      "services": [
+        {
+          "description": "string",
+          "id": 0,
+          "urn": "string"
+        }
+      ],
+      "tags": [
+        {
+          "id": 0,
+          "name": "string",
+          "urn": "string"
+        }
+      ],
+      "urn": "string"
+    }
+
+### Service
+
+      {
+        "description": "string",
+        "id": 0,
+        "urn": "string"
+      }
+
+### Application (a.k.a. Experiment)
+    {
+      "description": "string",
+      "id": 0,
+      "tagDomains": [
+        {
+          "description": "string",
+          "id": 0,
+          "services": [
+            {
+              "description": "string",
+              "id": 0,
+              "urn": "string"
+            }
+          ],
+          "tags": [
+            {
+              "id": 0,
+              "name": "string",
+              "urn": "string"
+            }
+          ],
+          "urn": "string"
+        }
+      ],
+      "urn": "string"
+    }
+
+### Asset
+   
+    {
+      "id": 0,   
+      "urn": "string"
+    }
+
+### Annotation
+
+    {
+      "annotationId": 0,
+      "application": "string",
+      "assetUrn": "string",
+      "datetime": "string",
+      "numericValue": 0,
+      "tagUrn": "string",
+      "textValue": "string",
+      "user": "string"
+    }
+
+
+
 ## Annotation Service API
 
 Operations:
