@@ -6,9 +6,9 @@ Organicity Assets. It is possible experimenters to define a set of
 labels under the scope of the experiment and then collect annotation 
 on data assets from the participants. 
  
-Annotation Service Endpoint: http://annotations.organicity.eu:8084/ 
-Annotation Service Swagger UI: http://annotations.organicity.eu:8084/swagger-ui.html 
-Annotation Service Swagger Documentation: https://organicityeu.github.io/api/Annotation.html 
+- Annotation Service Endpoint: http://annotations.organicity.eu:8084/ 
+- Annotation Service Swagger UI: http://annotations.organicity.eu:8084/swagger-ui.html 
+- Annotation Service Swagger Documentation: https://organicityeu.github.io/api/Annotation.html 
  
 ## Data Model
 
