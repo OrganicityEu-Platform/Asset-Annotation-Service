@@ -31,12 +31,12 @@ User Roles:
 - OC Anonymous (OC-AN)
 
 Restricions at Operations (v1):
-- TagDomain Management
+1. TagDomain Management
 + OC-A can CRUD on Service, TagDomain, Tag
 + OC-E, OC-P, OC-AN can R on Service, TagDomain, Tag
-- Application Management
+2. Application Management
 + OC-E can CRUD on Application, TagDomain
-- Annotation
+3. Annotation
 + OC-A can CRUR all Annotations 
 + OC-E can CRUR all annotations of his applications
 + OC-P can CRUD only his annotations
