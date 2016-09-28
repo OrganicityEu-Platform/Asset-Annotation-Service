@@ -59,7 +59,7 @@ public class TagDomainBrowser {
         if (d == null) {
             throw new RestException("TagDomain Not Found");
         }
-        return new ArrayList<Tag>(d.getTags());
+        return new ArrayList<>(d.getTags());
     }
 
     @RequestMapping(value = {"tags/{tagUrn}"}, method = RequestMethod.GET)

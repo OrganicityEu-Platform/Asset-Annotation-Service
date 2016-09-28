@@ -11,8 +11,6 @@ import org.springframework.data.rest.core.annotation.HandleBeforeSave;
 import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 /**
  * Created by Annita on 5/20/2015.
  */

@@ -79,8 +79,7 @@ public class AnnotationController {
                                                                   @RequestParam(value = "tagUrn", required = true) String tagUrn,
                                                                   @RequestParam(value = "user", required = true) String user
     ) {
-        Annotation l = annotationService.getAnnotationForAssetApplicationUserTag(assetUrn, applicationUrn, user, tagUrn);
-        return l;
+        return annotationService.getAnnotationForAssetApplicationUserTag(assetUrn, applicationUrn, user, tagUrn);
     }
 
 
@@ -92,8 +91,7 @@ public class AnnotationController {
                                                         final HttpServletResponse response
     ) {
         response.setHeader("Cache-Control", "no-cache");
-        Annotation l = annotationService.getAnnotationForAssetApplicationUserTagDomain(assetUrn, applicationUrn, user, tagDomain);
-        return l;
+        return annotationService.getAnnotationForAssetApplicationUserTagDomain(assetUrn, applicationUrn, user, tagDomain);
     }
 
 

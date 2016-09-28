@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by etheodor on 31/05/2016.
@@ -72,7 +73,7 @@ public class AnnotationService {
             asset.getTaggings().remove(taggToDelete);
         }
         Long timestamp = System.currentTimeMillis();
-        if (exists == false) {
+        if (!exists) {
             asset.getTaggings().add(tagg);
         }
         tagg.setTimestamp(timestamp);
@@ -95,9 +96,7 @@ public class AnnotationService {
     public List<Annotation> getAllAnnotations() {
         List<Annotation> annotations = new ArrayList<>();
         for (Asset asset : assetRepository.findAll()) {
-            for (Tagging t : asset.getTaggings()) {
-                annotations.add(getAnnotation(t));
-            }
+            annotations.addAll(asset.getTaggings().stream().map(this::getAnnotation).collect(Collectors.toList()));
         }
         return annotations;
     }
@@ -111,10 +110,7 @@ public class AnnotationService {
         if (asset == null) {
             throw new RestException("AssetUrn Unknown");
         }
-        List<Annotation> annotations = new ArrayList<>();
-        for (Tagging t : asset.getTaggings()) {
-            annotations.add(getAnnotation(t));
-        }
+        List<Annotation> annotations = asset.getTaggings().stream().map(this::getAnnotation).collect(Collectors.toList());
         return annotations;
     }
 

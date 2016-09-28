@@ -11,7 +11,7 @@ import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
 import org.springframework.stereotype.Service;
 
 /**
- * Created by Evangelos on 5/20/2015.
+ * Created by etheodor on 5/20/2015.
  */
 
 @Service

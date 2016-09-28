@@ -1,8 +1,5 @@
 package eu.oc.annotations.domain;
 
-/**
- * Created by etheodor on 12/04/2016.
- */
 
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -10,6 +7,9 @@ import org.neo4j.ogm.annotation.Property;
 
 import javax.validation.constraints.NotNull;
 
+/**
+ * Created by etheodor on 12/04/2016.
+ */
 @NodeEntity
 public class Service {
 

@@ -30,8 +30,6 @@ public class CurrentUserDetailsService implements UserDetailsService {
     private UserToUserDTO userDTOConverter;
 
 
-
-
     @Autowired
     public CurrentUserDetailsService(final UserService userService) {
         this.userService = userService;

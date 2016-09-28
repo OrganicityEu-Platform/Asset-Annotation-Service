@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by Evangelos on 29/1/2015.
+ * Created by etheodor on 29/1/2015.
  */
 public final class SpringUserDetails implements UserDetails {
 
@@ -49,7 +49,7 @@ public final class SpringUserDetails implements UserDetails {
     @Override
 
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
+        Set<GrantedAuthority> authorities = new HashSet<>();
 
         Integer userRoleId;
         String userRoleStr;

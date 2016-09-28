@@ -121,7 +121,7 @@ public class TagDomainManager {
         if (t == null) {
             throw new RestException("Tag Not Found");
         }
-        if (d.containsTag(tagUrn) == false) {
+        if (!d.containsTag(tagUrn)) {
             throw new RestException("TagDomain/Tag are not associated");
         }
         //todo check if there are taggings
@@ -225,8 +225,7 @@ public class TagDomainManager {
         if (s == null) {
             throw new RestException("Service Not Found");
         }
-        List<TagDomain> asnwer = tagDomainRepository.findAllByService(s.getUrn());
-        return asnwer;
+        return tagDomainRepository.findAllByService(s.getUrn());
     }
 
     // Application METHODS-----------------------------------------------
@@ -272,8 +271,7 @@ public class TagDomainManager {
         if (a == null) {
             throw new RestException("Application Not Found");
         }
-        List<TagDomain> asnwer = a.getTagDomains();
-        return asnwer;
+        return a.getTagDomains();
     }
 
 
