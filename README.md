@@ -30,17 +30,17 @@ User Roles:
 - OC Participant (OC-P)
 - OC Anonymous (OC-AN)
 
-Restricions at Operations (v1):
+Restricions at Operations:
 1. TagDomain Management
-+ OC-A can CRUD on Service, TagDomain, Tag
-+ OC-E, OC-P, OC-AN can R on Service, TagDomain, Tag
+ + OC-A can CRUD on Service, TagDomain, Tag
+ + OC-E, OC-P, OC-AN can R on Service, TagDomain, Tag
 2. Application Management
-+ OC-E can CRUD on Application, TagDomain
+ + OC-E can CRUD on Application, TagDomain
 3. Annotation
-+ OC-A can CRUR all Annotations 
-+ OC-E can CRUR all annotations of his applications
-+ OC-P can CRUD only his annotations
-+ OC-AN can R only COUNT aggregations of annotations
+ + OC-A can CRUR all Annotations 
+ + OC-E can CRUR all annotations of his applications
+ + OC-P can CRUD only his annotations
+ + OC-AN can R only COUNT aggregations of annotations
 
 
 ## Sample Calls
