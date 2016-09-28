@@ -46,6 +46,33 @@ Data Model Entities:
       "urn": "string"
     }
 
+Example:
+
+    {
+    id: 104,
+    urn: "urn:tagDomain:td1",
+    description: "description",
+    tags: [
+        {
+        id: 106,
+        urn: "urn:tag:t2",
+        name: null
+        },
+        {
+        id: 105,
+        urn: "urn:tag:t1",
+        name: null
+        }
+     ],
+    services: [
+        {
+        id: 107,
+        urn: "urn:service:s1",
+        description: null
+        }
+     ]
+    }
+
 ### Service
 
       {
