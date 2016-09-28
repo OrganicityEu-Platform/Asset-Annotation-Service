@@ -19,28 +19,28 @@ Data Model Entities:
 ## Annotation Service API
 
 Operations:
-1.   TagDomain Management: Service, TagDomain, Tag
-2.  Application Management: Application, TagDomain 
-3.   Annotations: Asset, Tag 
+- TagDomain Management: Service, TagDomain, Tag
+- Application Management: Application, TagDomain 
+- Annotations: Asset, Tag 
 
 
 User Roles:
-1. OC Admin (OC-A)
-2. OC Experimenter (OC-E)
-3. OC Participant (OC-P)
-4. OC Anonymous (OC-AN)
+- OC Admin (OC-A)
+- OC Experimenter (OC-E)
+- OC Participant (OC-P)
+- OC Anonymous (OC-AN)
 
 Restricions at Operations (v1):
-1. TagDomain Management
-- OC-A can CRUD on Service, TagDomain, Tag
-- OC-E, OC-P, OC-AN can R on Service, TagDomain, Tag
-2. Application Management
--OC-E can CRUD on Application, TagDomain
-3. Annotation
-- OC-A can CRUR all Annotations 
-- OC-E can CRUR all annotations of his applications
-- OC-P can CRUD only his annotations
-- OC-AN can R only COUNT aggregations of annotations
+- TagDomain Management
++ OC-A can CRUD on Service, TagDomain, Tag
++ OC-E, OC-P, OC-AN can R on Service, TagDomain, Tag
+- Application Management
++ OC-E can CRUD on Application, TagDomain
+- Annotation
++ OC-A can CRUR all Annotations 
++ OC-E can CRUR all annotations of his applications
++ OC-P can CRUD only his annotations
++ OC-AN can R only COUNT aggregations of annotations
 
 
 ## Sample Calls
