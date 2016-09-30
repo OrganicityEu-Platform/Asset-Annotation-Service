@@ -77,6 +77,7 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
                 .antMatchers("/v2/**").permitAll()
                 .antMatchers("/admin/**").authenticated()
                 .antMatchers("/annotations/**").authenticated()
+                .antMatchers("/**").permitAll()
                 .anyRequest().permitAll();
     }
 
