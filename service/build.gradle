@@ -43,6 +43,7 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-data-rest")
     compile("org.springframework.boot:spring-boot-starter-security")
     compile("org.springframework.boot:spring-boot-starter-web")
+
     compile("org.springframework.data:spring-data-neo4j:4.1.2.RELEASE")
     //compile("org.neo4j:neo4j-ogm-embedded-driver:2.0.1")
     //compile("org.springframework.data:spring-data-neo4j-rest:3.4.4.RELEASE")
@@ -53,8 +54,9 @@ dependencies {
     compile('io.springfox:springfox-swagger-ui:2.4.0')
     compile('org.springframework.boot:spring-boot-starter-test')
     testCompile('com.jayway.jsonpath:json-path:2.2.0')
-    compile group: 'org.keycloak', name: 'keycloak-spring-security-adapter', version: '1.4.0.Final'
-    compile group: 'org.keycloak', name: 'keycloak-spring-security-adapter', version: '2.1.0.Final', ext: 'pom'
+    //compile group: 'org.keycloak', name: 'keycloak-spring-security-adapter', version: '1.4.0.Final'
+    compile group: 'org.keycloak', name: 'keycloak-spring-security-adapter', version: '2.1.0.Final'
+    compile group: 'org.keycloak', name: 'keycloak-tomcat8-adapter', version: '2.1.0.Final'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: '1.4.0.RELEASE'
 }
 
