@@ -1,20 +1,15 @@
 package eu.oc.annotations.config;
 
+import org.keycloak.adapters.AdapterDeploymentContext;
+import org.keycloak.adapters.springsecurity.AdapterDeploymentContextFactoryBean;
 import org.keycloak.adapters.springsecurity.KeycloakSecurityComponents;
 import org.keycloak.adapters.springsecurity.client.KeycloakClientRequestFactory;
-import org.keycloak.adapters.springsecurity.client.KeycloakRestTemplate;
 import org.keycloak.adapters.springsecurity.config.KeycloakWebSecurityConfigurerAdapter;
-import org.keycloak.adapters.springsecurity.filter.KeycloakAuthenticationProcessingFilter;
-import org.keycloak.adapters.springsecurity.filter.KeycloakPreAuthActionsFilter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -38,33 +33,33 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
     public KeycloakClientRequestFactory keycloakClientRequestFactory;
 
     @Bean
-    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public KeycloakRestTemplate keycloakRestTemplate() {
-        return new KeycloakRestTemplate(keycloakClientRequestFactory);
-    }
-
-    @Bean
     @Override
     protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
         return new RegisterSessionAuthenticationStrategy(new SessionRegistryImpl());
     }
 
-    @Bean
+   /* @Bean
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    public KeycloakRestTemplate keycloakRestTemplate() {
+        return new KeycloakRestTemplate(keycloakClientRequestFactory);
+    }*/
+
+
+/*    @Bean
     public FilterRegistrationBean keycloakAuthenticationProcessingFilterRegistrationBean(
             KeycloakAuthenticationProcessingFilter filter) {
         FilterRegistrationBean registrationBean = new FilterRegistrationBean(filter);
         registrationBean.setEnabled(false);
         return registrationBean;
-    }
+    }*/
 
-    @Bean
-    @ConditionalOnClass(SpringBootApplication.class)
+ /*   @Bean
     public FilterRegistrationBean keycloakPreAuthActionsFilterRegistrationBean(
             KeycloakPreAuthActionsFilter filter) {
         FilterRegistrationBean registrationBean = new FilterRegistrationBean(filter);
         registrationBean.setEnabled(false);
         return registrationBean;
-    }
+    }*/
 
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
@@ -77,11 +72,18 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
         http.headers().frameOptions().disable();
 
         http.authorizeRequests()
-                .antMatchers("/**").permitAll()
+                //.antMatchers("/**").permitAll()
                 .antMatchers("/swagger-ui.html").permitAll()
                 .antMatchers("/v2/**").permitAll()
-                //.antMatchers("/**").authenticated()
+                .antMatchers("/**").authenticated()
                 .anyRequest().authenticated();
     }
 
+    @Override
+    protected AdapterDeploymentContext adapterDeploymentContext() throws Exception {
+        AdapterDeploymentContextFactoryBean factoryBean =
+                new AdapterDeploymentContextFactoryBean(new FileSystemResource("keycloak.json"));
+        factoryBean.afterPropertiesSet();
+        return factoryBean.getObject();
+    }
 }

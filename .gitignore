@@ -11,3 +11,4 @@
 /service/build
 /common/build
 /service/STDOUT.log
+/service/keycloak.json
