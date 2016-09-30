@@ -72,11 +72,11 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
         http.headers().frameOptions().disable();
 
         http.authorizeRequests()
-                //.antMatchers("/**").permitAll()
+                .antMatchers("/sso/login*").permitAll()
                 .antMatchers("/swagger-ui.html").permitAll()
                 .antMatchers("/v2/**").permitAll()
                 .antMatchers("/**").authenticated()
-                .anyRequest().authenticated();
+                .anyRequest().permitAll();
     }
 
     @Override
