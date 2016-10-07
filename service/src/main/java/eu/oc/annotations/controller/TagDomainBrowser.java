@@ -1,5 +1,6 @@
 package eu.oc.annotations.controller;
 
+import eu.oc.annotations.config.OrganicityAccount;
 import eu.oc.annotations.domain.Application;
 import eu.oc.annotations.domain.Service;
 import eu.oc.annotations.domain.Tag;
@@ -7,6 +8,7 @@ import eu.oc.annotations.domain.TagDomain;
 import eu.oc.annotations.handlers.RestException;
 import eu.oc.annotations.repositories.*;
 import eu.oc.annotations.service.AnnotationService;
+import eu.oc.annotations.service.OrganicityUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,6 +38,9 @@ public class TagDomainBrowser {
 
     @Autowired
     AnnotationService annotationService;
+
+
+
 
     // TAG DOMAIN METHODS-----------------------------------------------
 

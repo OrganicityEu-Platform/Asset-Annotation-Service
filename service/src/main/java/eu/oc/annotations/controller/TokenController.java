@@ -1,18 +1,19 @@
 package eu.oc.annotations.controller;
 
+import eu.oc.annotations.config.OrganicityAccount;
+import eu.oc.annotations.service.OrganicityUserDetailsService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.Principal;
-
 @RestController
 public class TokenController {
+    @RequestMapping(value = {"", "/", "token"}, method = RequestMethod.GET)
+    public final String token() {
 
-    //Get All tagDomains
-    @RequestMapping(value = {"token"}, method = RequestMethod.GET)
-    public final String domainFindAll(Principal principal) {
-         return principal.getName();
+        OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
+
+        return ou.toString();
     }
 
 

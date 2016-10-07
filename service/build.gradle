@@ -58,6 +58,8 @@ dependencies {
     compile group: 'org.keycloak', name: 'keycloak-spring-security-adapter', version: '2.1.0.Final'
     compile group: 'org.keycloak', name: 'keycloak-tomcat8-adapter', version: '2.1.0.Final'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: '1.4.0.RELEASE'
+    compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.6.0'
+
 }
 
 task wrapper(type: Wrapper) {
