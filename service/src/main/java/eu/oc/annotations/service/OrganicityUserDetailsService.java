@@ -15,15 +15,15 @@ public class OrganicityUserDetailsService {
     public static OrganicityAccount getCurrentUser() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
-            OrganicityAccount oa = new OrganicityAccount((KeycloakPrincipal) authentication.getPrincipal(), authentication.getAuthorities());
             try {
+                OrganicityAccount oa = new OrganicityAccount((KeycloakPrincipal) authentication.getPrincipal(), authentication.getAuthorities());
                 oa.parse();
+                return oa;
             } catch (Exception e) {
                 SecurityContextHolder.getContext().getAuthentication().setAuthenticated(false);
                 SecurityContextHolder.clearContext();
-                throw new AccessDeniedException(e.getMessage());
+                throw new AccessDeniedException("Access Denied::Not proper Organicity Token");
             }
-            return oa;
         }
         return null;
     }

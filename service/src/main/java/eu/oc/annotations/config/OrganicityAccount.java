@@ -4,7 +4,6 @@ import io.jsonwebtoken.Claims;
 import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Arrays;
@@ -41,6 +40,35 @@ public final class OrganicityAccount extends KeycloakPrincipal {
         }
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public Date getExpiration() {
+        return expiration;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public boolean isExperimenter() {
+        for (GrantedAuthority role : roles) {
+            if (role.getAuthority().equals("experimenter")) return true;
+        }
+        return false;
+    }
+
+    public boolean isParticipant() {
+        for (GrantedAuthority role : roles) {
+            if (role.getAuthority().equals("participant")) return true;
+        }
+        return false;
+    }
 
     @Override
     public String toString() {
@@ -49,7 +77,7 @@ public final class OrganicityAccount extends KeycloakPrincipal {
                 ", user='" + user + '\'' +
                 ", expiration=" + expiration +
                 ", email='" + email + '\'' +
-                ", roles=" + (roles!=null?Arrays.toString(roles.toArray()):"") +
+                ", roles=" + (roles != null ? Arrays.toString(roles.toArray()) : "") +
                 '}';
     }
 }
