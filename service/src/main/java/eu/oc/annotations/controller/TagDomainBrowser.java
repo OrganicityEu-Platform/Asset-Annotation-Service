@@ -101,6 +101,7 @@ public class TagDomainBrowser {
     }
 
 
+
     // Application Methods----------------------------------------------------------------------------------------------
     @RequestMapping(value = {"applications"}, method = RequestMethod.GET)
     public final List<Application> applications() {
@@ -124,6 +125,7 @@ public class TagDomainBrowser {
         }
         return a.getTagDomains();
     }
+
 
 
 }

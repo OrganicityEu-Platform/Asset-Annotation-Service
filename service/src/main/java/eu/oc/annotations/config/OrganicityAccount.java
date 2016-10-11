@@ -1,14 +1,18 @@
 package eu.oc.annotations.config;
 
+import eu.oc.annotations.domain.Application;
+import eu.oc.annotations.domain.experiment.Experiment;
+import eu.oc.annotations.handlers.RestException;
+import eu.oc.annotations.repositories.ApplicationRepository;
+import eu.oc.annotations.service.ExperimentationService;
 import io.jsonwebtoken.Claims;
 import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 
 /**
  * Created by etheodor on 29/1/2015.
@@ -20,6 +24,11 @@ public final class OrganicityAccount extends KeycloakPrincipal {
     Date expiration;
     String email;
     Collection<? extends GrantedAuthority> roles;
+    HashMap<String, Experiment> experiments = new HashMap<>();
+
+    @Autowired
+    ApplicationRepository applicationRepository;
+
 
     public OrganicityAccount(KeycloakPrincipal k, Collection<? extends GrantedAuthority> authorities) {
         super(k.getName(), k.getKeycloakSecurityContext());
@@ -37,6 +46,12 @@ public final class OrganicityAccount extends KeycloakPrincipal {
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
             throw e;
+        }
+        if (isExperimenter()) {
+            Experiment[] exps = ExperimentationService.getExperiments(this.getUser());
+            for (Experiment e : exps) {
+                experiments.put(e.getExperimentId(), e);
+            }
         }
     }
 
@@ -63,11 +78,40 @@ public final class OrganicityAccount extends KeycloakPrincipal {
         return false;
     }
 
-    public boolean isParticipant() {
+    public boolean isAdministrator() {
         for (GrantedAuthority role : roles) {
-            if (role.getAuthority().equals("participant")) return true;
+            if (role.getAuthority().equals("administrator")) return true;
         }
         return false;
+    }
+
+    public boolean isParticipant(String experimentId) {
+        if (experimentId == null)
+            return false;
+        else return true;
+    }
+
+    public boolean ownsExperiment(String experimentId) {
+        if (isExperimenter() == false) return false;
+        return experiments.containsKey(experimentId);
+    }
+
+    public boolean isTheOnlyExperimnterUsingTagDomain(String tagDomainUrn) {
+        if (isExperimenter()) {
+            List<Application> applications = applicationRepository.findApplicationsUsingTagDomain(tagDomainUrn);
+            for (Application app : applications) {
+                if (ownsExperiment(app.getUrn()) == false) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public Set<String> getExperiments() {
+        return experiments.keySet();
     }
 
     @Override
@@ -78,6 +122,7 @@ public final class OrganicityAccount extends KeycloakPrincipal {
                 ", expiration=" + expiration +
                 ", email='" + email + '\'' +
                 ", roles=" + (roles != null ? Arrays.toString(roles.toArray()) : "") +
+                ", experiments='" + Arrays.toString(experiments.keySet().toArray()) + '\'' +
                 '}';
     }
 }

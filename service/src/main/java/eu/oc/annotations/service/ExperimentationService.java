@@ -10,15 +10,12 @@ import eu.oc.annotations.domain.experiment.Experiment;
 import org.apache.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-/**
- * Created by etheodor on 31/05/2016.
- */
-@Service
+
 public class ExperimentationService {
-    final String url = "http://experimenters.organicity.eu:8081/experiments-full/";
+    final static String url = "http://experimenters.organicity.eu:8081/experiments-full/";
 
 
-    public Experiment[] getExperiment(String experimenter) {
+    public static Experiment[] getExperiments(String experimenter) {
 
         HttpResponse<JsonNode> jsonResponse = null;
         try {

@@ -1,5 +1,6 @@
 package eu.oc.annotations.controller;
 
+import eu.oc.annotations.config.OrganicityAccount;
 import eu.oc.annotations.domain.Application;
 import eu.oc.annotations.domain.Service;
 import eu.oc.annotations.domain.Tag;
@@ -9,6 +10,7 @@ import eu.oc.annotations.repositories.ApplicationRepository;
 import eu.oc.annotations.repositories.ServiceRepository;
 import eu.oc.annotations.repositories.TagDomainRepository;
 import eu.oc.annotations.repositories.TagRepository;
+import eu.oc.annotations.service.OrganicityUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,6 +43,10 @@ public class TagDomainManager {
         if (a != null) { //tagDomain Create
             throw new RestException("TagDomain Exception: duplicate urn");
         }
+        OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
+        if (ou.isAdministrator() == false && ou.isExperimenter() == false) {
+            throw new RestException("Not Authorized Access");
+        }
         domain.setId(null);
         try {
             domain = tagDomainRepository.save(domain);
@@ -57,6 +63,13 @@ public class TagDomainManager {
         TagDomain d = tagDomainRepository.findByUrn(tagDomainUrn);
         if (d == null) {
             throw new RestException("TagDomain Not Found");
+        }
+        OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
+        if (ou.isAdministrator() == false && ou.isExperimenter() == false) {
+            throw new RestException("Not Authorized Access");
+        }
+        if (ou.isTheOnlyExperimnterUsingTagDomain(tagDomainUrn)) {
+            throw new RestException("TagDomain is used also from other experiments. Not possible to delete/update");
         }
         d.setDescription(domain.getDescription());
         try {
@@ -75,8 +88,15 @@ public class TagDomainManager {
         if (d == null) {
             throw new RestException("TagDomain Not Found");
         }
-        if (d.getTags()!=null && d.getTags().size() > 0) {
+        if (d.getTags() != null && d.getTags().size() > 0) {
             throw new RestException("TagDomain is not empty");
+        }
+        OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
+        if (ou.isAdministrator() == false && ou.isExperimenter() == false) {
+            throw new RestException("Not Authorized Access");
+        }
+        if (ou.isTheOnlyExperimnterUsingTagDomain(tagDomainUrn)) {
+            throw new RestException("TagDomain is used also from other experiments. Not possible to delete/update");
         }
         try {
             tagDomainRepository.delete(d);
@@ -89,6 +109,7 @@ public class TagDomainManager {
 
     // TAG METHODS-----------------------------------------------------------------------------------------------------
 
+    //Add tag to domain
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/tags"}, method = RequestMethod.POST)
     public final Tag domainCreateTag(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody Tag tag) {
         TagDomain d = tagDomainRepository.findByUrn(tagDomainUrn);
@@ -99,6 +120,14 @@ public class TagDomainManager {
         if (a != null) {
             throw new RestException("Tag:Duplicate Urn");
         }
+        OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
+        if (ou.isAdministrator() == false && ou.isExperimenter() == false) {
+            throw new RestException("Not Authorized Access");
+        }
+        if (ou.isTheOnlyExperimnterUsingTagDomain(tagDomainUrn)) {
+            throw new RestException("TagDomain is used also from other experiments. Not possible to delete/update");
+        }
+
         tag.setId(null);
         d.getTags().add(tag);
         try {
@@ -110,6 +139,7 @@ public class TagDomainManager {
         return tag;
     }
 
+    //delete Tag from TagDomain
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/tags"}, method = RequestMethod.DELETE)
     public final void domainRemoveTag(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody String tagUrn) {
         TagDomain d = tagDomainRepository.findByUrn(tagDomainUrn);
@@ -124,7 +154,13 @@ public class TagDomainManager {
         if (!d.containsTag(tagUrn)) {
             throw new RestException("TagDomain/Tag are not associated");
         }
-        //todo check if there are taggings
+        OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
+        if (ou.isAdministrator() == false && ou.isExperimenter() == false) {
+            throw new RestException("Not Authorized Access");
+        }
+        if (ou.isTheOnlyExperimnterUsingTagDomain(tagDomainUrn)) {
+            throw new RestException("TagDomain is used also from other experiments. Not possible to delete/update");
+        }
         try {
             tagRepository.delete(t.getId());
         } catch (Exception e) {
@@ -133,6 +169,7 @@ public class TagDomainManager {
         }
     }
 
+    //get Services using this TagDomain
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/services"}, method = RequestMethod.GET)
     public final List<Service> tagDomainGetServices(@PathVariable("tagDomainUrn") String tagDomainUrn) {
         TagDomain a = tagDomainRepository.findByUrn(tagDomainUrn);
@@ -142,8 +179,9 @@ public class TagDomainManager {
         return a.getServices();
     }
 
+    //Associate TagDomain with Service
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/services"}, method = RequestMethod.POST)
-    public final TagDomain serviceAddTagDomains(@RequestParam(value="serviceUrn", required=true) String serviceUrn, @PathVariable("tagDomainUrn") String tagDomainUrn) {
+    public final TagDomain serviceAddTagDomains(@RequestParam(value = "serviceUrn", required = true) String serviceUrn, @PathVariable("tagDomainUrn") String tagDomainUrn) {
         Service s = serviceRepository.findByUrn(serviceUrn);
         if (s == null) {
             throw new RestException("Service Not Found");
@@ -151,6 +189,10 @@ public class TagDomainManager {
         TagDomain a = tagDomainRepository.findByUrn(tagDomainUrn);
         if (a == null) {
             throw new RestException("TagDomain Not Found");
+        }
+        OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
+        if (ou.isAdministrator() == false && ou.isExperimenter() == false) {
+            throw new RestException("Not Authorized Access");
         }
         try {
             a.getServices().add(s);
@@ -161,8 +203,9 @@ public class TagDomainManager {
         }
     }
 
+    //Disassociate TagDomain with Service
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/services"}, method = RequestMethod.DELETE)
-    public final void serviceRemoveTagDomains(@RequestParam(value="serviceUrn", required=true) String serviceUrn, @PathVariable("tagDomainUrn") String tagDomainUrn) {
+    public final void serviceRemoveTagDomains(@RequestParam(value = "serviceUrn", required = true) String serviceUrn, @PathVariable("tagDomainUrn") String tagDomainUrn) {
         Service s = serviceRepository.findByUrn(serviceUrn);
         if (s == null) {
             throw new RestException("Service Not Found");
@@ -171,7 +214,10 @@ public class TagDomainManager {
         if (a == null) {
             throw new RestException("TagDomain Not Found");
         }
-
+        OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
+        if (ou.isAdministrator() == false && ou.isExperimenter() == false) {
+            throw new RestException("Not Authorized Access");
+        }
         try {
             a.getServices().remove(s);
             tagDomainRepository.save(a);
@@ -194,6 +240,10 @@ public class TagDomainManager {
         if (a != null) { //tagDomain Create
             throw new RestException("Service Exception: duplicate urn");
         }
+        OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
+        if (ou.isAdministrator() == false && ou.isExperimenter() == false) {
+            throw new RestException("Not Authorized Access");
+        }
         service.setId(null);
         try {
             service = serviceRepository.save(service);
@@ -211,6 +261,10 @@ public class TagDomainManager {
         if (s == null) {
             throw new RestException("Service Not Found");
         }
+        OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
+        if (ou.isAdministrator() == false && ou.isExperimenter() == false) {
+            throw new RestException("Not Authorized Access");
+        }
         try {
             serviceRepository.delete(s);
         } catch (Exception e) {
@@ -219,18 +273,11 @@ public class TagDomainManager {
         }
     }
 
-    @RequestMapping(value = {"admin/services/{serviceUrn}/tagDomains"}, method = RequestMethod.GET) //todo
-    public final List<TagDomain> serviceGetTagDomains(@PathVariable("serviceUrn") String serviceUrn) {
-        Service s = serviceRepository.findByUrn(serviceUrn);
-        if (s == null) {
-            throw new RestException("Service Not Found");
-        }
-        return tagDomainRepository.findAllByService(s.getUrn());
-    }
+
 
     // Application METHODS-----------------------------------------------
 
-    //Create Service
+    //Create Experiment
     @RequestMapping(value = {"admin/applications"}, method = RequestMethod.POST)
     public final Application applicationsCreate(@RequestBody Application application) {
         if (application.getId() != null) {
@@ -239,6 +286,10 @@ public class TagDomainManager {
         Application a = applicationRepository.findByUrn(application.getUrn());
         if (a != null) { //tagDomain Create
             throw new RestException("Application Exception: duplicate urn");
+        }
+        OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
+        if (ou.isAdministrator() == false && ou.isExperimenter() == false) {
+            throw new RestException("Not Authorized Access");
         }
         application.setId(null);
         try {
@@ -257,6 +308,14 @@ public class TagDomainManager {
         if (a == null) {
             throw new RestException("Application Not Found");
         }
+        OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
+        if (ou.isAdministrator() == false && ou.isExperimenter() == false) {
+            throw new RestException("Not Authorized Access");
+        }
+        if (ou.ownsExperiment(applicationUrn)) {
+            throw new RestException("Experimenter is not owning experiment");
+        }
+        //todo extra checks (e.g. existing taggings etc)
         try {
             applicationRepository.delete(a);
         } catch (Exception e) {
@@ -271,12 +330,19 @@ public class TagDomainManager {
         if (a == null) {
             throw new RestException("Application Not Found");
         }
+        OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
+        if (ou.isAdministrator() == false && ou.isExperimenter() == false) {
+            throw new RestException("Not Authorized Access");
+        }
+        if (ou.ownsExperiment(applicationUrn)) {
+            throw new RestException("Experimenter is not owning experiment");
+        }
         return a.getTagDomains();
     }
 
 
     @RequestMapping(value = {"admin/applications/{applicationUrn}/tagDomains"}, method = RequestMethod.POST)
-    public final Application applicationAddTagDomains(@RequestParam(value="tagDomainUrn", required=true) String tagDomainUrn, @PathVariable("applicationUrn") String applicationUrn) {
+    public final Application applicationAddTagDomains(@RequestParam(value = "tagDomainUrn", required = true) String tagDomainUrn, @PathVariable("applicationUrn") String applicationUrn) {
         Application a = applicationRepository.findByUrn(applicationUrn);
         if (a == null) {
             throw new RestException("Application Not Found");
@@ -285,9 +351,17 @@ public class TagDomainManager {
         if (td == null) {
             throw new RestException("TagDomain Not Found");
         }
+        OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
+        if (ou.isAdministrator() == false && ou.isExperimenter() == false) {
+            throw new RestException("Not Authorized Access");
+        }
+        if (ou.ownsExperiment(applicationUrn)) {
+            throw new RestException("Experimenter is not owning experiment");
+        }
+
         try {
             a.getTagDomains().add(td);
-            a=applicationRepository.save(a);
+            a = applicationRepository.save(a);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RestException(e.getMessage());
@@ -296,7 +370,7 @@ public class TagDomainManager {
     }
 
     @RequestMapping(value = {"admin/applications/{applicationUrn}/tagDomains"}, method = RequestMethod.DELETE)
-    public final void applicationRemoveTagDomains(@RequestParam(value="tagDomainUrn", required=true) String tagDomainUrn, @PathVariable("applicationUrn") String applicationUrn) {
+    public final void applicationRemoveTagDomains(@RequestParam(value = "tagDomainUrn", required = true) String tagDomainUrn, @PathVariable("applicationUrn") String applicationUrn) {
         Application a = applicationRepository.findByUrn(applicationUrn);
         if (a == null) {
             throw new RestException("Application Not Found");
@@ -305,7 +379,13 @@ public class TagDomainManager {
         if (td == null) {
             throw new RestException("TagDomain Not Found");
         }
-
+        OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
+        if (ou.isAdministrator() == false && ou.isExperimenter() == false) {
+            throw new RestException("Not Authorized Access");
+        }
+        if (ou.ownsExperiment(applicationUrn)) {
+            throw new RestException("Experimenter is not owning experiment");
+        }
         try {
             a.getTagDomains().remove(td);
             applicationRepository.save(a);
@@ -314,8 +394,6 @@ public class TagDomainManager {
             throw new RestException(e.getMessage());
         }
     }
-
-
 
 
 }

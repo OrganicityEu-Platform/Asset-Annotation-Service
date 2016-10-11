@@ -57,7 +57,6 @@ public class TagDomain {
         this.description = description;
     }
 
-
     public List<Tag> getTags() {
         if (tags == null) tags = new ArrayList<>();
         return tags;
