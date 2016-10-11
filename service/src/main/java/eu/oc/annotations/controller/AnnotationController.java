@@ -1,8 +1,9 @@
 package eu.oc.annotations.controller;
 
 import eu.oc.annotations.domain.Annotation;
+import eu.oc.annotations.domain.Asset;
 import eu.oc.annotations.handlers.RestException;
-import eu.oc.annotations.repositories.*;
+import eu.oc.annotations.repositories.AssetRepository;
 import eu.oc.annotations.service.AnnotationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -15,22 +16,10 @@ import java.util.List;
 public class AnnotationController {
 
     @Autowired
-    TagDomainRepository tagDomainRepository;
-
-    @Autowired
-    TagRepository tagRepository;
-
-    @Autowired
-    ServiceRepository serviceRepository;
+    AnnotationService annotationService;
 
     @Autowired
     AssetRepository assetRepository;
-
-    @Autowired
-    ApplicationRepository applicationRepository;
-
-    @Autowired
-    AnnotationService annotationService;
 
     // Annotation Tagging METHODS-----------------------------------------------
     //Create Tagging
@@ -60,11 +49,6 @@ public class AnnotationController {
     }
 
 
-//    //Update Tagging
-//    @RequestMapping(value = {"annotations/{assetUrn}"}, method = RequestMethod.PATCH)
-//    public final Annotation updateAnnotation(@PathVariable("assetUrn") String assetUrn, @RequestParam(value="annotation", required=true) Annotation annotation) {
-//        throw new RestException("Not Implemented yet!");
-//    }
 
     //Delete Tagging
     @RequestMapping(value = {"annotations/{assetUrn}"}, method = RequestMethod.DELETE)
@@ -101,5 +85,12 @@ public class AnnotationController {
         annotationService.deleteAssetsAndAnnotations(assetUrn);
 
     }
+
+    @RequestMapping(value = {"annotations/all"}, method = RequestMethod.GET)
+    public final List<Asset> getAnnotations(final HttpServletResponse response) { //todo show all public Annotations of asset add paging and sorting
+        response.setHeader("Cache-Control", "no-cache");
+        return assetRepository.findAll();
+    }
+
 
 }

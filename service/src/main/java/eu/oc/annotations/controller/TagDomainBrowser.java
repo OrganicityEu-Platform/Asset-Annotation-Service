@@ -40,13 +40,12 @@ public class TagDomainBrowser {
     AnnotationService annotationService;
 
 
-
-
     // TAG DOMAIN METHODS-----------------------------------------------
 
     //Get All tagDomains
     @RequestMapping(value = {"tagDomains"}, method = RequestMethod.GET)
     public final List<TagDomain> domainFindAll() {
+
         return tagDomainRepository.findAll();
     }
 
@@ -101,7 +100,6 @@ public class TagDomainBrowser {
     }
 
 
-
     // Application Methods----------------------------------------------------------------------------------------------
     @RequestMapping(value = {"applications"}, method = RequestMethod.GET)
     public final List<Application> applications() {
@@ -125,7 +123,6 @@ public class TagDomainBrowser {
         }
         return a.getTagDomains();
     }
-
 
 
 }

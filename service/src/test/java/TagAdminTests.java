@@ -8,7 +8,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -24,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Created by etheodor on 18/05/2016.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = eu.oc.annotations.Application.class)
+//@SpringApplicationConfiguration(classes = eu.oc.annotations.Application.class)
 @WebIntegrationTest
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TagAdminTests {

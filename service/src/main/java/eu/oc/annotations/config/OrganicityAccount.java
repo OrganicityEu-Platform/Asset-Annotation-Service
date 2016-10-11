@@ -38,7 +38,7 @@ public final class OrganicityAccount extends KeycloakPrincipal {
     public void parse() throws Exception {
         try {
             JwtParser fwtparser = new JwtParser();
-            Claims claims = fwtparser.parseJWT(super.getKeycloakSecurityContext().getIdTokenString());
+            Claims claims = fwtparser.parseJWT(super.getKeycloakSecurityContext().getTokenString());
             id = claims.getId();
             user = claims.getSubject();
             expiration = claims.getExpiration();
