@@ -18,7 +18,7 @@ import java.util.Arrays;
 public class OrganicityProfileController {
 
 
-    @RequestMapping(value = {"OrganicityToken"}, method = RequestMethod.GET)
+    @RequestMapping(value = {"OrganicityProfile"}, method = RequestMethod.GET)
     public final String profile() {
         JSONObject jsonObject = new JSONObject();
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
