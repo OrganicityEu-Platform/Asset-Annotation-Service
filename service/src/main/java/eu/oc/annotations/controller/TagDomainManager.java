@@ -301,7 +301,7 @@ public class TagDomainManager {
         return application;
     }
 
-    //Delete Service
+    //Delete Application
     @RequestMapping(value = {"admin/applications/{applicationUrn}"}, method = RequestMethod.DELETE)
     public final void applicationDelete(@PathVariable("applicationUrn") String applicationUrn) {
         Application a = applicationRepository.findByUrn(applicationUrn);
@@ -324,6 +324,7 @@ public class TagDomainManager {
         }
     }
 
+    //Show all available tag domains for application/experiment
     @RequestMapping(value = {"admin/applications/{applicationUrn}/tagDomains"}, method = RequestMethod.GET) //todo
     public final List<TagDomain> applicationGetTagDomains(@PathVariable("applicationUrn") String applicationUrn) {
         Application a = applicationRepository.findByUrn(applicationUrn);

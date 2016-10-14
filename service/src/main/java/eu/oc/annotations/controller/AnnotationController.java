@@ -1,10 +1,12 @@
 package eu.oc.annotations.controller;
 
+import eu.oc.annotations.config.OrganicityAccount;
 import eu.oc.annotations.domain.Annotation;
 import eu.oc.annotations.domain.Asset;
 import eu.oc.annotations.handlers.RestException;
 import eu.oc.annotations.repositories.AssetRepository;
 import eu.oc.annotations.service.AnnotationService;
+import eu.oc.annotations.service.OrganicityUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,7 +33,9 @@ public class AnnotationController {
         if (annotation.getUser() == null) throw new RestException("UserIdentification should not be null");
         if (annotation.getTagUrn() == null) throw new RestException("TagUrn should not be null");
         if (annotation.getApplication() == null) throw new RestException("Application should not be null");
-        //todo validate assetUrn
+        OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
+        annotation.setUser(ou.getUser());
+
         return annotationService.createOrUpdateTagging(annotation);
     }
 

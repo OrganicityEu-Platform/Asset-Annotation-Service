@@ -8,7 +8,6 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import eu.oc.annotations.domain.experiment.Experiment;
 import org.apache.http.HttpStatus;
-import org.springframework.stereotype.Service;
 
 
 public class ExperimentationService {
@@ -24,14 +23,14 @@ public class ExperimentationService {
                     .header("Content-Type", "application/json")
                     .asObject(JsonNode.class);
             if (jsonResponse.getStatus() == HttpStatus.SC_OK) {
-                Experiment[] e=null;
+                Experiment[] e = null;
                 ObjectMapper mapper = new ObjectMapper();
                 try {
-                    e= (new Gson()).fromJson(jsonResponse.getBody().toString(), Experiment[].class);
+                    e = (new Gson()).fromJson(jsonResponse.getBody().toString(), Experiment[].class);
                 } catch (Exception e1) {
                     e1.printStackTrace();
                 }
-                return  e;
+                return e;
             }
         } catch (UnirestException e) {
             e.printStackTrace();
