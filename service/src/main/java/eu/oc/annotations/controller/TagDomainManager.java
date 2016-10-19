@@ -173,7 +173,7 @@ public class TagDomainManager {
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/tags"}, method = RequestMethod.DELETE)
     public final void domainRemoveTag(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody String tagUrn) {
 
-        LOGGER.info("DELETE domainRemoveTag");
+        LOGGER.info("DELETE domainRemoveTag " + tagUrn);
 
         TagDomain d = tagDomainRepository.findByUrn(tagDomainUrn);
         if (d == null) {
@@ -197,6 +197,9 @@ public class TagDomainManager {
         }
         try {
             tagRepository.delete(t.getId());
+            TagDomain domain = tagDomainRepository.findByUrn(tagDomainUrn);
+            domain.getTags().remove(t);
+            tagDomainRepository.save(domain);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RestException(e.getMessage());
