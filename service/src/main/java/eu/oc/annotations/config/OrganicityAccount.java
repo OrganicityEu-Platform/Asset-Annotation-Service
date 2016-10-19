@@ -99,8 +99,11 @@ public final class OrganicityAccount extends KeycloakPrincipal {
     public boolean isTheOnlyExperimnterUsingTagDomain(String tagDomainUrn) {
         if (isExperimenter()) {
             List<Application> applications = applicationRepository.findApplicationsUsingTagDomain(tagDomainUrn);
+            if (applications == null) {
+                return true;
+            }
             for (Application app : applications) {
-                if (ownsExperiment(app.getUrn()) == false) {
+                if (!ownsExperiment(app.getUrn())) {
                     return false;
                 }
             }
