@@ -155,8 +155,9 @@ public class TagDomainManager {
         }
 
         tag.setId(null);
-        d.getTags().add(tag);
         try {
+            tag = tagRepository.save(tag);
+            d.getTags().add(tag);
             tagDomainRepository.save(d);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
