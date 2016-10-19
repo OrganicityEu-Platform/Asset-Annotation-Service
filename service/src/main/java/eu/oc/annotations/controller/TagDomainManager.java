@@ -82,7 +82,7 @@ public class TagDomainManager {
             LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
-        if (ou.isTheOnlyExperimnterUsingTagDomain(tagDomainUrn)) {
+        if (ou.isTheOnlyExperimnterUsingTagDomain(applicationRepository.findApplicationsUsingTagDomain(tagDomainUrn))) {
             LOGGER.error("TagDomain is used also from other experiments. Not possible to delete/update");
             throw new RestException("TagDomain is used also from other experiments. Not possible to delete/update");
         }
@@ -114,7 +114,7 @@ public class TagDomainManager {
             LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
-        if (ou.isTheOnlyExperimnterUsingTagDomain(tagDomainUrn)) {
+        if (ou.isTheOnlyExperimnterUsingTagDomain(applicationRepository.findApplicationsUsingTagDomain(tagDomainUrn))) {
             throw new RestException("TagDomain is used also from other experiments. Not possible to delete/update");
         }
         try {
@@ -149,7 +149,7 @@ public class TagDomainManager {
             LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
-        if (ou.isTheOnlyExperimnterUsingTagDomain(tagDomainUrn)) {
+        if (ou.isTheOnlyExperimnterUsingTagDomain(applicationRepository.findApplicationsUsingTagDomain(tagDomainUrn))) {
             LOGGER.error("TagDomain is used also from other experiments. Not possible to delete/update");
             throw new RestException("TagDomain is used also from other experiments. Not possible to delete/update");
         }
@@ -189,7 +189,7 @@ public class TagDomainManager {
             LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
-        if (ou.isTheOnlyExperimnterUsingTagDomain(tagDomainUrn)) {
+        if (ou.isTheOnlyExperimnterUsingTagDomain(applicationRepository.findApplicationsUsingTagDomain(tagDomainUrn))) {
             throw new RestException("TagDomain is used also from other experiments. Not possible to delete/update");
         }
         try {

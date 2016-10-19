@@ -2,7 +2,6 @@ package eu.oc.annotations.config;
 
 import eu.oc.annotations.domain.Application;
 import eu.oc.annotations.domain.experiment.Experiment;
-import eu.oc.annotations.handlers.RestException;
 import eu.oc.annotations.repositories.ApplicationRepository;
 import eu.oc.annotations.service.ExperimentationService;
 import io.jsonwebtoken.Claims;
@@ -96,21 +95,16 @@ public final class OrganicityAccount extends KeycloakPrincipal {
         return experiments.containsKey(experimentId);
     }
 
-    public boolean isTheOnlyExperimnterUsingTagDomain(String tagDomainUrn) {
-        if (isExperimenter()) {
-            List<Application> applications = applicationRepository.findApplicationsUsingTagDomain(tagDomainUrn);
-            if (applications == null) {
-                return true;
-            }
-            for (Application app : applications) {
-                if (!ownsExperiment(app.getUrn())) {
-                    return false;
-                }
-            }
+    public boolean isTheOnlyExperimnterUsingTagDomain(final Collection<Application> applications) {
+        if (applications == null || applications.isEmpty()) {
             return true;
-        } else {
-            return false;
         }
+        for (Application app : applications) {
+            if (!ownsExperiment(app.getUrn())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public Set<String> getExperiments() {
