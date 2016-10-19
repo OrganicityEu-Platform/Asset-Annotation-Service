@@ -43,21 +43,24 @@ public class TagDomainManager {
         LOGGER.info("POST domainCreate");
 
         if (domain.getId() != null) {
+            LOGGER.error("TagDomain Exception: TagDomain.id has to be null");
             throw new RestException("TagDomain Exception: TagDomain.id has to be null");
         }
         TagDomain a = tagDomainRepository.findByUrn(domain.getUrn());
         if (a != null) { //tagDomain Create
+            LOGGER.error("TagDomain Exception: duplicate urn");
             throw new RestException("TagDomain Exception: duplicate urn");
         }
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (!ou.isAdministrator() && !ou.isExperimenter()) {
+            LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
         domain.setId(null);
         try {
             domain = tagDomainRepository.save(domain);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
             throw new RestException(e.getMessage());
         }
         return domain;
@@ -71,20 +74,23 @@ public class TagDomainManager {
 
         TagDomain d = tagDomainRepository.findByUrn(tagDomainUrn);
         if (d == null) {
+            LOGGER.error("TagDomain Not Found");
             throw new RestException("TagDomain Not Found");
         }
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (!ou.isAdministrator() && !ou.isExperimenter()) {
+            LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
         if (ou.isTheOnlyExperimnterUsingTagDomain(tagDomainUrn)) {
+            LOGGER.error("TagDomain is used also from other experiments. Not possible to delete/update");
             throw new RestException("TagDomain is used also from other experiments. Not possible to delete/update");
         }
         d.setDescription(domain.getDescription());
         try {
             domain = tagDomainRepository.save(d);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
             throw new RestException(e.getMessage());
         }
         return domain;
@@ -105,6 +111,7 @@ public class TagDomainManager {
         }
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (!ou.isAdministrator() && !ou.isExperimenter()) {
+            LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
         if (ou.isTheOnlyExperimnterUsingTagDomain(tagDomainUrn)) {
@@ -137,6 +144,7 @@ public class TagDomainManager {
         }
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (!ou.isAdministrator() && !ou.isExperimenter()) {
+            LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
         if (ou.isTheOnlyExperimnterUsingTagDomain(tagDomainUrn)) {
@@ -174,6 +182,7 @@ public class TagDomainManager {
         }
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (!ou.isAdministrator() && !ou.isExperimenter()) {
+            LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
         if (ou.isTheOnlyExperimnterUsingTagDomain(tagDomainUrn)) {
@@ -216,6 +225,7 @@ public class TagDomainManager {
         }
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (!ou.isAdministrator() && !ou.isExperimenter()) {
+            LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
         try {
@@ -243,6 +253,7 @@ public class TagDomainManager {
         }
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (!ou.isAdministrator() && !ou.isExperimenter()) {
+            LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
         try {
@@ -272,6 +283,7 @@ public class TagDomainManager {
         }
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (!ou.isAdministrator() && !ou.isExperimenter()) {
+            LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
         service.setId(null);
@@ -296,6 +308,7 @@ public class TagDomainManager {
         }
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (!ou.isAdministrator() && !ou.isExperimenter()) {
+            LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
         try {
@@ -305,7 +318,6 @@ public class TagDomainManager {
             throw new RestException(e.getMessage());
         }
     }
-
 
 
     // Application METHODS-----------------------------------------------
@@ -325,6 +337,7 @@ public class TagDomainManager {
         }
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (!ou.isAdministrator() && !ou.isExperimenter()) {
+            LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
         application.setId(null);
@@ -349,6 +362,7 @@ public class TagDomainManager {
         }
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (!ou.isAdministrator() && !ou.isExperimenter()) {
+            LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
         if (ou.ownsExperiment(applicationUrn)) {
@@ -375,6 +389,7 @@ public class TagDomainManager {
         }
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (!ou.isAdministrator() && !ou.isExperimenter()) {
+            LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
         if (ou.ownsExperiment(applicationUrn)) {
@@ -399,6 +414,7 @@ public class TagDomainManager {
         }
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (!ou.isAdministrator() && !ou.isExperimenter()) {
+            LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
         if (ou.ownsExperiment(applicationUrn)) {
@@ -430,6 +446,7 @@ public class TagDomainManager {
         }
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (!ou.isAdministrator() && !ou.isExperimenter()) {
+            LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
         if (ou.ownsExperiment(applicationUrn)) {
