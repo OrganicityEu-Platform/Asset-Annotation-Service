@@ -64,6 +64,7 @@ dependencies {
 
     compile group: 'com.google.code.gson', name: 'gson', version: '2.7'
 
+    compile("com.mixpanel:mixpanel-java:1.4.4")
 }
 
 task wrapper(type: Wrapper) {
