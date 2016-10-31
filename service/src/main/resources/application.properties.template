@@ -1,0 +1,4 @@
+server.port= 8084
+server.contextPath=/
+neo4j.httpPath=http://neo4j:neo4j@localhost:7474/
+mixpanel.token=
