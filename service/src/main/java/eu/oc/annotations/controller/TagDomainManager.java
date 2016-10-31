@@ -10,12 +10,14 @@ import eu.oc.annotations.repositories.ApplicationRepository;
 import eu.oc.annotations.repositories.ServiceRepository;
 import eu.oc.annotations.repositories.TagDomainRepository;
 import eu.oc.annotations.repositories.TagRepository;
+import eu.oc.annotations.service.KPIService;
 import eu.oc.annotations.service.OrganicityUserDetailsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -34,11 +36,15 @@ public class TagDomainManager {
     @Autowired
     ApplicationRepository applicationRepository;
 
+    @Autowired
+    KPIService kpiService;
+
     // TAG DOMAIN METHODS--------------------------------------------------------------------------------
 
     //Create tagDomain
     @RequestMapping(value = {"admin/tagDomains"}, method = RequestMethod.POST)
-    public final TagDomain domainCreate(@RequestBody TagDomain domain) {
+    public final TagDomain domainCreate(@RequestBody TagDomain domain, Principal principal) {
+        kpiService.addEvent(principal, "api:admin/tagDomains", "tagDomainUrn", domain.getUrn());
 
         LOGGER.info("POST domainCreate");
 
@@ -68,7 +74,9 @@ public class TagDomainManager {
 
     //Update tagDomain
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}"}, method = RequestMethod.POST)
-    public final TagDomain domainUpdate(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody TagDomain domain) {
+    public final TagDomain domainUpdate(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody TagDomain domain
+            , Principal principal) {
+        kpiService.addEvent(principal, "api:admin/tagDomains/update", "tagDomainUrn", domain.getUrn());
 
         LOGGER.info("POST domainUpdate");
 
@@ -98,7 +106,8 @@ public class TagDomainManager {
 
     //Delete tagDomain
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}"}, method = RequestMethod.DELETE)
-    public final void domainDelete(@PathVariable("tagDomainUrn") String tagDomainUrn) {
+    public final void domainDelete(@PathVariable("tagDomainUrn") String tagDomainUrn, Principal principal) {
+        kpiService.addEvent(principal, "api:admin/tagDomains/delete", "tagDomainUrn", tagDomainUrn);
 
         LOGGER.info("DELETE domainDelete");
 
@@ -133,7 +142,12 @@ public class TagDomainManager {
 
     //Add tag to domain
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/tags"}, method = RequestMethod.POST)
-    public final Tag domainCreateTag(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody Tag tag) {
+    public final Tag domainCreateTag(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody Tag tag
+            , Principal principal) {
+        kpiService.addEvent(principal, "api:admin/tagDomains/tags/add"
+                , "tagDomainUrn", tagDomainUrn
+                , "tagUrn", tag.getUrn()
+        );
 
         LOGGER.info("POST domainCreateTag");
 
@@ -171,7 +185,12 @@ public class TagDomainManager {
 
     //delete Tag from TagDomain
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/tags"}, method = RequestMethod.DELETE)
-    public final void domainRemoveTag(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody String tagUrn) {
+    public final void domainRemoveTag(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody String tagUrn
+            , Principal principal) {
+        kpiService.addEvent(principal, "api:admin/tagDomains/tags/delete"
+                , "tagDomainUrn", tagDomainUrn
+                , "tagUrn", tagUrn
+        );
 
         LOGGER.info("DELETE domainRemoveTag " + tagUrn);
 
@@ -208,7 +227,9 @@ public class TagDomainManager {
 
     //get Services using this TagDomain
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/services"}, method = RequestMethod.GET)
-    public final List<Service> tagDomainGetServices(@PathVariable("tagDomainUrn") String tagDomainUrn) {
+    public final List<Service> tagDomainGetServices(@PathVariable("tagDomainUrn") String tagDomainUrn
+            , Principal principal) {
+        kpiService.addEvent(principal, "api:admin/tagDomains/services", "tagDomainUrn", tagDomainUrn);
 
         LOGGER.info("GET tagDomainGetServices");
 
@@ -221,7 +242,12 @@ public class TagDomainManager {
 
     //Associate TagDomain with Service
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/services"}, method = RequestMethod.POST)
-    public final TagDomain serviceAddTagDomains(@RequestParam(value = "serviceUrn", required = true) String serviceUrn, @PathVariable("tagDomainUrn") String tagDomainUrn) {
+    public final TagDomain serviceAddTagDomains(@RequestParam(value = "serviceUrn", required = true) String serviceUrn, @PathVariable("tagDomainUrn") String tagDomainUrn
+            , Principal principal) {
+        kpiService.addEvent(principal, "api:admin/tagDomains/services/add"
+                , "tagDomainUrn", tagDomainUrn
+                , "serviceUrn", serviceUrn
+        );
 
         LOGGER.info("POST serviceAddTagDomains");
 
@@ -249,7 +275,12 @@ public class TagDomainManager {
 
     //Disassociate TagDomain with Service
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/services"}, method = RequestMethod.DELETE)
-    public final void serviceRemoveTagDomains(@RequestParam(value = "serviceUrn", required = true) String serviceUrn, @PathVariable("tagDomainUrn") String tagDomainUrn) {
+    public final void serviceRemoveTagDomains(@RequestParam(value = "serviceUrn", required = true) String serviceUrn, @PathVariable("tagDomainUrn") String tagDomainUrn
+            , Principal principal) {
+        kpiService.addEvent(principal, "api:admin/tagDomains/services/remove"
+                , "tagDomainUrn", tagDomainUrn
+                , "serviceUrn", serviceUrn
+        );
 
         LOGGER.info("DELETE serviceRemoveTagDomains");
 
@@ -280,7 +311,8 @@ public class TagDomainManager {
 
     //Create Service
     @RequestMapping(value = {"admin/services"}, method = RequestMethod.POST)
-    public final Service servicesCreate(@RequestBody Service service) {
+    public final Service servicesCreate(@RequestBody Service service, Principal principal) {
+        kpiService.addEvent(principal, "api:admin/services/create", "serviceUrn", service.getUrn());
 
         LOGGER.info("POST servicesCreate");
 
@@ -308,7 +340,9 @@ public class TagDomainManager {
 
     //Delete Service
     @RequestMapping(value = {"admin/services/{serviceUrn}"}, method = RequestMethod.DELETE)
-    public final void serviceDelete(@PathVariable("serviceUrn") String serviceUrn) {
+    public final void serviceDelete(@PathVariable("serviceUrn") String serviceUrn
+            , Principal principal) {
+        kpiService.addEvent(principal, "api:admin/services/delete", "serviceUrn", serviceUrn);
 
         LOGGER.info("DELETE serviceDelete");
 
@@ -334,7 +368,9 @@ public class TagDomainManager {
 
     //Create Experiment
     @RequestMapping(value = {"admin/applications"}, method = RequestMethod.POST)
-    public final Application applicationsCreate(@RequestBody Application application) {
+    public final Application applicationsCreate(@RequestBody Application application
+            , Principal principal) {
+        kpiService.addEvent(principal, "api:admin/applications/create", "applicationUrn", application.getUrn());
 
         LOGGER.info("POST applicationsCreate");
 
@@ -362,7 +398,9 @@ public class TagDomainManager {
 
     //Delete Application
     @RequestMapping(value = {"admin/applications/{applicationUrn}"}, method = RequestMethod.DELETE)
-    public final void applicationDelete(@PathVariable("applicationUrn") String applicationUrn) {
+    public final void applicationDelete(@PathVariable("applicationUrn") String applicationUrn
+            , Principal principal) {
+        kpiService.addEvent(principal, "api:admin/applications/delete", "applicationUrn", applicationUrn);
 
         LOGGER.info("DELETE applicationDelete");
 
@@ -389,7 +427,9 @@ public class TagDomainManager {
 
     //Show all available tag domains for application/experiment
     @RequestMapping(value = {"admin/applications/{applicationUrn}/tagDomains"}, method = RequestMethod.GET) //todo
-    public final List<TagDomain> applicationGetTagDomains(@PathVariable("applicationUrn") String applicationUrn) {
+    public final List<TagDomain> applicationGetTagDomains(@PathVariable("applicationUrn") String applicationUrn
+            , Principal principal) {
+        kpiService.addEvent(principal, "api:admin/applications/tagDomains", "applicationUrn", applicationUrn);
 
         LOGGER.info("GET applicationGetTagDomains");
 
@@ -410,7 +450,12 @@ public class TagDomainManager {
 
 
     @RequestMapping(value = {"admin/applications/{applicationUrn}/tagDomains"}, method = RequestMethod.POST)
-    public final Application applicationAddTagDomains(@RequestParam(value = "tagDomainUrn", required = true) String tagDomainUrn, @PathVariable("applicationUrn") String applicationUrn) {
+    public final Application applicationAddTagDomains(@RequestParam(value = "tagDomainUrn", required = true) String tagDomainUrn, @PathVariable("applicationUrn") String applicationUrn
+            , Principal principal) {
+        kpiService.addEvent(principal, "api:admin/applications/tagDomains/add"
+                , "applicationUrn", applicationUrn
+                , "tagDomainUrn", tagDomainUrn
+        );
 
         LOGGER.info("POST applicationAddTagDomains");
 
@@ -442,7 +487,12 @@ public class TagDomainManager {
     }
 
     @RequestMapping(value = {"admin/applications/{applicationUrn}/tagDomains"}, method = RequestMethod.DELETE)
-    public final void applicationRemoveTagDomains(@RequestParam(value = "tagDomainUrn", required = true) String tagDomainUrn, @PathVariable("applicationUrn") String applicationUrn) {
+    public final void applicationRemoveTagDomains(@RequestParam(value = "tagDomainUrn", required = true) String tagDomainUrn, @PathVariable("applicationUrn") String applicationUrn
+            , Principal principal) {
+        kpiService.addEvent(principal, "api:admin/applications/tagDomains/remove"
+                , "applicationUrn", applicationUrn
+                , "tagDomainUrn", tagDomainUrn
+        );
 
         LOGGER.info("DELETE applicationRemoveTagDomains");
 
