@@ -54,7 +54,8 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
                 .antMatchers("/swagger-ui.html").permitAll()
                 .antMatchers("/v2/**").permitAll()
                 .antMatchers("/admin/**").authenticated()
-                .antMatchers("/annotations/**").authenticated()
+                //TODO : fix that back when tokens work
+                .antMatchers("/annotations/**").permitAll()
                 .antMatchers("/").authenticated()
                 .antMatchers("/OrganicityProfile").authenticated()
                 .anyRequest().permitAll();
