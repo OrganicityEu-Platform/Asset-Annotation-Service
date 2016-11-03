@@ -65,7 +65,9 @@ public class KPIService {
      * @param eventName the name for the event to add.
      */
     public void addEvent(Principal principal, final String eventName) {
-        addEvent(principal.getName(), eventName, null, null, null, null);
+        if (principal != null && principal.getName() != null) {
+            addEvent(principal.getName(), eventName, null, null, null, null);
+        }
     }
 
     /**
@@ -77,17 +79,19 @@ public class KPIService {
      * @param propertyValue the value for the event's property.
      */
     public void addEvent(Principal principal, final String eventName, final String propertyName, final Object propertyValue) {
-        addEvent(principal.getName(), eventName, propertyName, propertyValue, null, null);
+        if (principal != null && principal.getName() != null) {
+            addEvent(principal.getName(), eventName, propertyName, propertyValue, null, null);
+        }
     }
 
     /**
      * Add an event on Mixpanel for a user.
      *
-     * @param principal     the Principal of the User.
-     * @param eventName     the name for the event to add.
-     * @param propertyName  a property for the event.
-     * @param propertyValue the value for the event's property.
-     * @param propertyName1 a second property for the event.
+     * @param principal      the Principal of the User.
+     * @param eventName      the name for the event to add.
+     * @param propertyName   a property for the event.
+     * @param propertyValue  the value for the event's property.
+     * @param propertyName1  a second property for the event.
      * @param propertyValue1 the value for the event's second property.
      */
     public void addEvent(Principal principal, final String eventName, final String propertyName, final Object propertyValue, final String propertyName1, final Object propertyValue1) {
