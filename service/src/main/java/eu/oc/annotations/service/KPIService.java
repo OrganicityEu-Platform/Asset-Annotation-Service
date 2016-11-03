@@ -34,13 +34,20 @@ public class KPIService {
 
     }
 
-    public void setUserProperty(final String userId, final String property, final Object properyValue) {
+    /**
+     * Sets a property for a user on Mixpanel.
+     *
+     * @param userId        the unique id of the user.
+     * @param property      a property for the user's profile.
+     * @param propertyValue the value for the user's profile property.
+     */
+    public void setUserProperty(final String userId, final String property, final Object propertyValue) {
         if (mixpanel == null) {
             return;
         }
 
         final JSONObject props = new JSONObject();
-        props.put(property, properyValue);
+        props.put(property, propertyValue);
         final JSONObject update = messageBuilder.set(userId, props);
 
         // Send the update to mixpanel
@@ -51,43 +58,53 @@ public class KPIService {
         }
     }
 
-    public void addEvent(Principal principal, final String eventName, final String propertyName, final Object propertyValue) {
-        if (mixpanel == null) {
-            return;
-        }
-
-        if (principal == null || principal.getName() == null) {
-            //addEvent("anon", eventName, propertyName, propertyValue, null, null);
-        } else {
-            addEvent(principal.getName(), eventName, propertyName, propertyValue, null, null);
-        }
+    /**
+     * Add an event on Mixpanel for a user.
+     *
+     * @param principal the Principal of the User.
+     * @param eventName the name for the event to add.
+     */
+    public void addEvent(Principal principal, final String eventName) {
+        addEvent(principal.getName(), eventName, null, null, null, null);
     }
 
+    /**
+     * Add an event on Mixpanel for a user.
+     *
+     * @param principal     the Principal of the User.
+     * @param eventName     the name for the event to add.
+     * @param propertyName  a property for the event.
+     * @param propertyValue the value for the event's property.
+     */
+    public void addEvent(Principal principal, final String eventName, final String propertyName, final Object propertyValue) {
+        addEvent(principal.getName(), eventName, propertyName, propertyValue, null, null);
+    }
+
+    /**
+     * Add an event on Mixpanel for a user.
+     *
+     * @param principal     the Principal of the User.
+     * @param eventName     the name for the event to add.
+     * @param propertyName  a property for the event.
+     * @param propertyValue the value for the event's property.
+     * @param propertyName1 a second property for the event.
+     * @param propertyValue1 the value for the event's second property.
+     */
     public void addEvent(Principal principal, final String eventName, final String propertyName, final Object propertyValue, final String propertyName1, final Object propertyValue1) {
         if (mixpanel == null) {
             return;
         }
 
         if (principal == null || principal.getName() == null) {
-            //addEvent("anon", eventName, propertyName, propertyValue);
+            //addEvent("anon", eventName, propertyName, propertyValue, propertyName1, propertyValue1);
         } else {
             addEvent(principal.getName(), eventName, propertyName, propertyValue, propertyName1, propertyValue1);
         }
     }
 
-    public void addEvent(Principal principal, final String eventName) {
-        if (mixpanel == null) {
-            return;
-        }
-
-        if (principal == null || principal.getName() == null) {
-            //addEvent("anon", eventName,null,null,null,null);
-        } else {
-            addEvent(principal.getName(), eventName, null, null, null, null);
-        }
-    }
-
-    private void addEvent(final String userId, final String eventName, final String properyName, final Object propertyValue, final String properyName1, final Object propertyValue1) {
+    private void addEvent(final String userId, final String eventName
+            , final String propertyName, final Object propertyValue
+            , final String propertyName1, final Object propertyValue1) {
         if (mixpanel == null) {
             return;
         }
@@ -95,11 +112,11 @@ public class KPIService {
 
         // You can send properties along with events
         JSONObject props = new JSONObject();
-        if (properyName != null && propertyValue != null) {
-            props.put(properyName, propertyValue);
+        if (propertyName != null && propertyValue != null) {
+            props.put(propertyName, propertyValue);
         }
-        if (properyName1 != null && propertyValue1 != null) {
-            props.put(properyName1, propertyValue1);
+        if (propertyName1 != null && propertyValue1 != null) {
+            props.put(propertyName1, propertyValue1);
         }
 
         final JSONObject event = messageBuilder.event(userId, eventName, props);
