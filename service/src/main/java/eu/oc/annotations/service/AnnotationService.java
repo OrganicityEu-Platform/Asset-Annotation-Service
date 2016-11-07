@@ -108,7 +108,8 @@ public class AnnotationService {
         }
         Asset asset = assetRepository.findByUrn(assetUrn);
         if (asset == null) {
-            throw new RestException("AssetUrn Unknown");
+            //throw new RestException("AssetUrn Unknown");
+            return new ArrayList<>();
         }
         List<Annotation> annotations = asset.getTaggings().stream().map(this::getAnnotation).collect(Collectors.toList());
         return annotations;
