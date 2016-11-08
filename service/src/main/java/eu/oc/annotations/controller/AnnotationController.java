@@ -3,6 +3,9 @@ package eu.oc.annotations.controller;
 import eu.oc.annotations.config.OrganicityAccount;
 import eu.oc.annotations.domain.Annotation;
 import eu.oc.annotations.domain.Asset;
+import eu.oc.annotations.domain.dto.AssetAnnotationListDTO;
+import eu.oc.annotations.domain.dto.AssetAnnotationListItemDTO;
+import eu.oc.annotations.domain.dto.AssetListDTO;
 import eu.oc.annotations.handlers.RestException;
 import eu.oc.annotations.repositories.AssetRepository;
 import eu.oc.annotations.service.AnnotationService;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 import java.security.Principal;
+import java.util.HashSet;
 import java.util.List;
 
 @RestController
@@ -105,10 +109,29 @@ public class AnnotationController {
     @RequestMapping(value = {"annotations/all"}, method = RequestMethod.GET)
     public final List<Asset> getAnnotations(final HttpServletResponse response, Principal principal) {
         kpiService.addEvent(principal, "api:annotations/all");
+
         //todo show all public Annotations of asset add paging and sorting
         response.setHeader("Cache-Control", "no-cache");
         return assetRepository.findAll();
     }
 
+    @RequestMapping(value = {"annotations/all"}, method = RequestMethod.POST)
+    public final AssetAnnotationListDTO getAnnotations(final HttpServletResponse response, Principal principal,
+                                                       @RequestBody final AssetListDTO assetListDTO) {
+        kpiService.addEvent(principal, "api:annotations/all");
+
+        final AssetAnnotationListDTO list = new AssetAnnotationListDTO();
+        list.setAssetAnnotations(new HashSet<>());
+        for (final String assetUrn : assetListDTO.getAssetUrns()) {
+            final List<Annotation> annotations = annotationService.getAnnotationsOfAsset(assetUrn);
+            list.getAssetAnnotations().add(
+                    new AssetAnnotationListItemDTO(assetUrn, annotations.size(), annotations)
+            );
+        }
+
+        //todo show all public Annotations of assets add paging and sorting
+        response.setHeader("Cache-Control", "no-cache");
+        return list;
+    }
 
 }
