@@ -4,6 +4,8 @@ import eu.oc.annotations.domain.Application;
 import eu.oc.annotations.domain.Service;
 import eu.oc.annotations.domain.Tag;
 import eu.oc.annotations.domain.TagDomain;
+import eu.oc.annotations.domain.dto.TagDomainDto;
+import eu.oc.annotations.domain.dto.TagDto;
 import eu.oc.annotations.handlers.RestException;
 import eu.oc.annotations.repositories.*;
 import eu.oc.annotations.service.AnnotationService;
@@ -18,7 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 public class TagDomainBrowser {
@@ -49,10 +53,30 @@ public class TagDomainBrowser {
 
     //Get All tagDomains
     @RequestMapping(value = {"tagDomains"}, method = RequestMethod.GET)
-    public final List<TagDomain> domainFindAll(Principal principal) {
+    public final List<TagDomainDto> domainFindAll(Principal principal) {
         kpiService.addEvent(principal, "api:tagDomains");
-        return tagDomainRepository.findAll();
+        return toDTO(tagDomainRepository.findAll());
     }
+
+    List<TagDomainDto> toDTO(List<TagDomain> tagDomains) {
+        final List<TagDomainDto> list = new ArrayList<>();
+        for (final TagDomain tagDomain : tagDomains) {
+            list.add(toDTO(tagDomain));
+        }
+        return list;
+    }
+
+    TagDomainDto toDTO(TagDomain tagDomain) {
+        final Set<TagDto> tags = new HashSet<>();
+        for (final Tag tag : tagDomain.getTags()) {
+            TagDto tagDto = new TagDto(tag.getId(), tag.getUrn(), tag.getName());
+            if (!tags.contains(tagDto)) {
+                tags.add(tagDto);
+            }
+        }
+        return new TagDomainDto(tagDomain.getId(), tagDomain.getUrn(), tagDomain.getDescription(), tags);
+    }
+
 
     //Get tagDomain
     @RequestMapping(value = {"tagDomains/{tagDomainUrn}"}, method = RequestMethod.GET)
