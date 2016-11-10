@@ -1,5 +1,7 @@
 package eu.oc.annotations.domain.dto;
 
+import eu.oc.annotations.domain.Service;
+
 import java.util.Set;
 
 /**
@@ -10,6 +12,7 @@ public class TagDomainDto {
     private String urn;
     private String description;
     private Set<TagDto> tags;
+    private Service[] services;
 
     public TagDomainDto() {
     }
@@ -51,5 +54,13 @@ public class TagDomainDto {
 
     public void setTags(Set<TagDto> tags) {
         this.tags = tags;
+    }
+
+    public Service[] getServices() {
+        return services;
+    }
+
+    public void setServices(Service[] services) {
+        this.services = services;
     }
 }

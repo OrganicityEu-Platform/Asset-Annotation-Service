@@ -80,10 +80,10 @@ public class TagDomainBrowser {
 
     //Get tagDomain
     @RequestMapping(value = {"tagDomains/{tagDomainUrn}"}, method = RequestMethod.GET)
-    public final TagDomain domainFindByUrn(@PathVariable("tagDomainUrn") String tagDomainUrn
+    public final TagDomainDto domainFindByUrn(@PathVariable("tagDomainUrn") String tagDomainUrn
             , Principal principal) {
         kpiService.addEvent(principal, "api:tagDomain", "tagDomainUrn", tagDomainUrn);
-        return tagDomainRepository.findByUrn(tagDomainUrn);
+        return toDTO(tagDomainRepository.findByUrn(tagDomainUrn));
     }
 
     // TAG METHODS-----------------------------------------------
