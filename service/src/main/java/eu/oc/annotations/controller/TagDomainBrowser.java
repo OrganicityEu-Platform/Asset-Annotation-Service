@@ -89,14 +89,16 @@ public class TagDomainBrowser {
     // TAG METHODS-----------------------------------------------
 
     @RequestMapping(value = {"tagDomains/{tagDomainUrn}/tags"}, method = RequestMethod.GET)
-    public final List<Tag> domainGetTags(@PathVariable("tagDomainUrn") String tagDomainUrn
+    public final Set<TagDto> domainGetTags(@PathVariable("tagDomainUrn") String tagDomainUrn
             , Principal principal) {
         kpiService.addEvent(principal, "api:tagDomainTags", "tagDomainUrn", tagDomainUrn);
         TagDomain d = tagDomainRepository.findByUrn(tagDomainUrn);
-        if (d == null) {
-            throw new RestException("TagDomain Not Found");
+        try {
+            return toDTO(d).getTags();
+        } catch (NullPointerException npe) {
+            LOGGER.error(npe.getMessage(), npe);
+            return new HashSet<>();
         }
-        return new ArrayList<>(d.getTags());
     }
 
     @RequestMapping(value = {"tags/{tagUrn}"}, method = RequestMethod.GET)
