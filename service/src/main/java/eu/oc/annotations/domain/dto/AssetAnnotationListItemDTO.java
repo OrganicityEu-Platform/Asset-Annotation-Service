@@ -1,15 +1,13 @@
 package eu.oc.annotations.domain.dto;
 
-import eu.oc.annotations.domain.Annotation;
-
 import java.util.Set;
 
 public class AssetAnnotationListItemDTO {
     private String assetUrn;
     private long count;
-    private Set<Annotation> annotations;
+    private Set<AnnotationDTO> annotations;
 
-    public AssetAnnotationListItemDTO(String assetUrn, int count, Set<Annotation> annotations) {
+    public AssetAnnotationListItemDTO(String assetUrn, int count, Set<AnnotationDTO> annotations) {
         this.assetUrn = assetUrn;
         this.count = count;
         this.annotations = annotations;
@@ -31,11 +29,11 @@ public class AssetAnnotationListItemDTO {
         this.count = count;
     }
 
-    public Set<Annotation> getAnnotations() {
+    public Set<AnnotationDTO> getAnnotations() {
         return annotations;
     }
 
-    public void setAnnotations(Set<Annotation> annotations) {
+    public void setAnnotations(Set<AnnotationDTO> annotations) {
         this.annotations = annotations;
     }
 }

@@ -137,7 +137,7 @@ public class AnnotationController {
         for (final String assetUrn : assetListDTO.getAssetUrns()) {
             final Set<Annotation> annotations = annotationService.getAnnotationsOfAsset(assetUrn);
             list.getAssetAnnotations().add(
-                    new AssetAnnotationListItemDTO(assetUrn, annotations.size(), annotations)
+                    new AssetAnnotationListItemDTO(assetUrn, annotations.size(), toDTO(annotations))
             );
         }
 
