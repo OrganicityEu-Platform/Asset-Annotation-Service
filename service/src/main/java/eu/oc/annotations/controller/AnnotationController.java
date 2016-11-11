@@ -3,6 +3,7 @@ package eu.oc.annotations.controller;
 import eu.oc.annotations.config.OrganicityAccount;
 import eu.oc.annotations.domain.Annotation;
 import eu.oc.annotations.domain.Asset;
+import eu.oc.annotations.domain.dto.AnnotationDTO;
 import eu.oc.annotations.domain.dto.AssetAnnotationListDTO;
 import eu.oc.annotations.domain.dto.AssetAnnotationListItemDTO;
 import eu.oc.annotations.domain.dto.AssetListDTO;
@@ -56,13 +57,23 @@ public class AnnotationController {
     }
 
     @RequestMapping(value = {"annotations/{assetUrn}/all"}, method = RequestMethod.GET)
-    public final Set<Annotation> getAnnotations(@PathVariable("assetUrn") String assetUrn, final HttpServletResponse response
+    public final Set<AnnotationDTO> getAnnotations(@PathVariable("assetUrn") String assetUrn, final HttpServletResponse response
             , Principal principal) {
         kpiService.addEvent(principal, "api:annotations", "assetUrn", assetUrn);
 
         //todo show all public Annotations of asset add paging and sorting
         response.setHeader("Cache-Control", "no-cache");
-        return annotationService.getAnnotationsOfAsset(assetUrn);
+        return toDTO(annotationService.getAnnotationsOfAsset(assetUrn));
+    }
+
+    private Set<AnnotationDTO> toDTO(Set<Annotation> annotationsOfAsset) {
+        final Set<AnnotationDTO> dtos = new HashSet<>();
+        for (final Annotation annotation : annotationsOfAsset) {
+            dtos.add(new AnnotationDTO(annotation.getAnnotationId(), annotation.getAssetUrn(), annotation.getTagUrn(),
+                    annotation.getDatetime(), annotation.getUser(), annotation.getApplication(),
+                    annotation.getNumericValue(), annotation.getTextValue()));
+        }
+        return dtos;
     }
 
 
