@@ -12,6 +12,8 @@ import eu.oc.annotations.repositories.AssetRepository;
 import eu.oc.annotations.service.AnnotationService;
 import eu.oc.annotations.service.KPIService;
 import eu.oc.annotations.service.OrganicityUserDetailsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +26,7 @@ import java.util.Set;
 
 @RestController
 public class AnnotationController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AnnotationController.class);
 
     @Autowired
     AnnotationService annotationService;
@@ -136,9 +139,21 @@ public class AnnotationController {
         list.setAssetAnnotations(new HashSet<>());
         for (final String assetUrn : assetListDTO.getAssetUrns()) {
             final Set<Annotation> annotations = annotationService.getAnnotationsOfAsset(assetUrn);
-            list.getAssetAnnotations().add(
-                    new AssetAnnotationListItemDTO(assetUrn, annotations.size(), toDTO(annotations))
-            );
+            try {
+                if (annotations != null) {
+                    list.getAssetAnnotations().add(
+                            new AssetAnnotationListItemDTO(assetUrn, annotations.size(), toDTO(annotations))
+                    );
+                } else {
+                    list.getAssetAnnotations().add(
+                            new AssetAnnotationListItemDTO(assetUrn, 0, new HashSet<>())
+                    );
+                }
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+                list.getAssetAnnotations().add(new AssetAnnotationListItemDTO(assetUrn, 0, new HashSet<>()));
+
+            }
         }
 
         //todo show all public Annotations of assets add paging and sorting
