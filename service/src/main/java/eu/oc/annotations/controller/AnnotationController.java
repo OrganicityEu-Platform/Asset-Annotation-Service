@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 import java.security.Principal;
@@ -35,11 +34,6 @@ public class AnnotationController {
     AssetRepository assetRepository;
     @Autowired
     KPIService kpiService;
-
-    @PostConstruct
-    public void init(){
-        assetRepository.deleteAll();
-    }
 
     // Annotation Tagging METHODS-----------------------------------------------
     //Create Tagging
