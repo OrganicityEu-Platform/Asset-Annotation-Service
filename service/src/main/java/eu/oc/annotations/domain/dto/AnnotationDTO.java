@@ -22,7 +22,11 @@ public class AnnotationDTO {
         this.datetime = datetime;
         this.user = user;
         this.application = application;
-        this.numericValue = numericValue;
+        if (numericValue == null) {
+            this.numericValue = 0;
+        } else {
+            this.numericValue = numericValue;
+        }
         this.textValue = textValue;
     }
 
