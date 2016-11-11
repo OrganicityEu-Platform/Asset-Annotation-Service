@@ -18,12 +18,12 @@ import java.util.*;
  */
 public final class OrganicityAccount extends KeycloakPrincipal {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganicityAccount.class);
-    String id;
-    String user;
-    Date expiration;
-    String email;
-    Collection<? extends GrantedAuthority> roles;
-    HashMap<String, Experiment> experiments = new HashMap<>();
+    private String id;
+    private String user;
+    private Date expiration;
+    private String email;
+    private Collection<? extends GrantedAuthority> roles;
+    private HashMap<String, Experiment> experiments = new HashMap<>();
 
     @Autowired
     ApplicationRepository applicationRepository;

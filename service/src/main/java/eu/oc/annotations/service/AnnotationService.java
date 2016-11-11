@@ -9,8 +9,8 @@ import eu.oc.annotations.repositories.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -93,25 +93,25 @@ public class AnnotationService {
     }
 
 
-    public List<Annotation> getAllAnnotations() {
-        List<Annotation> annotations = new ArrayList<>();
+    public Set<Annotation> getAllAnnotations() {
+        Set<Annotation> annotations = new HashSet<>();
         for (Asset asset : assetRepository.findAll()) {
-            annotations.addAll(asset.getTaggings().stream().map(this::getAnnotation).collect(Collectors.toList()));
+            annotations.addAll(asset.getTaggings().stream().map(this::getAnnotation).collect(Collectors.toSet()));
         }
         return annotations;
     }
 
 
-    public List<Annotation> getAnnotationsOfAsset(String assetUrn) {
+    public Set<Annotation> getAnnotationsOfAsset(String assetUrn) {
         if (assetUrn.equals("*")){
             return getAllAnnotations();
         }
         Asset asset = assetRepository.findByUrn(assetUrn);
         if (asset == null) {
             //throw new RestException("AssetUrn Unknown");
-            return new ArrayList<>();
+            return new HashSet<>();
         }
-        List<Annotation> annotations = asset.getTaggings().stream().map(this::getAnnotation).collect(Collectors.toList());
+        Set<Annotation> annotations = asset.getTaggings().stream().map(this::getAnnotation).collect(Collectors.toSet());
         return annotations;
     }
 

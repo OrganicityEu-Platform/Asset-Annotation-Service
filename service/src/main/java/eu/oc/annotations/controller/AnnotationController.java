@@ -19,6 +19,7 @@ import javax.validation.constraints.NotNull;
 import java.security.Principal;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 public class AnnotationController {
@@ -55,7 +56,7 @@ public class AnnotationController {
     }
 
     @RequestMapping(value = {"annotations/{assetUrn}/all"}, method = RequestMethod.GET)
-    public final List<Annotation> getAnnotations(@PathVariable("assetUrn") String assetUrn, final HttpServletResponse response
+    public final Set<Annotation> getAnnotations(@PathVariable("assetUrn") String assetUrn, final HttpServletResponse response
             , Principal principal) {
         kpiService.addEvent(principal, "api:annotations", "assetUrn", assetUrn);
 
@@ -123,7 +124,7 @@ public class AnnotationController {
         final AssetAnnotationListDTO list = new AssetAnnotationListDTO();
         list.setAssetAnnotations(new HashSet<>());
         for (final String assetUrn : assetListDTO.getAssetUrns()) {
-            final List<Annotation> annotations = annotationService.getAnnotationsOfAsset(assetUrn);
+            final Set<Annotation> annotations = annotationService.getAnnotationsOfAsset(assetUrn);
             list.getAssetAnnotations().add(
                     new AssetAnnotationListItemDTO(assetUrn, annotations.size(), annotations)
             );
