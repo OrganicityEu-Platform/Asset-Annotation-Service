@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by amaxilat on 1/12/2016.
@@ -70,4 +71,11 @@ public class DTOService {
     }
 
 
+    public Set<TagDTO> toTagSetDTO(Set<Tag> tags) {
+        Set<TagDTO> dto = new HashSet<>();
+        for (Tag tag : tags) {
+            dto.add(toDTO(tag));
+        }
+        return dto;
+    }
 }

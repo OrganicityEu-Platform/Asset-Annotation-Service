@@ -14,13 +14,16 @@ import eu.oc.annotations.service.DTOService;
 import eu.oc.annotations.service.KPIService;
 import eu.oc.annotations.service.OrganicityUserDetailsService;
 import eu.organicity.annotation.service.dto.ExperimentDTO;
+import eu.organicity.annotation.service.dto.TagDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 public class TagDomainManager {
@@ -146,8 +149,8 @@ public class TagDomainManager {
     // TAG METHODS-----------------------------------------------------------------------------------------------------
 
     //Add tag to domain
-    @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/tags"}, method = RequestMethod.POST)
-    public final Tag domainCreateTag(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody Tag tag
+    @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/tag"}, method = RequestMethod.POST)
+    public final TagDTO domainCreateTag(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody Tag tag
             , Principal principal) {
         kpiService.addEvent(principal, "api:admin/tagDomains/tags/add"
                 , "tagDomainUrn", tagDomainUrn
@@ -155,7 +158,11 @@ public class TagDomainManager {
         );
 
         LOGGER.info("POST domainCreateTag");
+        Tag addedTag = addTag2Domain(tagDomainUrn, tag);
+        return dtoService.toDTO(tag);
+    }//Add tag to domain
 
+    private Tag addTag2Domain(String tagDomainUrn, Tag tag) {
         TagDomain d = tagDomainRepository.findByUrn(tagDomainUrn);
         if (d == null) {
             LOGGER.error("TagDomain Not Found");
@@ -181,11 +188,27 @@ public class TagDomainManager {
             tag = tagRepository.save(tag);
             d.getTags().add(tag);
             tagDomainRepository.save(d);
+            return tag;
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             throw new RestException(e.getMessage());
         }
-        return tag;
+    }
+
+    @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/tags"}, method = RequestMethod.POST)
+    public final Set<TagDTO> domainCreateTags(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody List<Tag> tags
+            , Principal principal) {
+        kpiService.addEvent(principal, "api:admin/tagDomains/tags/add"
+                , "tagDomainUrn", tagDomainUrn
+                , "tags", tags
+        );
+
+        LOGGER.info("POST domainCreateTags");
+        Set<Tag> addedTags = new HashSet<>();
+        for (final Tag tag : tags) {
+            addedTags.add(addTag2Domain(tagDomainUrn, tag));
+        }
+        return dtoService.toTagSetDTO(addedTags);
     }
 
     //delete Tag from TagDomain
