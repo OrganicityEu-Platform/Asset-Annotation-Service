@@ -90,19 +90,19 @@ public class AnnotationController {
 
     @RequestMapping(value = {"annotations/"}, method = RequestMethod.GET) //todo fix
     public final Annotation getAnnotationForApplicationUserandTag(@RequestParam(value = "assetUrn", required = true) String assetUrn,
-                                                                  @RequestParam(value = "applicationUrn", required = true) String applicationUrn,
+                                                                  @RequestParam(value = "experimentUrn", required = true) String experimentUrn,
                                                                   @RequestParam(value = "tagUrn", required = true) String tagUrn,
                                                                   @RequestParam(value = "user", required = true) String user
             , Principal principal
     ) {
         kpiService.addEvent(principal, "api:annotations/query");
-        return annotationService.getAnnotationForAssetApplicationUserTag(assetUrn, applicationUrn, user, tagUrn);
+        return annotationService.getAnnotationForAssetApplicationUserTag(assetUrn, experimentUrn, user, tagUrn);
     }
 
 
     @RequestMapping(value = {"annotations/{tagDomain}"}, method = RequestMethod.GET) //todo fix
     public final Annotation getAnnotationForApplication(@RequestParam(value = "assetUrn", required = true) String assetUrn,
-                                                        @RequestParam(value = "applicationUrn", required = true) String applicationUrn,
+                                                        @RequestParam(value = "experimentUrn", required = true) String experimentUrn,
                                                         @NotNull @PathVariable(value = "tagDomain") String tagDomain,
                                                         @RequestParam(value = "user", required = true) String user,
                                                         final HttpServletResponse response
@@ -110,7 +110,7 @@ public class AnnotationController {
     ) {
         kpiService.addEvent(principal, "api:annotations", "tagDomain", tagDomain);
         response.setHeader("Cache-Control", "no-cache");
-        return annotationService.getAnnotationForAssetApplicationUserTagDomain(assetUrn, applicationUrn, user, tagDomain);
+        return annotationService.getAnnotationForAssetApplicationUserTagDomain(assetUrn, experimentUrn, user, tagDomain);
     }
 
 

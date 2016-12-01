@@ -4,12 +4,14 @@ import eu.oc.annotations.domain.Application;
 import eu.oc.annotations.domain.Service;
 import eu.oc.annotations.domain.Tag;
 import eu.oc.annotations.domain.TagDomain;
-import eu.oc.annotations.domain.dto.TagDomainDto;
-import eu.oc.annotations.domain.dto.TagDto;
 import eu.oc.annotations.handlers.RestException;
 import eu.oc.annotations.repositories.*;
 import eu.oc.annotations.service.AnnotationService;
+import eu.oc.annotations.service.DTOService;
 import eu.oc.annotations.service.KPIService;
+import eu.organicity.annotation.service.dto.ExperimentDTO;
+import eu.organicity.annotation.service.dto.TagDTO;
+import eu.organicity.annotation.service.dto.TagDomainDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -49,52 +50,36 @@ public class TagDomainBrowser {
     @Autowired
     KPIService kpiService;
 
+    @Autowired
+    DTOService dtoService;
+
     // TAG DOMAIN METHODS-----------------------------------------------
 
     //Get All tagDomains
     @RequestMapping(value = {"tagDomains"}, method = RequestMethod.GET)
-    public final List<TagDomainDto> domainFindAll(Principal principal) {
+    public final List<TagDomainDTO> domainFindAll(Principal principal) {
         kpiService.addEvent(principal, "api:tagDomains");
-        return toDTO(tagDomainRepository.findAll());
-    }
-
-    List<TagDomainDto> toDTO(List<TagDomain> tagDomains) {
-        final List<TagDomainDto> list = new ArrayList<>();
-        for (final TagDomain tagDomain : tagDomains) {
-            list.add(toDTO(tagDomain));
-        }
-        return list;
-    }
-
-    TagDomainDto toDTO(TagDomain tagDomain) {
-        final Set<TagDto> tags = new HashSet<>();
-        for (final Tag tag : tagDomain.getTags()) {
-            TagDto tagDto = new TagDto(tag.getId(), tag.getUrn(), tag.getName());
-            if (!tags.contains(tagDto)) {
-                tags.add(tagDto);
-            }
-        }
-        return new TagDomainDto(tagDomain.getId(), tagDomain.getUrn(), tagDomain.getDescription(), tags);
+        return dtoService.toTagDomainListDTO(tagDomainRepository.findAll());
     }
 
 
     //Get tagDomain
     @RequestMapping(value = {"tagDomains/{tagDomainUrn}"}, method = RequestMethod.GET)
-    public final TagDomainDto domainFindByUrn(@PathVariable("tagDomainUrn") String tagDomainUrn
+    public final TagDomainDTO domainFindByUrn(@PathVariable("tagDomainUrn") String tagDomainUrn
             , Principal principal) {
         kpiService.addEvent(principal, "api:tagDomain", "tagDomainUrn", tagDomainUrn);
-        return toDTO(tagDomainRepository.findByUrn(tagDomainUrn));
+        return dtoService.toDTO(tagDomainRepository.findByUrn(tagDomainUrn));
     }
 
     // TAG METHODS-----------------------------------------------
 
     @RequestMapping(value = {"tagDomains/{tagDomainUrn}/tags"}, method = RequestMethod.GET)
-    public final Set<TagDto> domainGetTags(@PathVariable("tagDomainUrn") String tagDomainUrn
+    public final Set<TagDTO> domainGetTags(@PathVariable("tagDomainUrn") String tagDomainUrn
             , Principal principal) {
         kpiService.addEvent(principal, "api:tagDomainTags", "tagDomainUrn", tagDomainUrn);
         TagDomain d = tagDomainRepository.findByUrn(tagDomainUrn);
         try {
-            return toDTO(d).getTags();
+            return dtoService.toDTO(d).getTags();
         } catch (NullPointerException npe) {
             LOGGER.error(npe.getMessage(), npe);
             return new HashSet<>();
@@ -142,30 +127,30 @@ public class TagDomainBrowser {
 
 
     // Application Methods----------------------------------------------------------------------------------------------
-    @RequestMapping(value = {"applications"}, method = RequestMethod.GET)
-    public final List<Application> applications(Principal principal) {
-        kpiService.addEvent(principal, "api:applications");
-        return applicationRepository.findAll();
+    @RequestMapping(value = {"experiments"}, method = RequestMethod.GET)
+    public final List<ExperimentDTO> experiments(Principal principal) {
+        kpiService.addEvent(principal, "api:experiments");
+        return dtoService.toExperimentListDTO(applicationRepository.findAll());
     }
 
-    @RequestMapping(value = {"applications/{applicationUrn}"}, method = RequestMethod.GET)
-    public final Application applications(@PathVariable("applicationUrn") String applicationUrn
+    @RequestMapping(value = {"experiments/{experimentUrn}"}, method = RequestMethod.GET)
+    public final ExperimentDTO experiments(@PathVariable("experimentUrn") String experimentUrn
             , Principal principal) {
-        kpiService.addEvent(principal, "api:application", "applicationUrn", applicationUrn);
-        Application a = applicationRepository.findByUrn(applicationUrn);
+        kpiService.addEvent(principal, "api:experiments", "experimentUrn", experimentUrn);
+        Application a = applicationRepository.findByUrn(experimentUrn);
         if (a == null) {
-            throw new RestException("Service Not Found");
+            throw new RestException("Experiment Not Found");
         }
-        return a;
+        return dtoService.toDTO(a);
     }
 
-    @RequestMapping(value = {"applications/{applicationUrn}/tagDomains"}, method = RequestMethod.GET)
-    public final List<TagDomain> applicationGetTagDomains(@PathVariable("applicationUrn") String applicationUrn
+    @RequestMapping(value = {"experiments/{experimentUrn}/tagDomains"}, method = RequestMethod.GET)
+    public final List<TagDomain> experimentGetTagDomains(@PathVariable("experimentUrn") String experimentUrn
             , Principal principal) {
-        kpiService.addEvent(principal, "api:applicationTagDomains", "applicationUrn", applicationUrn);
-        Application a = applicationRepository.findByUrn(applicationUrn);
+        kpiService.addEvent(principal, "api:experimentTagDomains", "experimentUrn", experimentUrn);
+        Application a = applicationRepository.findByUrn(experimentUrn);
         if (a == null) {
-            throw new RestException("Application Not Found");
+            throw new RestException("Experiment Not Found");
         }
         return a.getTagDomains();
     }
