@@ -213,44 +213,48 @@ public class TagDomainManager {
 
     //delete Tag from TagDomain
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/tags"}, method = RequestMethod.DELETE)
-    public final void domainRemoveTag(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody String tagUrn
+    public final void domainRemoveTag(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody String tagUrnList
             , Principal principal) {
         kpiService.addEvent(principal, "api:admin/tagDomains/tags/delete"
                 , "tagDomainUrn", tagDomainUrn
-                , "tagUrn", tagUrn
+                , "tagUrn", tagUrnList
         );
 
-        LOGGER.info("DELETE domainRemoveTag " + tagUrn);
+        LOGGER.info("DELETE domainRemoveTag " + tagUrnList);
 
-        TagDomain d = tagDomainRepository.findByUrn(tagDomainUrn);
-        if (d == null) {
-            throw new RestException("TagDomain Not Found");
+        for (String tagUrn : tagUrnList.split(",")) {
+
+            TagDomain d = tagDomainRepository.findByUrn(tagDomainUrn);
+            if (d == null) {
+                throw new RestException("TagDomain Not Found");
+            }
+            tagUrn = tagUrn.replace("\"", "");
+            Tag t = tagRepository.findByUrn(tagUrn);
+            if (t == null) {
+                throw new RestException("Tag Not Found");
+            }
+            if (!d.containsTag(tagUrn)) {
+                throw new RestException("TagDomain/Tag are not associated");
+            }
+            OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
+            if (!ou.isAdministrator() && !ou.isExperimenter()) {
+                LOGGER.error("Not Authorized Access");
+                throw new RestException("Not Authorized Access");
+            }
+            if (ou.isTheOnlyExperimnterUsingTagDomain(applicationRepository.findApplicationsUsingTagDomain(tagDomainUrn))) {
+                throw new RestException("TagDomain is used also from other experiments. Not possible to delete/update");
+            }
+            try {
+                tagRepository.delete(t.getId());
+                TagDomain domain = tagDomainRepository.findByUrn(tagDomainUrn);
+                domain.getTags().remove(t);
+                tagDomainRepository.save(domain);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RestException(e.getMessage());
+            }
         }
-        tagUrn = tagUrn.replace("\"", "");
-        Tag t = tagRepository.findByUrn(tagUrn);
-        if (t == null) {
-            throw new RestException("Tag Not Found");
-        }
-        if (!d.containsTag(tagUrn)) {
-            throw new RestException("TagDomain/Tag are not associated");
-        }
-        OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
-        if (!ou.isAdministrator() && !ou.isExperimenter()) {
-            LOGGER.error("Not Authorized Access");
-            throw new RestException("Not Authorized Access");
-        }
-        if (ou.isTheOnlyExperimnterUsingTagDomain(applicationRepository.findApplicationsUsingTagDomain(tagDomainUrn))) {
-            throw new RestException("TagDomain is used also from other experiments. Not possible to delete/update");
-        }
-        try {
-            tagRepository.delete(t.getId());
-            TagDomain domain = tagDomainRepository.findByUrn(tagDomainUrn);
-            domain.getTags().remove(t);
-            tagDomainRepository.save(domain);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RestException(e.getMessage());
-        }
+
     }
 
     //get Services using this TagDomain
