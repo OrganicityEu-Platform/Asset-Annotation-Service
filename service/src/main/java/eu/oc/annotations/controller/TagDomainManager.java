@@ -450,74 +450,86 @@ public class TagDomainManager {
 
 
     @RequestMapping(value = {"admin/applications/{applicationUrn}/tagDomains"}, method = RequestMethod.POST)
-    public final Application applicationAddTagDomains(@RequestParam(value = "tagDomainUrn", required = true) String tagDomainUrn, @PathVariable("applicationUrn") String applicationUrn
+    public final Application applicationAddTagDomains(@RequestParam(value = "tagDomainUrn", required = true) List<String> tagDomainUrns, @PathVariable("applicationUrn") String applicationUrn
             , Principal principal) {
         kpiService.addEvent(principal, "api:admin/applications/tagDomains/add"
                 , "applicationUrn", applicationUrn
-                , "tagDomainUrn", tagDomainUrn
+                , "tagDomainUrns", tagDomainUrns
         );
+
+        OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
+        if (!ou.isAdministrator() && !ou.isExperimenter()) {
+            LOGGER.error("Not Authorized Access");
+            throw new RestException("Not Authorized Access");
+        }
 
         LOGGER.info("POST applicationAddTagDomains");
 
-        Application a = applicationRepository.findByUrn(applicationUrn);
-        if (a == null) {
-            throw new RestException("Application Not Found");
-        }
-        TagDomain td = tagDomainRepository.findByUrn(tagDomainUrn);
-        if (td == null) {
-            throw new RestException("TagDomain Not Found");
-        }
-        OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
-        if (!ou.isAdministrator() && !ou.isExperimenter()) {
-            LOGGER.error("Not Authorized Access");
-            throw new RestException("Not Authorized Access");
-        }
-        if (ou.ownsExperiment(applicationUrn)) {
-            throw new RestException("Experimenter is not owning experiment");
+        for (String tagDomainUrn : tagDomainUrns) {
+
+            Application a = applicationRepository.findByUrn(applicationUrn);
+            if (a == null) {
+                throw new RestException("Application Not Found");
+            }
+            TagDomain td = tagDomainRepository.findByUrn(tagDomainUrn);
+            if (td == null) {
+                throw new RestException("TagDomain Not Found");
+            }
+
+            if (ou.ownsExperiment(applicationUrn)) {
+                throw new RestException("Experimenter is not owning experiment");
+            }
+
+            try {
+                a.getTagDomains().add(td);
+                a = applicationRepository.save(a);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RestException(e.getMessage());
+            }
         }
 
-        try {
-            a.getTagDomains().add(td);
-            a = applicationRepository.save(a);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RestException(e.getMessage());
-        }
-        return a;
+        return applicationRepository.findByUrn(applicationUrn);
+
     }
 
     @RequestMapping(value = {"admin/applications/{applicationUrn}/tagDomains"}, method = RequestMethod.DELETE)
-    public final void applicationRemoveTagDomains(@RequestParam(value = "tagDomainUrn", required = true) String tagDomainUrn, @PathVariable("applicationUrn") String applicationUrn
+    public final void applicationRemoveTagDomains(@RequestParam(value = "tagDomainUrn", required = true) List<String> tagDomainUrns, @PathVariable("applicationUrn") String applicationUrn
             , Principal principal) {
         kpiService.addEvent(principal, "api:admin/applications/tagDomains/remove"
                 , "applicationUrn", applicationUrn
-                , "tagDomainUrn", tagDomainUrn
+                , "tagDomainUrns", tagDomainUrns
         );
 
-        LOGGER.info("DELETE applicationRemoveTagDomains");
-
-        Application a = applicationRepository.findByUrn(applicationUrn);
-        if (a == null) {
-            throw new RestException("Application Not Found");
-        }
-        TagDomain td = tagDomainRepository.findByUrn(tagDomainUrn);
-        if (td == null) {
-            throw new RestException("TagDomain Not Found");
-        }
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (!ou.isAdministrator() && !ou.isExperimenter()) {
             LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
-        if (ou.ownsExperiment(applicationUrn)) {
-            throw new RestException("Experimenter is not owning experiment");
-        }
-        try {
-            a.getTagDomains().remove(td);
-            applicationRepository.save(a);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RestException(e.getMessage());
+
+        LOGGER.info("DELETE applicationRemoveTagDomains");
+
+        for (String tagDomainUrn : tagDomainUrns) {
+
+            Application a = applicationRepository.findByUrn(applicationUrn);
+            if (a == null) {
+                throw new RestException("Application Not Found");
+            }
+            TagDomain td = tagDomainRepository.findByUrn(tagDomainUrn);
+            if (td == null) {
+                throw new RestException("TagDomain Not Found");
+            }
+
+            if (ou.ownsExperiment(applicationUrn)) {
+                throw new RestException("Experimenter is not owning experiment");
+            }
+            try {
+                a.getTagDomains().remove(td);
+                applicationRepository.save(a);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RestException(e.getMessage());
+            }
         }
     }
 
