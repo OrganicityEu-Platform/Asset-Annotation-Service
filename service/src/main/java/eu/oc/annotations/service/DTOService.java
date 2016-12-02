@@ -4,6 +4,7 @@ import eu.oc.annotations.domain.Application;
 import eu.oc.annotations.domain.Tag;
 import eu.oc.annotations.domain.TagDomain;
 import eu.organicity.annotation.service.dto.ExperimentDTO;
+import eu.organicity.annotation.service.dto.ServiceDTO;
 import eu.organicity.annotation.service.dto.TagDTO;
 import eu.organicity.annotation.service.dto.TagDomainDTO;
 import org.springframework.stereotype.Service;
@@ -54,6 +55,14 @@ public class DTOService {
         return tagDTO;
     }
 
+    public ServiceDTO toDTO(eu.oc.annotations.domain.Service service) {
+        ServiceDTO dto = new ServiceDTO();
+        dto.setId(service.getId());
+        dto.setUrn(service.getUrn());
+        dto.setDescription(service.getDescription());
+        return dto;
+    }
+
     public List<ExperimentDTO> toExperimentListDTO(List<Application> applications) {
         ArrayList<ExperimentDTO> dtoList = new ArrayList<>();
         for (Application application : applications) {
@@ -70,6 +79,13 @@ public class DTOService {
         return list;
     }
 
+    public List<ServiceDTO> toServiceListDTO(List<eu.oc.annotations.domain.Service> services) {
+        final List<ServiceDTO> list = new ArrayList<>();
+        for (final eu.oc.annotations.domain.Service service : services) {
+            list.add(toDTO(service));
+        }
+        return list;
+    }
 
     public Set<TagDTO> toTagSetDTO(Set<Tag> tags) {
         Set<TagDTO> dto = new HashSet<>();

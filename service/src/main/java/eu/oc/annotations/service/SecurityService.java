@@ -34,4 +34,8 @@ public class SecurityService {
     public boolean canEdit(eu.oc.annotations.domain.Service s, OrganicityAccount ou) {
         return ou.isAdministrator();
     }
+
+    public boolean canCreateService(OrganicityAccount ou) {
+        return ou.isAdministrator();
+    }
 }

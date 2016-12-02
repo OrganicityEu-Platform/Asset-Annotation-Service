@@ -15,6 +15,7 @@ import eu.oc.annotations.service.KPIService;
 import eu.oc.annotations.service.OrganicityUserDetailsService;
 import eu.oc.annotations.service.SecurityService;
 import eu.organicity.annotation.service.dto.ExperimentDTO;
+import eu.organicity.annotation.service.dto.ServiceDTO;
 import eu.organicity.annotation.service.dto.TagDTO;
 import eu.organicity.annotation.service.dto.TagDomainDTO;
 import org.slf4j.Logger;
@@ -255,7 +256,7 @@ public class TagDomainManager {
 
     //get Services using this TagDomain
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/services"}, method = RequestMethod.GET)
-    public final List<Service> tagDomainGetServices(@PathVariable("tagDomainUrn") String tagDomainUrn
+    public final List<ServiceDTO> tagDomainGetServices(@PathVariable("tagDomainUrn") String tagDomainUrn
             , Principal principal) {
         kpiService.addEvent(principal, "api:admin/tagDomains/services", "tagDomainUrn", tagDomainUrn);
 
@@ -265,13 +266,13 @@ public class TagDomainManager {
         if (a == null) {
             throw new RestException("TagDomain Not Found");
         }
-        return a.getServices();
+        return dtoService.toServiceListDTO(a.getServices());
     }
 
     //Associate TagDomain with Service
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/services"}, method = RequestMethod.POST)
-    public final TagDomain serviceAddTagDomains(@RequestParam(value = "serviceUrn", required = true) String
-                                                        serviceUrn, @PathVariable("tagDomainUrn") String tagDomainUrn
+    public final TagDomainDTO serviceAddTagDomains(@RequestParam(value = "serviceUrn") String serviceUrn
+            , @PathVariable("tagDomainUrn") String tagDomainUrn
             , Principal principal) {
         kpiService.addEvent(principal, "api:admin/tagDomains/services/add"
                 , "tagDomainUrn", tagDomainUrn
@@ -289,13 +290,13 @@ public class TagDomainManager {
             throw new RestException("TagDomain Not Found");
         }
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
-        if (!securityService.canEdit(d, ou)) {
+        if (!securityService.canEdit(d, ou) || !securityService.canEdit(s, ou)) {
             LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
         try {
             d.getServices().add(s);
-            return tagDomainRepository.save(d);
+            return dtoService.toDTO(tagDomainRepository.save(d));
         } catch (Exception e) {
             e.printStackTrace();
             throw new RestException(e.getMessage());
@@ -304,8 +305,8 @@ public class TagDomainManager {
 
     //Disassociate TagDomain with Service
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/services"}, method = RequestMethod.DELETE)
-    public final void serviceRemoveTagDomains(@RequestParam(value = "serviceUrn", required = true) String
-                                                      serviceUrn, @PathVariable("tagDomainUrn") String tagDomainUrn
+    public final void serviceRemoveTagDomains(@RequestParam(value = "serviceUrn") String serviceUrn
+            , @PathVariable("tagDomainUrn") String tagDomainUrn
             , Principal principal) {
         kpiService.addEvent(principal, "api:admin/tagDomains/services/remove"
                 , "tagDomainUrn", tagDomainUrn
@@ -318,18 +319,18 @@ public class TagDomainManager {
         if (s == null) {
             throw new RestException("Service Not Found");
         }
-        TagDomain a = tagDomainRepository.findByUrn(tagDomainUrn);
-        if (a == null) {
+        TagDomain d = tagDomainRepository.findByUrn(tagDomainUrn);
+        if (d == null) {
             throw new RestException("TagDomain Not Found");
         }
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
-        if (!securityService.canEdit(s, ou)) {
+        if (!securityService.canEdit(d, ou) || !securityService.canEdit(s, ou)) {
             LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
         try {
-            a.getServices().remove(s);
-            tagDomainRepository.save(a);
+            d.getServices().remove(s);
+            tagDomainRepository.save(d);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RestException(e.getMessage());
@@ -341,31 +342,31 @@ public class TagDomainManager {
 
     //Create Service
     @RequestMapping(value = {"admin/services"}, method = RequestMethod.POST)
-    public final Service servicesCreate(@RequestBody Service service, Principal principal) {
-        kpiService.addEvent(principal, "api:admin/services/create", "serviceUrn", service.getUrn());
+    public final ServiceDTO servicesCreate(@RequestBody ServiceDTO dto, Principal principal) {
+        kpiService.addEvent(principal, "api:admin/services/create", "serviceUrn", dto.getUrn());
 
         LOGGER.info("POST servicesCreate");
 
-        if (service.getId() != null) {
-            throw new RestException("Service Exception: Service.id has to be null");
-        }
-        Service s = serviceRepository.findByUrn(service.getUrn());
+        Service s = serviceRepository.findByUrn(dto.getUrn());
         if (s != null) { //tagDomain Create
             throw new RestException("Service Exception: duplicate urn");
         }
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
-        if (!securityService.canEdit(s, ou)) {
+        if (!securityService.canCreateService(ou)) {
             LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
-        service.setId(null);
+        s = new Service();
+        s.setId(null);
+        s.setUrn(dto.getUrn());
+        s.setDescription(dto.getDescription());
         try {
-            service = serviceRepository.save(service);
+            s = serviceRepository.save(s);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RestException(e.getMessage());
         }
-        return service;
+        return dtoService.toDTO(s);
     }
 
     //Delete Service
