@@ -81,19 +81,10 @@ public class TagDomainManager {
         }
 
         for (TagDTO tagDTO : dto.getTags()) {
-            Tag tag = tagRepository.findByUrn(tagDTO.getUrn());
-            if (tag != null) { //tagDomain Create
-                LOGGER.error("Tag Exception: duplicate urn: " + tag.getUrn());
-                throw new RestException("Tag Exception: duplicate urn");
-            }
-            tag = new Tag();
-            tag.setUrn(tagDTO.getUrn());
-            tag.setName(tagDTO.getName());
-            tag = tagRepository.save(tag);
-            domain.getTags().add(tag);
-            domain = tagDomainRepository.save(domain);
+            addTag2Domain(domain.getUrn(), tagDTO);
         }
 
+        domain = tagDomainRepository.findByUrn(dto.getUrn());
         return dtoService.toDTO(domain);
     }
 
@@ -167,7 +158,7 @@ public class TagDomainManager {
 
     //Add tag to domain
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/tag"}, method = RequestMethod.POST)
-    public final TagDTO domainCreateTag(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody Tag tag
+    public final TagDTO domainCreateTag(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody TagDTO tag
             , Principal principal) {
         kpiService.addEvent(principal, "api:admin/tagDomains/tags/add"
                 , "tagDomainUrn", tagDomainUrn
@@ -176,44 +167,11 @@ public class TagDomainManager {
 
         LOGGER.info("POST domainCreateTag");
         Tag addedTag = addTag2Domain(tagDomainUrn, tag);
-        return dtoService.toDTO(tag);
-    }//Add tag to domain
-
-    private Tag addTag2Domain(String tagDomainUrn, Tag tag) {
-        TagDomain d = tagDomainRepository.findByUrn(tagDomainUrn);
-        if (d == null) {
-            LOGGER.error("TagDomain Not Found");
-            throw new RestException("TagDomain Not Found");
-        }
-        Tag a = tagRepository.findByUrn(tag.getUrn());
-        if (a != null) {
-            LOGGER.error("Tag:Duplicate Urn");
-            throw new RestException("Tag:Duplicate Urn");
-        }
-        OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
-        if (!ou.isAdministrator() && !ou.isExperimenter()) {
-            LOGGER.error("Not Authorized Access");
-            throw new RestException("Not Authorized Access");
-        }
-        if (ou.isTheOnlyExperimnterUsingTagDomain(applicationRepository.findApplicationsUsingTagDomain(tagDomainUrn))) {
-            LOGGER.error("TagDomain is used also from other experiments. Not possible to delete/update");
-            throw new RestException("TagDomain is used also from other experiments. Not possible to delete/update");
-        }
-
-        tag.setId(null);
-        try {
-            tag = tagRepository.save(tag);
-            d.getTags().add(tag);
-            tagDomainRepository.save(d);
-            return tag;
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            throw new RestException(e.getMessage());
-        }
+        return dtoService.toDTO(addedTag);
     }
 
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/tags"}, method = RequestMethod.POST)
-    public final Set<TagDTO> domainCreateTags(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody List<Tag> tags
+    public final Set<TagDTO> domainCreateTags(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody List<TagDTO> tags
             , Principal principal) {
         kpiService.addEvent(principal, "api:admin/tagDomains/tags/add"
                 , "tagDomainUrn", tagDomainUrn
@@ -222,7 +180,7 @@ public class TagDomainManager {
 
         LOGGER.info("POST domainCreateTags");
         Set<Tag> addedTags = new HashSet<>();
-        for (final Tag tag : tags) {
+        for (final TagDTO tag : tags) {
             addedTags.add(addTag2Domain(tagDomainUrn, tag));
         }
         return dtoService.toTagSetDTO(addedTags);
@@ -586,5 +544,39 @@ public class TagDomainManager {
         }
     }
 
+    //Add tag to domain
+    private Tag addTag2Domain(String tagDomainUrn, TagDTO tag) {
+        TagDomain d = tagDomainRepository.findByUrn(tagDomainUrn);
+        if (d == null) {
+            LOGGER.error("TagDomain Not Found");
+            throw new RestException("TagDomain Not Found");
+        }
+        Tag a = tagRepository.findByUrn(tag.getUrn());
+        if (a != null) {
+            LOGGER.error("Tag:Duplicate Urn");
+            throw new RestException("Tag:Duplicate Urn");
+        }
+        OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
+        if (!ou.isAdministrator() && !ou.isExperimenter()) {
+            LOGGER.error("Not Authorized Access");
+            throw new RestException("Not Authorized Access");
+        }
+        if (ou.isTheOnlyExperimnterUsingTagDomain(applicationRepository.findApplicationsUsingTagDomain(tagDomainUrn))) {
+            LOGGER.error("TagDomain is used also from other experiments. Not possible to delete/update");
+            throw new RestException("TagDomain is used also from other experiments. Not possible to delete/update");
+        }
 
+        a.setId(null);
+        try {
+            a.setUrn(tag.getUrn());
+            a.setName(tag.getName());
+            a = tagRepository.save(a);
+            d.getTags().add(a);
+            tagDomainRepository.save(d);
+            return a;
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            throw new RestException(e.getMessage());
+        }
+    }
 }
