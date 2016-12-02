@@ -15,12 +15,14 @@ import eu.oc.annotations.service.KPIService;
 import eu.oc.annotations.service.OrganicityUserDetailsService;
 import eu.organicity.annotation.service.dto.ExperimentDTO;
 import eu.organicity.annotation.service.dto.TagDTO;
+import eu.organicity.annotation.service.dto.TagDomainDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -51,16 +53,12 @@ public class TagDomainManager {
 
     //Create tagDomain
     @RequestMapping(value = {"admin/tagDomains"}, method = RequestMethod.POST)
-    public final TagDomain domainCreate(@RequestBody TagDomain domain, Principal principal) {
-        kpiService.addEvent(principal, "api:admin/tagDomains", "tagDomainUrn", domain.getUrn());
+    public final TagDomainDTO domainCreate(@RequestBody TagDomainDTO dto, Principal principal) {
+        kpiService.addEvent(principal, "api:admin/tagDomains", "tagDomainUrn", dto.getUrn());
 
         LOGGER.info("POST domainCreate");
 
-        if (domain.getId() != null) {
-            LOGGER.error("TagDomain Exception: TagDomain.id has to be null");
-            throw new RestException("TagDomain Exception: TagDomain.id has to be null");
-        }
-        TagDomain a = tagDomainRepository.findByUrn(domain.getUrn());
+        TagDomain a = tagDomainRepository.findByUrn(dto.getUrn());
         if (a != null) { //tagDomain Create
             LOGGER.error("TagDomain Exception: duplicate urn");
             throw new RestException("TagDomain Exception: duplicate urn");
@@ -70,19 +68,38 @@ public class TagDomainManager {
             LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
-        domain.setId(null);
+
+        TagDomain domain = new TagDomain();
+        domain.setUrn(dto.getUrn());
+        domain.setDescription(dto.getDescription());
+        domain.setTags(new ArrayList<>());
         try {
             domain = tagDomainRepository.save(domain);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             throw new RestException(e.getMessage());
         }
-        return domain;
+
+        for (TagDTO tagDTO : dto.getTags()) {
+            Tag tag = tagRepository.findByUrn(tagDTO.getUrn());
+            if (tag != null) { //tagDomain Create
+                LOGGER.error("Tag Exception: duplicate urn: " + tag.getUrn());
+                throw new RestException("Tag Exception: duplicate urn");
+            }
+            tag = new Tag();
+            tag.setUrn(tagDTO.getUrn());
+            tag.setName(tagDTO.getName());
+            tag = tagRepository.save(tag);
+            domain.getTags().add(tag);
+            domain = tagDomainRepository.save(domain);
+        }
+
+        return dtoService.toDTO(domain);
     }
 
     //Update tagDomain
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}"}, method = RequestMethod.POST)
-    public final TagDomain domainUpdate(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody TagDomain domain
+    public final TagDomainDTO domainUpdate(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody TagDomainDTO domain
             , Principal principal) {
         kpiService.addEvent(principal, "api:admin/tagDomains/update", "tagDomainUrn", domain.getUrn());
 
@@ -104,12 +121,12 @@ public class TagDomainManager {
         }
         d.setDescription(domain.getDescription());
         try {
-            domain = tagDomainRepository.save(d);
+            d = tagDomainRepository.save(d);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             throw new RestException(e.getMessage());
         }
-        return domain;
+        return dtoService.toDTO(d);
     }
 
     //Delete tagDomain
