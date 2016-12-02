@@ -12,25 +12,26 @@ public class SecurityService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SecurityService.class);
 
 
+    public boolean canCreate(OrganicityAccount ou) {
+        return ou.isAdministrator() || ou.isExperimenter();
+    }
+
     public boolean canEdit(TagDomain d, OrganicityAccount ou) {
-        if (d.getServices() != null && !d.getServices().isEmpty()) {
-            if (ou.isAdministrator()) {
-                return true;
+        if (d.getServices() != null) {
+            if (d.getServices().isEmpty()) {
+                LOGGER.info(ou.isExperimenter() + "|| " + ou.isAdministrator());
+                return ou.isExperimenter() || ou.isAdministrator();
+            } else {
+                LOGGER.info("" + ou.isAdministrator());
+                return ou.isAdministrator();
             }
-
-
         } else {
-            if (ou.isAdministrator() || ou.isExperimenter()) {
-                return true;
-            }
+            LOGGER.info(ou.isExperimenter() + "|| " + ou.isAdministrator());
+            return ou.isExperimenter() || ou.isAdministrator();
         }
-        return false;
     }
 
     public boolean canEdit(eu.oc.annotations.domain.Service s, OrganicityAccount ou) {
-        if (ou.isAdministrator()) {
-            return true;
-        }
-        return false;
+        return ou.isAdministrator();
     }
 }

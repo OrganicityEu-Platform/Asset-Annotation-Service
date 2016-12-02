@@ -21,9 +21,9 @@
     <logger name="org.springframework.data.jpa" level="ALL" />
     <logger name="org.springframework.dao" level="ALL"/>
     <logger name="org.springframework.orm" level="ALL"/>
-    <logger name="org.keycloak.OAuthErrorException" level="ALL"/>
-     <root level="ERROR"> <!-- ERROR, ALL, INFO, WARN-->
-        <appender-ref ref="STDOUT"/>
+    <logger name="eu.oc.annotations" level="ALL"/>
+    <logger name="org.keycloak" level="DEBUG"/>
+    <root level="ERROR"> <!-- ERROR, ALL, INFO, WARN-->
         <appender-ref ref="FILE"/>
     </root>
 </configuration>

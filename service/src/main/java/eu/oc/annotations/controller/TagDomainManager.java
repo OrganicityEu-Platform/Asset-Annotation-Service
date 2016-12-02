@@ -68,28 +68,36 @@ public class TagDomainManager {
             throw new RestException("TagDomain Exception: duplicate urn");
         }
 
+        LOGGER.info("checking permissions");
+
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
-        if (!securityService.canEdit(d, ou)) {
+        if (!securityService.canCreate(ou)) {
             LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
+        LOGGER.info("has access");
 
         TagDomain domain = new TagDomain();
         domain.setUrn(dto.getUrn());
         domain.setDescription(dto.getDescription());
         domain.setTags(new ArrayList<>());
         try {
+            LOGGER.info("saving domain " + domain);
             domain = tagDomainRepository.save(domain);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             throw new RestException(e.getMessage());
         }
-
-        for (TagDTO tagDTO : dto.getTags()) {
-            addTag2Domain(domain.getUrn(), tagDTO);
+        if (dto.getTags() != null) {
+            LOGGER.info("adding tags");
+            for (TagDTO tagDTO : dto.getTags()) {
+                LOGGER.info("adding tag " + tagDTO);
+                addTag2Domain(domain.getUrn(), tagDTO);
+            }
         }
 
         domain = tagDomainRepository.findByUrn(dto.getUrn());
+        LOGGER.info("returning : " + domain);
         return dtoService.toDTO(domain);
     }
 
@@ -176,6 +184,7 @@ public class TagDomainManager {
 
         LOGGER.info("POST domainCreateTag");
         Tag addedTag = addTag2Domain(tagDomainUrn, tag);
+        LOGGER.info("addedTag:" + addedTag);
         return dtoService.toDTO(addedTag);
     }
 
@@ -564,35 +573,38 @@ public class TagDomainManager {
 
     //Add tag to domain
 
-    private Tag addTag2Domain(String tagDomainUrn, TagDTO tag) {
+    private Tag addTag2Domain(String tagDomainUrn, TagDTO dto) {
         TagDomain d = tagDomainRepository.findByUrn(tagDomainUrn);
         if (d == null) {
             LOGGER.error("TagDomain Not Found");
             throw new RestException("TagDomain Not Found");
         }
-        Tag a = tagRepository.findByUrn(tag.getUrn());
-        if (a != null) {
+        Tag tag = tagRepository.findByUrn(dto.getUrn());
+        if (tag != null) {
             LOGGER.error("Tag:Duplicate Urn");
             throw new RestException("Tag:Duplicate Urn");
         }
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
-        if (!ou.isAdministrator() && !ou.isExperimenter()) {
+        if (!securityService.canEdit(d, ou)) {
             LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
+
         if (ou.isTheOnlyExperimnterUsingTagDomain(applicationRepository.findApplicationsUsingTagDomain(tagDomainUrn))) {
             LOGGER.error("TagDomain is used also from other experiments. Not possible to delete/update");
             throw new RestException("TagDomain is used also from other experiments. Not possible to delete/update");
         }
 
-        a.setId(null);
         try {
-            a.setUrn(tag.getUrn());
-            a.setName(tag.getName());
-            a = tagRepository.save(a);
-            d.getTags().add(a);
+            tag = new Tag();
+            tag.setId(null);
+            tag.setUrn(dto.getUrn());
+            tag.setName(dto.getName());
+            tag = tagRepository.save(tag);
+            LOGGER.info("tag:" + tag);
+            d.getTags().add(tag);
             tagDomainRepository.save(d);
-            return a;
+            return tag;
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             throw new RestException(e.getMessage());
