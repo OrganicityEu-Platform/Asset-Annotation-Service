@@ -328,13 +328,8 @@ public class TagDomainManager {
             LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
-        try {
-            d.getServices().remove(s);
-            tagDomainRepository.save(d);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RestException(e.getMessage());
-        }
+        d.getServices().remove(s);
+        tagDomainRepository.save(d);
     }
 
 
@@ -351,21 +346,19 @@ public class TagDomainManager {
         if (s != null) { //tagDomain Create
             throw new RestException("Service Exception: duplicate urn");
         }
+        LOGGER.info("check permissions");
+
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (!securityService.canCreateService(ou)) {
             LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
+        LOGGER.info("can create");
         s = new Service();
         s.setId(null);
         s.setUrn(dto.getUrn());
         s.setDescription(dto.getDescription());
-        try {
-            s = serviceRepository.save(s);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RestException(e.getMessage());
-        }
+        s = serviceRepository.save(s);
         return dtoService.toDTO(s);
     }
 
