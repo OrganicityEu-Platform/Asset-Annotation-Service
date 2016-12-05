@@ -20,6 +20,9 @@ public class Tag {
     @Property(name = "name")
     private String name;
 
+    @Property(name = "user")
+    private String user;
+
     public Long getId() {
         return id;
     }
@@ -44,6 +47,13 @@ public class Tag {
         this.name = name;
     }
 
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
 
     @Override
     public String toString() {

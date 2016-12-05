@@ -23,6 +23,9 @@ public class Service {
     @Property(name = "description")
     private String description;
 
+    @Property(name = "user")
+    private String user;
+
     public Service() {
     }
 
@@ -53,6 +56,14 @@ public class Service {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
     }
 
     @Override

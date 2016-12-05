@@ -25,6 +25,7 @@ public class DTOService {
         dto.setUrn(experiment.getUrn());
         dto.setDescription(experiment.getDescription());
         dto.setTagDomains(new ArrayList<>());
+        dto.setUser(experiment.getUser());
         if (experiment.getTagDomains() != null) {
             for (TagDomain tagDomain : experiment.getTagDomains()) {
                 dto.getTagDomains().add(toDTO(tagDomain));
@@ -39,6 +40,7 @@ public class DTOService {
         dto.setUrn(tagDomain.getUrn());
         dto.setDescription(tagDomain.getDescription());
         dto.setTags(new HashSet<>());
+        dto.setUser(tagDomain.getUser());
         if (tagDomain.getTags() != null) {
             for (Tag tag : tagDomain.getTags()) {
                 dto.getTags().add(toDTO(tag));
@@ -52,6 +54,7 @@ public class DTOService {
         tagDTO.setId(tag.getId());
         tagDTO.setUrn(tag.getUrn());
         tagDTO.setName(tag.getName());
+        tagDTO.setUser(tag.getUser());
         return tagDTO;
     }
 
@@ -60,6 +63,7 @@ public class DTOService {
         dto.setId(service.getId());
         dto.setUrn(service.getUrn());
         dto.setDescription(service.getDescription());
+        dto.setUser(service.getUser());
         return dto;
     }
 

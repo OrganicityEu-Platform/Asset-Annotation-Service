@@ -22,6 +22,9 @@ public class TagDomain {
     @Property(name = "description")
     private String description;
 
+    @Property(name = "user")
+    private String user;
+
 
     @Relationship(type = "HAS", direction = "UNDIRECTED")
     private List<Tag> tags;
@@ -73,6 +76,14 @@ public class TagDomain {
 
     public void setServices(List<Service> services) {
         this.services = services;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
     }
 
     @Override

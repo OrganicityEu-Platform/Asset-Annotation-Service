@@ -126,6 +126,7 @@ public class TagDomainManager {
             throw new RestException("TagDomain is used also from other experiments. Not possible to delete/update");
         }
         d.setDescription(domain.getDescription());
+        d.setUser(ou.getUser());
         try {
             d = tagDomainRepository.save(d);
         } catch (Exception e) {
@@ -358,6 +359,7 @@ public class TagDomainManager {
         s.setId(null);
         s.setUrn(dto.getUrn());
         s.setDescription(dto.getDescription());
+        s.setUser(dto.getDescription());
         s = serviceRepository.save(s);
         return dtoService.toDTO(s);
     }
@@ -414,6 +416,7 @@ public class TagDomainManager {
         experiment.setId(null);
         experiment.setUrn(experimentDTO.getUrn());
         experiment.setDescription(experimentDTO.getDescription());
+        experiment.setUser(ou.getUser());
         try {
             experiment = applicationRepository.save(experiment);
         } catch (Exception e) {
@@ -593,6 +596,7 @@ public class TagDomainManager {
             tag.setId(null);
             tag.setUrn(dto.getUrn());
             tag.setName(dto.getName());
+            tag.setUser(ou.getUser());
             tag = tagRepository.save(tag);
             LOGGER.info("tag:" + tag);
             d.getTags().add(tag);

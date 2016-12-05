@@ -28,7 +28,10 @@ public class Application {
     private String description;
 
     @Relationship(type = "USES", direction = "UNDIRECTED")
-    private List<TagDomain> tagDomains=new ArrayList<>();
+    private List<TagDomain> tagDomains = new ArrayList<>();
+
+    @Property(name = "user")
+    private String user;
 
     public Application() {
     }
@@ -70,6 +73,13 @@ public class Application {
         this.tagDomains = tagDomains;
     }
 
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
 
     @Override
     public String toString() {
