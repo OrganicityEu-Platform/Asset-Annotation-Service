@@ -573,11 +573,7 @@ public class TagDomainManager {
             LOGGER.error("TagDomain Not Found");
             throw new RestException("TagDomain Not Found");
         }
-        Tag tag = tagRepository.findByUrn(dto.getUrn());
-        if (tag != null) {
-            LOGGER.error("Tag:Duplicate Urn");
-            throw new RestException("Tag:Duplicate Urn");
-        }
+
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (!securityService.canEdit(d, ou)) {
             LOGGER.error("Not Authorized Access");
@@ -589,8 +585,11 @@ public class TagDomainManager {
             throw new RestException("TagDomain is used also from other experiments. Not possible to delete/update");
         }
 
+        Tag tag = tagRepository.findByUrn(dto.getUrn());
         try {
-            tag = new Tag();
+            if (tag == null) {
+                tag = new Tag();
+            }
             tag.setId(null);
             tag.setUrn(dto.getUrn());
             tag.setName(dto.getName());
