@@ -359,7 +359,7 @@ public class TagDomainManager {
         s.setId(null);
         s.setUrn(dto.getUrn());
         s.setDescription(dto.getDescription());
-        s.setUser(dto.getDescription());
+        s.setUser(dto.getUser());
         s = serviceRepository.save(s);
         return dtoService.toDTO(s);
     }
