@@ -19,6 +19,7 @@ import java.util.Set;
  */
 @Service
 public class DTOService {
+
     public ExperimentDTO toDTO(Application experiment) {
         ExperimentDTO dto = new ExperimentDTO();
         dto.setId(experiment.getId());
@@ -44,6 +45,12 @@ public class DTOService {
         if (tagDomain.getTags() != null) {
             for (Tag tag : tagDomain.getTags()) {
                 dto.getTags().add(toDTO(tag));
+            }
+        }
+        dto.setServices(new HashSet<>());
+        if (tagDomain.getServices() != null) {
+            for (eu.oc.annotations.domain.Service service : tagDomain.getServices()) {
+                dto.getServices().add(toDTO(service));
             }
         }
         return dto;
