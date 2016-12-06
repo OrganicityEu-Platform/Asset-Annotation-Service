@@ -408,7 +408,7 @@ public class TagDomainManager {
             throw new RestException("Experiment Exception: duplicate urn");
         }
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
-        if (!ou.isAdministrator() && !ou.isExperimenter()) {
+        if (ou == null || (!ou.isAdministrator() && !ou.isExperimenter())) {
             LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
@@ -440,7 +440,7 @@ public class TagDomainManager {
             throw new RestException("Experiment Not Found");
         }
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
-        if (!ou.isAdministrator() && !ou.isExperimenter()) {
+        if (ou == null || (!ou.isAdministrator() && !ou.isExperimenter())) {
             LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
@@ -469,7 +469,7 @@ public class TagDomainManager {
             throw new RestException("Experiment Not Found");
         }
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
-        if (!ou.isAdministrator() && !ou.isExperimenter()) {
+        if (ou == null || (!ou.isAdministrator() && !ou.isExperimenter())) {
             LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
@@ -491,7 +491,7 @@ public class TagDomainManager {
         );
 
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
-        if (!ou.isAdministrator() && !ou.isExperimenter()) {
+        if (ou == null || (!ou.isAdministrator() && !ou.isExperimenter())) {
             LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
@@ -537,7 +537,7 @@ public class TagDomainManager {
         );
 
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
-        if (!ou.isAdministrator() && !ou.isExperimenter()) {
+        if (ou == null || (!ou.isAdministrator() && !ou.isExperimenter())) {
             LOGGER.error("Not Authorized Access");
             throw new RestException("Not Authorized Access");
         }
