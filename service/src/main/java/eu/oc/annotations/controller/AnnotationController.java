@@ -2,16 +2,16 @@ package eu.oc.annotations.controller;
 
 import eu.oc.annotations.config.OrganicityAccount;
 import eu.oc.annotations.domain.Annotation;
-import eu.oc.annotations.domain.Asset;
-import eu.oc.annotations.domain.dto.AnnotationDTO;
 import eu.oc.annotations.domain.dto.AssetAnnotationListDTO;
 import eu.oc.annotations.domain.dto.AssetAnnotationListItemDTO;
 import eu.oc.annotations.domain.dto.AssetListDTO;
 import eu.oc.annotations.handlers.RestException;
 import eu.oc.annotations.repositories.AssetRepository;
 import eu.oc.annotations.service.AnnotationService;
+import eu.oc.annotations.service.DTOService;
 import eu.oc.annotations.service.KPIService;
 import eu.oc.annotations.service.OrganicityUserDetailsService;
+import eu.organicity.annotation.service.dto.AnnotationDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 import java.security.Principal;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -34,6 +33,8 @@ public class AnnotationController {
     AssetRepository assetRepository;
     @Autowired
     KPIService kpiService;
+    @Autowired
+    DTOService dtoService;
 
     // Annotation Tagging METHODS-----------------------------------------------
     //Create Tagging
@@ -71,9 +72,7 @@ public class AnnotationController {
     private Set<AnnotationDTO> toDTO(Set<Annotation> annotationsOfAsset) {
         final Set<AnnotationDTO> dtos = new HashSet<>();
         for (final Annotation annotation : annotationsOfAsset) {
-            dtos.add(new AnnotationDTO(annotation.getAnnotationId(), annotation.getAssetUrn(), annotation.getTagUrn(),
-                    annotation.getDatetime(), annotation.getUser(), annotation.getApplication(),
-                    annotation.getNumericValue(), annotation.getTextValue()));
+            dtos.add(dtoService.toAnnotationDTO(annotation));
         }
         return dtos;
     }
@@ -121,12 +120,13 @@ public class AnnotationController {
     }
 
     @RequestMapping(value = {"annotations/all"}, method = RequestMethod.GET)
-    public final List<Asset> getAnnotations(final HttpServletResponse response, Principal principal) {
+    public final Set<eu.organicity.annotation.service.dto.AnnotationDTO> getAnnotations(final HttpServletResponse response, Principal principal) {
         kpiService.addEvent(principal, "api:annotations/all");
 
         //todo show all public Annotations of asset add paging and sorting
         response.setHeader("Cache-Control", "no-cache");
-        return assetRepository.findAll();
+
+        return dtoService.toAssetListDTO(assetRepository.findAll());
     }
 
     @RequestMapping(value = {"annotations/all"}, method = RequestMethod.POST)

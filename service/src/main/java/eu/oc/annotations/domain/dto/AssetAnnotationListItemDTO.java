@@ -1,5 +1,7 @@
 package eu.oc.annotations.domain.dto;
 
+import eu.organicity.annotation.service.dto.AnnotationDTO;
+
 import java.util.Set;
 
 public class AssetAnnotationListItemDTO {

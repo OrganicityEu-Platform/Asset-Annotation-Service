@@ -1,12 +1,7 @@
 package eu.oc.annotations.service;
 
-import eu.oc.annotations.domain.Application;
-import eu.oc.annotations.domain.Tag;
-import eu.oc.annotations.domain.TagDomain;
-import eu.organicity.annotation.service.dto.ExperimentDTO;
-import eu.organicity.annotation.service.dto.ServiceDTO;
-import eu.organicity.annotation.service.dto.TagDTO;
-import eu.organicity.annotation.service.dto.TagDomainDTO;
+import eu.oc.annotations.domain.*;
+import eu.organicity.annotation.service.dto.*;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -103,6 +98,42 @@ public class DTOService {
         for (Tag tag : tags) {
             dto.add(toDTO(tag));
         }
+        return dto;
+    }
+
+    public Set<AnnotationDTO> toAssetListDTO(List<Asset> all) {
+        final HashSet<AnnotationDTO> dto = new HashSet<>();
+        for (final Asset asset : all) {
+            for (final Tagging tagging : asset.getTaggings()) {
+                dto.add(toDTO(tagging));
+            }
+        }
+        return dto;
+    }
+
+    public AnnotationDTO toDTO(final Tagging tagging) {
+        AnnotationDTO dto = new AnnotationDTO();
+        dto.setAnnotationId(tagging.getTaggingId());
+        dto.setApplication(tagging.getApplication());
+        dto.setAssetUrn(tagging.getAsset().getUrn());
+        dto.setDatetime("" + tagging.getTimestamp());
+        dto.setUser(tagging.getUser());
+        dto.setTagUrn(tagging.getTag().getUrn());
+        dto.setTextValue(tagging.getTextValue());
+        dto.setNumericValue(tagging.getNumericValue());
+        return dto;
+    }
+
+    public AnnotationDTO toAnnotationDTO(final Annotation tagging) {
+        AnnotationDTO dto = new AnnotationDTO();
+        dto.setAnnotationId(tagging.getAnnotationId());
+        dto.setApplication(tagging.getApplication());
+        dto.setAssetUrn(tagging.getAssetUrn());
+        dto.setDatetime(tagging.getDatetime());
+        dto.setUser(tagging.getUser());
+        dto.setTagUrn(tagging.getTagUrn());
+        dto.setTextValue(tagging.getTextValue());
+        dto.setNumericValue(tagging.getNumericValue());
         return dto;
     }
 }
