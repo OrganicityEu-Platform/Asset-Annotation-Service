@@ -226,38 +226,40 @@ public class TagDomainManager {
                 throw new RestException("TagDomain Not Found");
             }
             tagUrn = tagUrn.replace("\"", "");
-            Tag t = tagRepository.findByUrn(tagUrn);
-            if (t == null) {
-                throw new RestException("Tag Not Found");
-            }
-            if (!d.containsTag(tagUrn)) {
-                throw new RestException("TagDomain/Tag are not associated");
-            }
-            OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
-            if (!securityService.canEdit(d, ou)) {
-                LOGGER.error("Not Authorized Access");
-                throw new RestException("Not Authorized Access");
-            }
-
-            try {
-                if (ou.isTheOnlyExperimnterUsingTagDomain(applicationRepository.findApplicationsUsingTagDomain(tagDomainUrn))) {
-                    LOGGER.info("");
-                    throw new RestException("TagDomain is used also from other experiments. Not possible to delete/update");
+            Set<Tag> ts = tagRepository.findAllByUrn(tagUrn);
+            for (Tag t : ts) {
+                if (t == null) {
+                    throw new RestException("Tag Not Found");
                 }
-            } catch (Exception e) {
-                LOGGER.error(e.getMessage(), e);
-            }
+                if (!d.containsTag(tagUrn)) {
+                    throw new RestException("TagDomain/Tag are not associated");
+                }
+                OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
+                if (!securityService.canEdit(d, ou)) {
+                    LOGGER.error("Not Authorized Access");
+                    throw new RestException("Not Authorized Access");
+                }
 
-            try {
-                LOGGER.info("Deleting tag: " + t.getId());
-                tagRepository.delete(t.getId());
-                TagDomain domain = tagDomainRepository.findByUrn(tagDomainUrn);
-                LOGGER.info("Removing tag from TagDomain: " + t.getId());
-                domain.getTags().remove(t);
-                tagDomainRepository.save(domain);
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new RestException(e.getMessage());
+                try {
+                    if (ou.isTheOnlyExperimnterUsingTagDomain(applicationRepository.findApplicationsUsingTagDomain(tagDomainUrn))) {
+                        LOGGER.info("");
+                        throw new RestException("TagDomain is used also from other experiments. Not possible to delete/update");
+                    }
+                } catch (Exception e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
+
+                try {
+                    LOGGER.info("Deleting tag: " + t.getId());
+                    tagRepository.delete(t.getId());
+                    TagDomain domain = tagDomainRepository.findByUrn(tagDomainUrn);
+                    LOGGER.info("Removing tag from TagDomain: " + t.getId());
+                    domain.getTags().remove(t);
+                    tagDomainRepository.save(domain);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new RestException(e.getMessage());
+                }
             }
         }
 
