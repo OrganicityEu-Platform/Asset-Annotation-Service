@@ -239,12 +239,20 @@ public class TagDomainManager {
                 throw new RestException("Not Authorized Access");
             }
 
-            if (ou.isTheOnlyExperimnterUsingTagDomain(applicationRepository.findApplicationsUsingTagDomain(tagDomainUrn))) {
-                throw new RestException("TagDomain is used also from other experiments. Not possible to delete/update");
-            }
             try {
+                if (ou.isTheOnlyExperimnterUsingTagDomain(applicationRepository.findApplicationsUsingTagDomain(tagDomainUrn))) {
+                    LOGGER.info("");
+                    throw new RestException("TagDomain is used also from other experiments. Not possible to delete/update");
+                }
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+            }
+
+            try {
+                LOGGER.info("Deleting tag: " + t.getId());
                 tagRepository.delete(t.getId());
                 TagDomain domain = tagDomainRepository.findByUrn(tagDomainUrn);
+                LOGGER.info("Removing tag from TagDomain: " + t.getId());
                 domain.getTags().remove(t);
                 tagDomainRepository.save(domain);
             } catch (Exception e) {
