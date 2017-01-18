@@ -231,9 +231,7 @@ public class TagDomainManager {
                 if (t == null) {
                     throw new RestException("Tag Not Found");
                 }
-                if (!d.containsTag(tagUrn)) {
-                    throw new RestException("TagDomain/Tag are not associated");
-                }
+
                 OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
                 if (!securityService.canEdit(d, ou)) {
                     LOGGER.error("Not Authorized Access");
@@ -252,10 +250,12 @@ public class TagDomainManager {
                 try {
                     LOGGER.info("Deleting tag: " + t.getId());
                     tagRepository.delete(t.getId());
-                    TagDomain domain = tagDomainRepository.findByUrn(tagDomainUrn);
-                    LOGGER.info("Removing tag from TagDomain: " + t.getId());
-                    domain.getTags().remove(t);
-                    tagDomainRepository.save(domain);
+                    if (d.containsTag(tagUrn)) {
+                        TagDomain domain = tagDomainRepository.findByUrn(tagDomainUrn);
+                        LOGGER.info("Removing tag from TagDomain: " + t.getId());
+                        domain.getTags().remove(t);
+                        tagDomainRepository.save(domain);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                     throw new RestException(e.getMessage());
