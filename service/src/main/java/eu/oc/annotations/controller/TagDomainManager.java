@@ -407,7 +407,7 @@ public class TagDomainManager {
         domain.setUrn(tagDomainUrn);
         domain.setDescription("Experiment Tag Domain");
         domain.setTags(new ArrayList<>());
-        
+        domain.setUser(ou.getUser());
         try {
             LOGGER.info("saving domain " + domain);
             domain = tagDomainRepository.save(domain);
