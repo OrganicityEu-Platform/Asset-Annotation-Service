@@ -13,3 +13,6 @@
 /service/STDOUT.log
 /service/keycloak.json
 /classes
+*.iml
+*.log
+**/target

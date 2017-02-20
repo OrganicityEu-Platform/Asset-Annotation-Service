@@ -1,6 +1,4 @@
-package eu.oc.annotations.domain.dto;
-
-import eu.organicity.annotation.service.dto.AnnotationDTO;
+package eu.organicity.annotation.common.dto;
 
 import java.util.Set;
 

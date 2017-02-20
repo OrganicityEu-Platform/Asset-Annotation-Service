@@ -7,11 +7,11 @@ import eu.oc.annotations.domain.TagDomain;
 import eu.oc.annotations.domain.TagDomainService;
 import eu.oc.annotations.domain.Tagging;
 import eu.oc.annotations.repositories.TagDomainServiceRepository;
-import eu.organicity.annotation.service.dto.AnnotationDTO;
-import eu.organicity.annotation.service.dto.ExperimentDTO;
-import eu.organicity.annotation.service.dto.ServiceDTO;
-import eu.organicity.annotation.service.dto.TagDTO;
-import eu.organicity.annotation.service.dto.TagDomainDTO;
+import eu.organicity.annotation.common.dto.AnnotationDTO;
+import eu.organicity.annotation.common.dto.ExperimentDTO;
+import eu.organicity.annotation.common.dto.ServiceDTO;
+import eu.organicity.annotation.common.dto.TagDTO;
+import eu.organicity.annotation.common.dto.TagDomainDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

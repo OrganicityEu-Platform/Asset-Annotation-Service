@@ -2,16 +2,16 @@ package eu.oc.annotations.controller;
 
 import eu.oc.annotations.config.OrganicityAccount;
 import eu.oc.annotations.domain.Annotation;
-import eu.oc.annotations.domain.dto.AssetAnnotationListDTO;
-import eu.oc.annotations.domain.dto.AssetAnnotationListItemDTO;
-import eu.oc.annotations.domain.dto.AssetListDTO;
 import eu.oc.annotations.handlers.RestException;
 import eu.oc.annotations.repositories.TaggingRepository;
 import eu.oc.annotations.service.AnnotationService;
 import eu.oc.annotations.service.DTOService;
 import eu.oc.annotations.service.KPIService;
 import eu.oc.annotations.service.OrganicityUserDetailsService;
-import eu.organicity.annotation.service.dto.AnnotationDTO;
+import eu.organicity.annotation.common.dto.AnnotationDTO;
+import eu.organicity.annotation.common.dto.AssetAnnotationListDTO;
+import eu.organicity.annotation.common.dto.AssetAnnotationListItemDTO;
+import eu.organicity.annotation.common.dto.AssetListDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,7 +125,7 @@ public class AnnotationController {
     }
 
     @RequestMapping(value = {"annotations/all"}, method = RequestMethod.GET)
-    public final Set<eu.organicity.annotation.service.dto.AnnotationDTO> getAnnotations(final HttpServletResponse response, Principal principal) {
+    public final Set<AnnotationDTO> getAnnotations(final HttpServletResponse response, Principal principal) {
         kpiService.addEvent(principal, "api:annotations/all");
 
         //todo show all public Annotations of asset add paging and sorting
