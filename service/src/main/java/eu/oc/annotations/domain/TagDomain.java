@@ -1,37 +1,41 @@
 package eu.oc.annotations.domain;
 
-import org.neo4j.ogm.annotation.GraphId;
-import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Property;
-import org.neo4j.ogm.annotation.Relationship;
-
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-@NodeEntity
+@Entity
+@Table(name = "tagDomain")
 public class TagDomain {
 
-    @GraphId
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Property(name = "urn")
     @NotNull
+    @Column(unique = true)
     private String urn;
 
-    @Property(name = "description")
     private String description;
 
-    @Property(name = "user")
     private String user;
 
-
-    @Relationship(type = "HAS", direction = "UNDIRECTED")
+    @OneToMany(mappedBy = "tagDomain")
     private List<Tag> tags;
 
-    @Relationship(type = "LINK", direction = "UNDIRECTED")
-    private List<Service> services;
-
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "applicationId")
+    private Application application;
 
     public TagDomain() {
     }
@@ -69,21 +73,20 @@ public class TagDomain {
         this.tags = tags;
     }
 
-    public List<Service> getServices() {
-        if (services == null) services = new ArrayList<>();
-        return services;
-    }
-
-    public void setServices(List<Service> services) {
-        this.services = services;
-    }
-
     public String getUser() {
         return user;
     }
 
     public void setUser(String user) {
         this.user = user;
+    }
+
+    public Application getApplication() {
+        return application;
+    }
+
+    public void setApplication(Application application) {
+        this.application = application;
     }
 
     @Override
@@ -93,7 +96,6 @@ public class TagDomain {
                 ", urn='" + urn + '\'' +
                 ", description='" + description + '\'' +
                 ", tags=" + tags +
-                ", services=" + services +
                 '}';
     }
 

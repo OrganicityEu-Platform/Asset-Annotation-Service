@@ -1,10 +1,12 @@
 package eu.oc.annotations.domain;
 
-import org.neo4j.ogm.annotation.GraphId;
-import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Property;
-import org.neo4j.ogm.annotation.Relationship;
-
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,23 +16,23 @@ import java.util.List;
 /**
  * Created by etheodor on 12/04/2016.
  */
-@NodeEntity
+@Entity
+@Table(name = "application")
 public class Application {
 
-    @GraphId
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Property(name = "urn")
     @NotNull
+    @Column(unique = true)
     private String urn;
 
-    @Property(name = "description")
     private String description;
 
-    @Relationship(type = "USES", direction = "UNDIRECTED")
+    @OneToMany(mappedBy = "application")
     private List<TagDomain> tagDomains = new ArrayList<>();
 
-    @Property(name = "user")
     private String user;
 
     public Application() {

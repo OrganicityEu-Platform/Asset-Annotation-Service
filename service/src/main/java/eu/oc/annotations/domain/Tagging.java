@@ -1,56 +1,60 @@
 package eu.oc.annotations.domain;
 
-import org.neo4j.ogm.annotation.*;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 /**
  * Created by etheodor on 31/05/2016.
  */
 
-@RelationshipEntity(type = "TAGGING")
+@Entity
+@Table(name = "annotation")
 public class Tagging {
 
-    @GraphId
-    private Long taggingId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
-    @StartNode
-    private Asset asset;
+    private String urn;
 
-    @EndNode
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "tagId")
     private Tag tag;
 
-    @Property
     private Long timestamp;
 
-    @Property
     private String user;
 
-    @Property
     private String application;
 
-    @Property
     private Double numericValue;
 
-    @Property
     private String textValue;
 
 
     public Tagging() {
     }
 
-    public Long getTaggingId() {
-        return taggingId;
+    public Long getId() {
+        return id;
     }
 
-    public void setTaggingId(Long taggingId) {
-        this.taggingId = taggingId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public Asset getAsset() {
-        return asset;
+    public String getUrn() {
+        return urn;
     }
 
-    public void setAsset(Asset asset) {
-        this.asset = asset;
+    public void setUrn(String urn) {
+        this.urn = urn;
     }
 
     public Tag getTag() {
@@ -104,9 +108,8 @@ public class Tagging {
     @Override
     public String toString() {
         return "Tagging{" +
-                "taggingId=" + taggingId +
-                ", asset=" + ((asset!=null)?asset.getUrn():"NULL") +
-                ", tag=" + ((tag!=null)?tag.getUrn():"NULL") +
+                "id=" + id +
+                ", tag=" + ((tag != null) ? tag.getUrn() : "NULL") +
                 ", timestamp=" + timestamp +
                 ", user='" + user + '\'' +
                 ", application='" + application + '\'' +

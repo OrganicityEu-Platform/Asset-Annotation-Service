@@ -1,29 +1,31 @@
 package eu.oc.annotations.domain;
 
 
-import org.neo4j.ogm.annotation.GraphId;
-import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Property;
-
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 /**
  * Created by etheodor on 12/04/2016.
  */
-@NodeEntity
+@Entity
+@Table(name = "service")
 public class Service {
 
-    @GraphId
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Property(name = "urn")
     @NotNull
+    @Column(unique = true)
     private String urn;
 
-    @Property(name = "description")
     private String description;
 
-    @Property(name = "user")
     private String user;
 
     public Service() {

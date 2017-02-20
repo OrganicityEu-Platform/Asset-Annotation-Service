@@ -1,15 +1,22 @@
 package eu.oc.annotations.service;
 
 import eu.oc.annotations.config.Constants;
-import eu.oc.annotations.domain.*;
+import eu.oc.annotations.domain.Annotation;
+import eu.oc.annotations.domain.Application;
+import eu.oc.annotations.domain.Tag;
+import eu.oc.annotations.domain.TagDomain;
+import eu.oc.annotations.domain.Tagging;
 import eu.oc.annotations.handlers.RestException;
-import eu.oc.annotations.repositories.AssetRepository;
 import eu.oc.annotations.repositories.TagDomainRepository;
 import eu.oc.annotations.repositories.TagRepository;
+import eu.oc.annotations.repositories.TaggingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -19,7 +26,7 @@ import java.util.stream.Collectors;
 @Service
 public class AnnotationService {
     @Autowired
-    AssetRepository assetRepository;
+    TaggingRepository taggingRepository;
 
 
     @Autowired
@@ -29,13 +36,13 @@ public class AnnotationService {
 
     public Annotation getAnnotation(Tagging t) {
         Annotation a = new Annotation();
-        a.setAnnotationId(t.getTaggingId());
+        a.setAnnotationId(t.getId());
         a.setUser(t.getUser());
         a.setApplication(t.getApplication());
         a.setNumericValue(t.getNumericValue());
         a.setTextValue(t.getTextValue());
-        if (t.getAsset() == null) throw new RestException("Null Asset Object");
-        a.setAssetUrn(t.getAsset().getUrn());
+        if (t.getUrn() == null) throw new RestException("Null urn");
+        a.setAssetUrn(t.getUrn());
         if (t.getTag() == null) throw new RestException("Null Tag Object");
         a.setTagUrn(t.getTag().getUrn());
         if (t.getTimestamp() == null) throw new RestException("Null Timestamp Object");
@@ -46,21 +53,14 @@ public class AnnotationService {
     public Annotation createOrUpdateTagging(Annotation annotation) {
         Tag tag = tagRepository.findByUrn(annotation.getTagUrn());
         if (tag == null) throw new RestException("Provide a valid tag urn");
-        TagDomain td = tagDomainRepository.findByTag(tag.getUrn());
-        Asset asset = assetRepository.findByUrn(annotation.getAssetUrn());
-        if (asset == null) {
-            //todo validate assetUrn
-            asset = new Asset();
-            asset.setUrn(annotation.getAssetUrn());
-            asset = assetRepository.save(asset);
-        }
+        TagDomain td = tagDomainRepository.findById(tag.getTagDomain().getId());
 
         Tagging tagg = new Tagging();
         Boolean exists = false;
         Tagging taggToDelete = null;
-        for (Tagging t : asset.getTaggings()) {
-            TagDomain tdT = tagDomainRepository.findByTag(t.getTag().getUrn());
-            if (t.getTag().getUrn().equals(tag.getUrn()) && t.getAsset().getUrn().equals(asset.getUrn()) && t.getApplication().equals(annotation.getApplication()) && t.getUser().equals(annotation.getUser())) {
+        for (Tagging t : taggingRepository.findByUrn(annotation.getAssetUrn())) {
+            TagDomain tdT = tagDomainRepository.findById(t.getTag().getTagDomain().getId());
+            if (t.getTag().getUrn().equals(tag.getUrn()) && t.getUrn().equals(annotation.getAssetUrn()) && t.getApplication().equals(annotation.getApplication()) && t.getUser().equals(annotation.getUser())) {
                 tagg = t;
                 exists = true;
                 break;
@@ -70,12 +70,10 @@ public class AnnotationService {
             }
         }
         if (taggToDelete != null) {
-            asset.getTaggings().remove(taggToDelete);
+            taggingRepository.delete(taggToDelete);
         }
         Long timestamp = System.currentTimeMillis();
-        if (!exists) {
-            asset.getTaggings().add(tagg);
-        }
+
         tagg.setTimestamp(timestamp);
         if (annotation.getNumericValue() != null) {
             if (annotation.getNumericValue().isInfinite() || annotation.getNumericValue().isNaN()) {
@@ -86,43 +84,32 @@ public class AnnotationService {
         tagg.setTextValue(annotation.getTextValue());
         tagg.setUser(annotation.getUser()); //todo fix
         tagg.setApplication(annotation.getApplication()); //todo fix
-        tagg.setAsset(asset);
+        tagg.setUrn(annotation.getAssetUrn());
         tagg.setTag(tag);
-        assetRepository.save(asset);
+        taggingRepository.save(tagg);
         return getAnnotation(tagg);
     }
 
 
     public Set<Annotation> getAllAnnotations() {
         Set<Annotation> annotations = new HashSet<>();
-        for (Asset asset : assetRepository.findAll()) {
-            annotations.addAll(asset.getTaggings().stream().map(this::getAnnotation).collect(Collectors.toSet()));
+        for (Tagging tagging : taggingRepository.findAll()) {
+            annotations.add(getAnnotation(tagging));
         }
         return annotations;
     }
 
 
     public Set<Annotation> getAnnotationsOfAsset(String assetUrn) {
-        if (assetUrn.equals("*")){
+        if (assetUrn.equals("*")) {
             return getAllAnnotations();
         }
-        Asset asset = assetRepository.findByUrn(assetUrn);
-        if (asset == null) {
-            //throw new RestException("AssetUrn Unknown");
-            return new HashSet<>();
-        }
-        Set<Annotation> annotations = asset.getTaggings().stream().map(this::getAnnotation).collect(Collectors.toSet());
+        Set<Annotation> annotations = taggingRepository.findByUrn(assetUrn).stream().map(this::getAnnotation).collect(Collectors.toSet());
         return annotations;
     }
 
     public Annotation getAnnotationForAssetApplicationUserTag(String assetUrn, String application, String user, String tagUrn) {
-        Asset asset = assetRepository.findByUrn(assetUrn);
-        if (asset == null) {
-            throw new RestException("AssetUrn Unknown");
-        }
-        //todo add more
-
-        for (Tagging t : asset.getTaggings()) {
+        for (Tagging t : taggingRepository.findByUrn(assetUrn)) {
             if (t.getUser().equals(user) && t.getApplication().equals(application) && t.getTag().getUrn().equals(tagUrn)) {
                 return getAnnotation(t);
             }
@@ -131,14 +118,10 @@ public class AnnotationService {
     }
 
     public Annotation getAnnotationForAssetApplicationUserTagDomain(String assetUrn, String application, String user, String tagDomain) {
-        Asset asset = assetRepository.findByUrn(assetUrn);
-        if (asset == null) {
-            throw new RestException("AssetUrn Unknown");
-        }
         //todo add more
-        for (Tagging t : asset.getTaggings()) {
+        for (Tagging t : taggingRepository.findByUrn(assetUrn)) {
             if (t.getUser().equals(user) && t.getApplication().equals(application)) {
-                TagDomain td = tagDomainRepository.findByTag(t.getTag().getUrn());
+                TagDomain td = tagDomainRepository.findById(t.getTag().getTagDomain().getId());
                 if (td.getUrn().equals(tagDomain))
                     return getAnnotation(t);
             }
@@ -149,12 +132,10 @@ public class AnnotationService {
     public void deleteAssetsAndAnnotations(String assetUrn) {
         try {
             if (assetUrn.equals("*"))
-                assetRepository.deleteAll();
+                taggingRepository.deleteAll();
             else {
-                Asset asset = assetRepository.findByUrn(assetUrn);
-                if (asset == null) throw new RestException("AssetUrn Unknown");
-                assetRepository.delete(asset);
-
+                List<Tagging> taggings = taggingRepository.findByUrn(assetUrn);
+                taggingRepository.delete(taggings);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -163,4 +144,7 @@ public class AnnotationService {
     }
 
 
+    public Collection<Application> findApplicationsUsingTagDomain(String tagDomainUrn) {
+        return new ArrayList<>();
+    }
 }

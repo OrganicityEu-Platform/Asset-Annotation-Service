@@ -1,7 +1,18 @@
 package eu.oc.annotations.service;
 
-import eu.oc.annotations.domain.*;
-import eu.organicity.annotation.service.dto.*;
+import eu.oc.annotations.domain.Annotation;
+import eu.oc.annotations.domain.Application;
+import eu.oc.annotations.domain.Tag;
+import eu.oc.annotations.domain.TagDomain;
+import eu.oc.annotations.domain.TagDomainService;
+import eu.oc.annotations.domain.Tagging;
+import eu.oc.annotations.repositories.TagDomainServiceRepository;
+import eu.organicity.annotation.service.dto.AnnotationDTO;
+import eu.organicity.annotation.service.dto.ExperimentDTO;
+import eu.organicity.annotation.service.dto.ServiceDTO;
+import eu.organicity.annotation.service.dto.TagDTO;
+import eu.organicity.annotation.service.dto.TagDomainDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -14,6 +25,9 @@ import java.util.Set;
  */
 @Service
 public class DTOService {
+
+    @Autowired
+    TagDomainServiceRepository tagDomainServiceRepository;
 
     public ExperimentDTO toDTO(Application experiment) {
         ExperimentDTO dto = new ExperimentDTO();
@@ -43,9 +57,10 @@ public class DTOService {
             }
         }
         dto.setServices(new HashSet<>());
-        if (tagDomain.getServices() != null) {
-            for (eu.oc.annotations.domain.Service service : tagDomain.getServices()) {
-                dto.getServices().add(toDTO(service));
+        List<TagDomainService> services = tagDomainServiceRepository.findByTagDomain(tagDomain);
+        if (services != null) {
+            for (TagDomainService service : services) {
+                dto.getServices().add(toDTO(service.getService()));
             }
         }
         return dto;
@@ -69,7 +84,7 @@ public class DTOService {
         return dto;
     }
 
-    public List<ExperimentDTO> toExperimentListDTO(List<Application> applications) {
+    public List<ExperimentDTO> toExperimentListDTO(Iterable<Application> applications) {
         ArrayList<ExperimentDTO> dtoList = new ArrayList<>();
         for (Application application : applications) {
             dtoList.add(toDTO(application));
@@ -77,7 +92,7 @@ public class DTOService {
         return dtoList;
     }
 
-    public List<TagDomainDTO> toTagDomainListDTO(List<TagDomain> tagDomains) {
+    public List<TagDomainDTO> toTagDomainListDTO(Iterable<TagDomain> tagDomains) {
         final List<TagDomainDTO> list = new ArrayList<>();
         for (final TagDomain tagDomain : tagDomains) {
             list.add(toDTO(tagDomain));
@@ -85,10 +100,18 @@ public class DTOService {
         return list;
     }
 
-    public List<ServiceDTO> toServiceListDTO(List<eu.oc.annotations.domain.Service> services) {
+    public List<TagDomainDTO> toTagDomainListDTOFromTagDomainServices(Iterable<TagDomainService> tagDomainServices) {
+        final List<TagDomainDTO> list = new ArrayList<>();
+        for (final TagDomainService tagDomainService : tagDomainServices) {
+            list.add(toDTO(tagDomainService.getTagDomain()));
+        }
+        return list;
+    }
+
+    public List<ServiceDTO> toServiceListDTO(Iterable<TagDomainService> services) {
         final List<ServiceDTO> list = new ArrayList<>();
-        for (final eu.oc.annotations.domain.Service service : services) {
-            list.add(toDTO(service));
+        for (final TagDomainService service : services) {
+            list.add(toDTO(service.getService()));
         }
         return list;
     }
@@ -101,21 +124,19 @@ public class DTOService {
         return dto;
     }
 
-    public Set<AnnotationDTO> toAssetListDTO(List<Asset> all) {
+    public Set<AnnotationDTO> toAssetListDTO(Iterable<Tagging> all) {
         final HashSet<AnnotationDTO> dto = new HashSet<>();
-        for (final Asset asset : all) {
-            for (final Tagging tagging : asset.getTaggings()) {
-                dto.add(toDTO(tagging));
-            }
+        for (final Tagging tagging : all) {
+            dto.add(toDTO(tagging));
         }
         return dto;
     }
 
     public AnnotationDTO toDTO(final Tagging tagging) {
         AnnotationDTO dto = new AnnotationDTO();
-        dto.setAnnotationId(tagging.getTaggingId());
+        dto.setAnnotationId(tagging.getId());
         dto.setApplication(tagging.getApplication());
-        dto.setAssetUrn(tagging.getAsset().getUrn());
+        dto.setAssetUrn(tagging.getUrn());
         dto.setDatetime("" + tagging.getTimestamp());
         dto.setUser(tagging.getUser());
         dto.setTagUrn(tagging.getTag().getUrn());

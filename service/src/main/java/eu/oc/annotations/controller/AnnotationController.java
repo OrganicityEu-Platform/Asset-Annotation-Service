@@ -6,7 +6,7 @@ import eu.oc.annotations.domain.dto.AssetAnnotationListDTO;
 import eu.oc.annotations.domain.dto.AssetAnnotationListItemDTO;
 import eu.oc.annotations.domain.dto.AssetListDTO;
 import eu.oc.annotations.handlers.RestException;
-import eu.oc.annotations.repositories.AssetRepository;
+import eu.oc.annotations.repositories.TaggingRepository;
 import eu.oc.annotations.service.AnnotationService;
 import eu.oc.annotations.service.DTOService;
 import eu.oc.annotations.service.KPIService;
@@ -15,7 +15,12 @@ import eu.organicity.annotation.service.dto.AnnotationDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
@@ -30,7 +35,7 @@ public class AnnotationController {
     @Autowired
     AnnotationService annotationService;
     @Autowired
-    AssetRepository assetRepository;
+    TaggingRepository taggingRepository;
     @Autowired
     KPIService kpiService;
     @Autowired
@@ -126,7 +131,7 @@ public class AnnotationController {
         //todo show all public Annotations of asset add paging and sorting
         response.setHeader("Cache-Control", "no-cache");
 
-        return dtoService.toAssetListDTO(assetRepository.findAll());
+        return dtoService.toAssetListDTO(taggingRepository.findAll());
     }
 
     @RequestMapping(value = {"annotations/all"}, method = RequestMethod.POST)

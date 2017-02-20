@@ -40,10 +40,13 @@ public class TagDomainBrowser {
     ServiceRepository serviceRepository;
 
     @Autowired
-    AssetRepository assetRepository;
+    TaggingRepository taggingRepository;
 
     @Autowired
     ApplicationRepository applicationRepository;
+
+    @Autowired
+    TagDomainServiceRepository tagDomainServiceRepository;
 
     @Autowired
     AnnotationService annotationService;
@@ -102,7 +105,7 @@ public class TagDomainBrowser {
     @RequestMapping(value = {"services"}, method = RequestMethod.GET)
     public final List<ServiceDTO> services(Principal principal) {
         kpiService.addEvent(principal, "api:services");
-        return dtoService.toServiceListDTO(serviceRepository.findAll());
+        return dtoService.toServiceListDTO(tagDomainServiceRepository.findAll());
     }
 
     @RequestMapping(value = {"services/{serviceUrn}"}, method = RequestMethod.GET)
@@ -123,7 +126,7 @@ public class TagDomainBrowser {
         if (s == null) {
             throw new RestException("Service Not Found");
         }
-        return dtoService.toTagDomainListDTO(tagDomainRepository.findAllByService(s.getUrn()));
+        return dtoService.toTagDomainListDTOFromTagDomainServices(tagDomainServiceRepository.findByService(s));
     }
 
 

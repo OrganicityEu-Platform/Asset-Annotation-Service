@@ -1,27 +1,36 @@
 package eu.oc.annotations.domain;
 
 
-import org.neo4j.ogm.annotation.GraphId;
-import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Property;
-
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-@NodeEntity
+@Entity
+@Table(name = "tag")
 public class Tag {
 
-    @GraphId
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Property(name = "urn")
     @NotNull
+    @Column(unique = true)
     private String urn;
 
-    @Property(name = "name")
     private String name;
 
-    @Property(name = "user")
     private String user;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "tagDomainId")
+    private TagDomain tagDomain;
 
     public Long getId() {
         return id;
@@ -53,6 +62,14 @@ public class Tag {
 
     public void setUser(String user) {
         this.user = user;
+    }
+
+    public TagDomain getTagDomain() {
+        return tagDomain;
+    }
+
+    public void setTagDomain(TagDomain tagDomain) {
+        this.tagDomain = tagDomain;
     }
 
     @Override
