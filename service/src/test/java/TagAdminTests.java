@@ -1,9 +1,9 @@
 //import com.fasterxml.jackson.databind.ObjectMapper;
-//import eu.oc.annotations.domain.Annotation;
-//import eu.oc.annotations.domain.Application;
-//import eu.oc.annotations.domain.Service;
-//import eu.oc.annotations.domain.Tag;
-//import eu.oc.annotations.domain.TagDomain;
+//import Annotation;
+//import Application;
+//import Service;
+//import Tag;
+//import TagDomain;
 //import org.junit.After;
 //import org.junit.Before;
 //import org.junit.FixMethodOrder;
@@ -31,7 +31,7 @@
 // * Created by etheodor on 18/05/2016.
 // */
 //@RunWith(SpringJUnit4ClassRunner.class)
-////@SpringApplicationConfiguration(classes = eu.oc.annotations.Application.class)
+////@SpringApplicationConfiguration(classes = Application.class)
 ////@WebIntegrationTest
 //@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 //public class TagAdminTests {

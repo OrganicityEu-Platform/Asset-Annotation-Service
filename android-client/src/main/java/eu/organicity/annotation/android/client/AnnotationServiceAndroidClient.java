@@ -12,6 +12,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.Set;
+
 /**
  * Helper Client implementation for the OrganiCity Annotation Service.
  * This client implements the API described here:
@@ -126,6 +128,21 @@ public class AnnotationServiceAndroidClient extends OrganicityServiceBaseClient 
      * @param description a text description  for the {@link TagDomainDTO}
      * @return the added {@link TagDomainDTO}
      */
+    public TagDomainDTO addTagDomain(final String urn, final String description, final Set<TagDTO> tags) {
+        final TagDomainDTO dto = new TagDomainDTO();
+        dto.setUrn(urn);
+        dto.setDescription(description);
+        dto.setTags(tags);
+        return postTagDomain(dto);
+    }
+
+    /**
+     * Adds a {@link TagDomainDTO}
+     *
+     * @param urn         the {@link TagDomainDTO} urn
+     * @param description a text description  for the {@link TagDomainDTO}
+     * @return the added {@link TagDomainDTO}
+     */
     public ExperimentDTO addExperiment(final String urn, final String description) {
         final ExperimentDTO dto = new ExperimentDTO();
         dto.setUrn(urn);
@@ -159,6 +176,13 @@ public class AnnotationServiceAndroidClient extends OrganicityServiceBaseClient 
         return restTemplate.exchange(baseUrl + "admin/services", HttpMethod.POST, entity, ServiceDTO.class).getBody();
     }
 
+    public ServiceDTO servicesCreate(final String urn) {
+        ServiceDTO dto = new ServiceDTO();
+        dto.setUrn(urn);
+        dto.setDescription(urn);
+        return servicesCreate(dto);
+    }
+
     /**
      * Adds a {@link ServiceDTO} to a {@link TagDomainDTO}
      *
@@ -178,11 +202,24 @@ public class AnnotationServiceAndroidClient extends OrganicityServiceBaseClient 
     /**
      * Adds a new {@link ExperimentDTO}
      *
+     * @param experimentDTO the urn of the experiment to add
+     * @return the added {@link ExperimentDTO}
+     */
+    public ExperimentDTO experimentCreate(final String experimentUrn) {
+        ExperimentDTO dto = new ExperimentDTO();
+        dto.setUrn(experimentUrn);
+        return experimentCreate(dto);
+    }
+
+    /**
+     * Adds a new {@link ExperimentDTO}
+     *
      * @param experimentDTO the {@link ExperimentDTO} to add
      * @return the added {@link ExperimentDTO}
      */
     public ExperimentDTO experimentCreate(final ExperimentDTO experimentDTO) {
-        return restTemplate.postForObject(baseUrl + "admin/applications", experimentDTO, ExperimentDTO.class);
+        HttpEntity<ExperimentDTO> entity = new HttpEntity<>(experimentDTO, headers);
+        return restTemplate.exchange(baseUrl + "admin/experiments", HttpMethod.POST, entity, ExperimentDTO.class).getBody();
     }
 
     /**
@@ -215,11 +252,6 @@ public class AnnotationServiceAndroidClient extends OrganicityServiceBaseClient 
             return;
         }
 
-        if (domain.getTags() != null && !domain.getTags().isEmpty()) {
-            for (final TagDTO tagDTO : domain.getTags()) {
-                removeTag(tagDomainUrn, tagDTO.getUrn());
-            }
-        }
         deleteTagDomain(tagDomainUrn);
     }
 

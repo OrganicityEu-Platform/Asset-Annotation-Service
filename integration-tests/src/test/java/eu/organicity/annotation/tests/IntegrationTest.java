@@ -1,6 +1,6 @@
 package eu.organicity.annotation.tests;
 
-import eu.oc.annotations.Application;
+import eu.organicity.annotation.Application;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;

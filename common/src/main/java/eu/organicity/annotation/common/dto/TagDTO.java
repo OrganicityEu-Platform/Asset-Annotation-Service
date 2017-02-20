@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TagDTO {
-    private long id;
+    private Long id;
     private String urn;
     private String name;
     private String user;
@@ -14,17 +14,17 @@ public class TagDTO {
     public TagDTO() {
     }
 
-    public TagDTO(long id, String urn, String name) {
+    public TagDTO(Long id, String urn, String name) {
         this.id = id;
         this.urn = urn;
         this.name = name;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -66,17 +66,14 @@ public class TagDTO {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        TagDTO tagDto = (TagDTO) o;
+        TagDTO tagDTO = (TagDTO) o;
 
-        if (id != tagDto.id) return false;
-        return urn.equals(tagDto.urn);
+        return urn.equals(tagDTO.urn);
 
     }
 
     @Override
     public int hashCode() {
-        int result = (int) (id ^ (id >>> 32));
-        result = 31 * result + urn.hashCode();
-        return result;
+        return urn.hashCode();
     }
 }
