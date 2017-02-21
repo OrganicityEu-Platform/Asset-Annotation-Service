@@ -6,11 +6,13 @@ import eu.organicity.annotation.common.dto.ServiceDTO;
 import eu.organicity.annotation.common.dto.TagDTO;
 import eu.organicity.annotation.common.dto.TagDomainDTO;
 import eu.organicity.annotation.domain.Annotation;
-import eu.organicity.annotation.domain.Application;
+import eu.organicity.annotation.domain.Experiment;
+import eu.organicity.annotation.domain.ExperimentTagDomain;
 import eu.organicity.annotation.domain.Tag;
 import eu.organicity.annotation.domain.TagDomain;
 import eu.organicity.annotation.domain.TagDomainService;
 import eu.organicity.annotation.domain.Tagging;
+import eu.organicity.annotation.repositories.ExperimentTagDomainRepository;
 import eu.organicity.annotation.repositories.TagDomainServiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,29 +27,29 @@ import java.util.Set;
  */
 @Service
 public class DTOService {
-
+    
     @Autowired
     TagDomainServiceRepository tagDomainServiceRepository;
-
-    public ExperimentDTO toDTO(Application experiment) {
+    @Autowired
+    ExperimentTagDomainRepository experimentTagDomainRepository;
+    
+    public ExperimentDTO toDTO(Experiment experiment) {
         ExperimentDTO dto = new ExperimentDTO();
         dto.setId(experiment.getId());
         dto.setUrn(experiment.getUrn());
         dto.setDescription(experiment.getDescription());
         dto.setTagDomains(new ArrayList<>());
         dto.setUser(experiment.getUser());
-        if (experiment.getTagDomains() != null) {
-            for (TagDomain tagDomain : experiment.getTagDomains()) {
-                dto.getTagDomains().add(toDTO(tagDomain));
-            }
+        for (ExperimentTagDomain etd : experimentTagDomainRepository.findByExperiment(experiment)) {
+            dto.getTagDomains().add(toDTO(etd.getTagDomain()));
         }
         return dto;
     }
-
+    
     public TagDomainDTO toDTO(TagDomain tagDomain) {
         return toDTO(tagDomain, tagDomain.getTags());
     }
-
+    
     public TagDomainDTO toDTO(TagDomain tagDomain, final List<Tag> tags) {
         TagDomainDTO dto = new TagDomainDTO();
         dto.setId(tagDomain.getId());
@@ -69,7 +71,7 @@ public class DTOService {
         }
         return dto;
     }
-
+    
     public TagDTO toDTO(Tag tag) {
         TagDTO tagDTO = new TagDTO();
         tagDTO.setId(tag.getId());
@@ -78,7 +80,7 @@ public class DTOService {
         tagDTO.setUser(tag.getUser());
         return tagDTO;
     }
-
+    
     public ServiceDTO toDTO(eu.organicity.annotation.domain.Service service) {
         ServiceDTO dto = new ServiceDTO();
         dto.setId(service.getId());
@@ -87,15 +89,15 @@ public class DTOService {
         dto.setUser(service.getUser());
         return dto;
     }
-
-    public List<ExperimentDTO> toExperimentListDTO(Iterable<Application> applications) {
+    
+    public List<ExperimentDTO> toExperimentListDTO(Iterable<Experiment> experiments) {
         ArrayList<ExperimentDTO> dtoList = new ArrayList<>();
-        for (Application application : applications) {
-            dtoList.add(toDTO(application));
+        for (Experiment experiment : experiments) {
+            dtoList.add(toDTO(experiment));
         }
         return dtoList;
     }
-
+    
     public List<TagDomainDTO> toTagDomainListDTO(Iterable<TagDomain> tagDomains) {
         final List<TagDomainDTO> list = new ArrayList<>();
         for (final TagDomain tagDomain : tagDomains) {
@@ -103,7 +105,7 @@ public class DTOService {
         }
         return list;
     }
-
+    
     public List<TagDomainDTO> toTagDomainListDTOFromTagDomainServices(Iterable<TagDomainService> tagDomainServices) {
         final List<TagDomainDTO> list = new ArrayList<>();
         for (final TagDomainService tagDomainService : tagDomainServices) {
@@ -111,7 +113,15 @@ public class DTOService {
         }
         return list;
     }
-
+    
+    public List<ServiceDTO> toOriginalServiceListDTO(Iterable<eu.organicity.annotation.domain.Service> services) {
+        final List<ServiceDTO> list = new ArrayList<>();
+        for (final eu.organicity.annotation.domain.Service service : services) {
+            list.add(toDTO(service));
+        }
+        return list;
+    }
+    
     public List<ServiceDTO> toServiceListDTO(Iterable<TagDomainService> services) {
         final List<ServiceDTO> list = new ArrayList<>();
         for (final TagDomainService service : services) {
@@ -119,7 +129,7 @@ public class DTOService {
         }
         return list;
     }
-
+    
     public Set<TagDTO> toTagSetDTO(Set<Tag> tags) {
         Set<TagDTO> dto = new HashSet<>();
         for (Tag tag : tags) {
@@ -127,7 +137,7 @@ public class DTOService {
         }
         return dto;
     }
-
+    
     public Set<AnnotationDTO> toAssetListDTO(Iterable<Tagging> all) {
         final HashSet<AnnotationDTO> dto = new HashSet<>();
         for (final Tagging tagging : all) {
@@ -135,7 +145,7 @@ public class DTOService {
         }
         return dto;
     }
-
+    
     public AnnotationDTO toDTO(final Tagging tagging) {
         AnnotationDTO dto = new AnnotationDTO();
         dto.setAnnotationId(tagging.getId());
@@ -148,7 +158,7 @@ public class DTOService {
         dto.setNumericValue(tagging.getNumericValue());
         return dto;
     }
-
+    
     public AnnotationDTO toAnnotationDTO(final Annotation tagging) {
         AnnotationDTO dto = new AnnotationDTO();
         dto.setAnnotationId(tagging.getAnnotationId());

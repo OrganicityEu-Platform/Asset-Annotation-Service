@@ -37,10 +37,6 @@ public class TagDomain {
     @Fetch(value = FetchMode.SELECT)
     private List<Tag> tags;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "applicationId")
-    private Application application;
-
     public TagDomain() {
     }
 
@@ -83,14 +79,6 @@ public class TagDomain {
 
     public void setUser(String user) {
         this.user = user;
-    }
-
-    public Application getApplication() {
-        return application;
-    }
-
-    public void setApplication(Application application) {
-        this.application = application;
     }
 
     @Override

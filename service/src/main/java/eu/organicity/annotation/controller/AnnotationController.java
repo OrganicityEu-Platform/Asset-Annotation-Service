@@ -52,7 +52,7 @@ public class AnnotationController {
         if (annotation.getAnnotationId() != null) throw new RestException("AnnotationID should be null");
         if (annotation.getDatetime() != null) throw new RestException("Datetime should be null");
         if (annotation.getTagUrn() == null) throw new RestException("TagUrn should not be null");
-        if (annotation.getApplication() == null) throw new RestException("Application should not be null");
+        if (annotation.getApplication() == null) throw new RestException("Experiment should not be null");
 
         if (annotation.getUser() == null) {
             OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();

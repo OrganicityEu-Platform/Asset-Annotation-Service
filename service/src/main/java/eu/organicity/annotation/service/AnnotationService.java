@@ -2,7 +2,7 @@ package eu.organicity.annotation.service;
 
 import eu.organicity.annotation.config.Constants;
 import eu.organicity.annotation.domain.Annotation;
-import eu.organicity.annotation.domain.Application;
+import eu.organicity.annotation.domain.Experiment;
 import eu.organicity.annotation.domain.Tag;
 import eu.organicity.annotation.domain.TagDomain;
 import eu.organicity.annotation.domain.Tagging;
@@ -144,7 +144,7 @@ public class AnnotationService {
     }
 
 
-    public Collection<Application> findApplicationsUsingTagDomain(String tagDomainUrn) {
+    public Collection<Experiment> findApplicationsUsingTagDomain(String tagDomainUrn) {
         return new ArrayList<>();
     }
 }

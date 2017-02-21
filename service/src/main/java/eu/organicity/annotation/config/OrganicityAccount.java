@@ -1,8 +1,7 @@
 package eu.organicity.annotation.config;
 
-import eu.organicity.annotation.domain.Application;
-import eu.organicity.annotation.domain.experiment.Experiment;
-import eu.organicity.annotation.repositories.ApplicationRepository;
+import eu.organicity.annotation.domain.Experiment;
+import eu.organicity.annotation.repositories.ExperimentRepository;
 import eu.organicity.annotation.service.ExperimentationService;
 import io.jsonwebtoken.Claims;
 import org.keycloak.KeycloakPrincipal;
@@ -23,10 +22,10 @@ public final class OrganicityAccount extends KeycloakPrincipal {
     private Date expiration;
     private String email;
     private Collection<? extends GrantedAuthority> roles;
-    private HashMap<String, Experiment> experiments = new HashMap<>();
+    private HashMap<String, eu.organicity.annotation.domain.experiment.Experiment> experiments = new HashMap<>();
 
     @Autowired
-    ApplicationRepository applicationRepository;
+    ExperimentRepository experimentRepository;
 
 
     public OrganicityAccount(KeycloakPrincipal k, Collection<? extends GrantedAuthority> authorities) {
@@ -47,8 +46,8 @@ public final class OrganicityAccount extends KeycloakPrincipal {
             throw e;
         }
         if (isExperimenter()) {
-            Experiment[] exps = ExperimentationService.getExperiments(this.getUser());
-            for (Experiment e : exps) {
+            eu.organicity.annotation.domain.experiment.Experiment[] exps = ExperimentationService.getExperiments(this.getUser());
+            for (eu.organicity.annotation.domain.experiment.Experiment e : exps) {
                 experiments.put(e.getExperimentId(), e);
             }
         }
@@ -95,11 +94,11 @@ public final class OrganicityAccount extends KeycloakPrincipal {
         return experiments.containsKey(experimentId);
     }
 
-    public boolean isTheOnlyExperimnterUsingTagDomain(final Collection<Application> applications) {
-        if (applications == null || applications.isEmpty()) {
+    public boolean isTheOnlyExperimnterUsingTagDomain(final Collection<Experiment> experiments) {
+        if (experiments == null || experiments.isEmpty()) {
             return false;
         }
-        for (Application app : applications) {
+        for (Experiment app : experiments) {
             if (!ownsExperiment(app.getUrn())) {
                 return false;
             }

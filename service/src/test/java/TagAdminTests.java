@@ -1,6 +1,6 @@
 //import com.fasterxml.jackson.databind.ObjectMapper;
 //import Annotation;
-//import Application;
+//import Experiment;
 //import Service;
 //import Tag;
 //import TagDomain;
@@ -31,7 +31,7 @@
 // * Created by etheodor on 18/05/2016.
 // */
 //@RunWith(SpringJUnit4ClassRunner.class)
-////@SpringApplicationConfiguration(classes = Application.class)
+////@SpringApplicationConfiguration(classes = Experiment.class)
 ////@WebIntegrationTest
 //@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 //public class TagAdminTests {
@@ -52,7 +52,7 @@
 //
 //    TagDomain td = new TagDomain();
 //    Service s = new Service();
-//    Application a = new Application();
+//    Experiment a = new Experiment();
 //
 //
 //    @Before
@@ -237,7 +237,7 @@
 //        Annotation annotation = new Annotation();
 //        annotation.setAssetUrn(assetUrn);
 //        annotation.setTagUrn(tagUrn1);
-//        annotation.setApplication("none");
+//        annotation.setExperiment("none");
 //        MvcResult r = mockMvc.perform(post("/annotations/" + assetUrn)
 //                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
 //                .content(new ObjectMapper().writeValueAsBytes(annotation)))
@@ -259,7 +259,7 @@
 //        Annotation annotation = new Annotation();
 //        annotation.setAssetUrn(assetUrn);
 //        annotation.setTagUrn(tagUrn1);
-//        annotation.setApplication(application);
+//        annotation.setExperiment(application);
 //        MvcResult r = mockMvc.perform(patch("/annotations/" + assetUrn)
 //                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
 //                .content(new ObjectMapper().writeValueAsBytes(annotation)))

@@ -5,20 +5,16 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 
 /**
  * Created by etheodor on 12/04/2016.
  */
 @Entity
-@Table(name = "application")
-public class Application {
+@Table(name = "experiment")
+public class Experiment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -30,15 +26,12 @@ public class Application {
 
     private String description;
 
-    @OneToMany(mappedBy = "application")
-    private List<TagDomain> tagDomains = new ArrayList<>();
-
     private String user;
 
-    public Application() {
+    public Experiment() {
     }
 
-    public Application(String urn, String description) {
+    public Experiment(String urn, String description) {
         this.urn = urn;
         this.description = description;
     }
@@ -67,14 +60,6 @@ public class Application {
         this.description = description;
     }
 
-    public List<TagDomain> getTagDomains() {
-        return tagDomains;
-    }
-
-    public void setTagDomains(List<TagDomain> tagDomains) {
-        this.tagDomains = tagDomains;
-    }
-
     public String getUser() {
         return user;
     }
@@ -85,11 +70,10 @@ public class Application {
 
     @Override
     public String toString() {
-        return "Application{" +
+        return "Experiment{" +
                 "id=" + id +
                 ", urn='" + urn + '\'' +
                 ", description='" + description + '\'' +
-                ", tagDomains=" + Arrays.toString(tagDomains.toArray()) +
                 '}';
     }
 }

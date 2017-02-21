@@ -70,11 +70,11 @@
 //        this.user = user;
 //    }
 //
-//    public String getApplication() {
+//    public String getExperiment() {
 //        return application;
 //    }
 //
-//    public void setApplication(String application) {
+//    public void setExperiment(String application) {
 //        this.application = application;
 //    }
 //
