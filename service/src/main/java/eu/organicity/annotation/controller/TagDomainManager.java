@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 
 @RestController
 public class TagDomainManager {
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrganicityAccount.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TagDomainManager.class);
     
     @Autowired
     TagDomainRepository tagDomainRepository;
