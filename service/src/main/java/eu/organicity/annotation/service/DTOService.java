@@ -40,6 +40,16 @@ public class DTOService {
         dto.setDescription(experiment.getDescription());
         dto.setTagDomains(new ArrayList<>());
         dto.setUser(experiment.getUser());
+        if (experiment.getCreatedDate() != null) {
+            dto.setCreated(experiment.getCreatedDate().toEpochSecond());
+        } else {
+            dto.setCreated(0L);
+        }
+        if (experiment.getLastModifiedDate() != null) {
+            dto.setModified(experiment.getLastModifiedDate().toEpochSecond());
+        } else {
+            dto.setModified(0L);
+        }
         for (ExperimentTagDomain etd : experimentTagDomainRepository.findByExperiment(experiment)) {
             dto.getTagDomains().add(toDTO(etd.getTagDomain()));
         }
@@ -57,6 +67,16 @@ public class DTOService {
         dto.setDescription(tagDomain.getDescription());
         dto.setTags(new HashSet<>());
         dto.setUser(tagDomain.getUser());
+        if (tagDomain.getCreatedDate() != null) {
+            dto.setCreated(tagDomain.getCreatedDate().toEpochSecond());
+        } else {
+            dto.setCreated(0L);
+        }
+        if (tagDomain.getLastModifiedDate() != null) {
+            dto.setModified(tagDomain.getLastModifiedDate().toEpochSecond());
+        } else {
+            dto.setModified(0L);
+        }
         if (tags != null) {
             for (Tag tag : tags) {
                 dto.getTags().add(toDTO(tag));
@@ -78,6 +98,16 @@ public class DTOService {
         tagDTO.setUrn(tag.getUrn());
         tagDTO.setName(tag.getName());
         tagDTO.setUser(tag.getUser());
+        if (tag.getCreatedDate() != null) {
+            tagDTO.setCreated(tag.getCreatedDate().toEpochSecond());
+        } else {
+            tagDTO.setCreated(0L);
+        }
+        if (tag.getLastModifiedDate() != null) {
+            tagDTO.setModified(tag.getLastModifiedDate().toEpochSecond());
+        } else {
+            tagDTO.setModified(0L);
+        }
         return tagDTO;
     }
     
@@ -87,6 +117,16 @@ public class DTOService {
         dto.setUrn(service.getUrn());
         dto.setDescription(service.getDescription());
         dto.setUser(service.getUser());
+        if (service.getCreatedDate() != null) {
+            dto.setCreated(service.getCreatedDate().toEpochSecond());
+        } else {
+            dto.setCreated(0L);
+        }
+        if (service.getLastModifiedDate() != null) {
+            dto.setModified(service.getLastModifiedDate().toEpochSecond());
+        } else {
+            dto.setModified(0L);
+        }
         return dto;
     }
     
@@ -151,7 +191,9 @@ public class DTOService {
         dto.setAnnotationId(tagging.getId());
         dto.setApplication(tagging.getApplication());
         dto.setAssetUrn(tagging.getUrn());
-        dto.setDatetime("" + tagging.getTimestamp());
+        if (tagging.getLastModifiedDate() != null) {
+            dto.setDatetime("" + tagging.getLastModifiedDate());
+        }
         dto.setUser(tagging.getUser());
         dto.setTagUrn(tagging.getTag().getUrn());
         dto.setTextValue(tagging.getTextValue());

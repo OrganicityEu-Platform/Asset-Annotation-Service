@@ -1,6 +1,5 @@
 package eu.organicity.annotation.service;
 
-import eu.organicity.annotation.config.Constants;
 import eu.organicity.annotation.domain.Annotation;
 import eu.organicity.annotation.domain.Experiment;
 import eu.organicity.annotation.domain.Tag;
@@ -27,13 +26,13 @@ import java.util.stream.Collectors;
 public class AnnotationService {
     @Autowired
     TaggingRepository taggingRepository;
-
-
+    
+    
     @Autowired
     TagRepository tagRepository;
     @Autowired
     TagDomainRepository tagDomainRepository;
-
+    
     public Annotation getAnnotation(Tagging t) {
         Annotation a = new Annotation();
         a.setAnnotationId(t.getId());
@@ -41,20 +40,24 @@ public class AnnotationService {
         a.setApplication(t.getApplication());
         a.setNumericValue(t.getNumericValue());
         a.setTextValue(t.getTextValue());
-        if (t.getUrn() == null) throw new RestException("Null urn");
+        if (t.getUrn() == null)
+            throw new RestException("Null urn");
         a.setAssetUrn(t.getUrn());
-        if (t.getTag() == null) throw new RestException("Null Tag Object");
+        if (t.getTag() == null)
+            throw new RestException("Null Tag Object");
         a.setTagUrn(t.getTag().getUrn());
-        if (t.getTimestamp() == null) throw new RestException("Null Timestamp Object");
-        a.setDatetime(Constants.epochToISODatetime(t.getTimestamp()));
+        if (t.getLastModifiedDate() != null) {
+            a.setDatetime("" + t.getLastModifiedDate());
+        }
         return a;
     }
-
+    
     public Annotation createOrUpdateTagging(Annotation annotation) {
         Tag tag = tagRepository.findByUrn(annotation.getTagUrn());
-        if (tag == null) throw new RestException("Provide a valid tag urn");
+        if (tag == null)
+            throw new RestException("Provide a valid tag urn");
         TagDomain td = tagDomainRepository.findById(tag.getTagDomain().getId());
-
+        
         Tagging tagg = new Tagging();
         Boolean exists = false;
         Tagging taggToDelete = null;
@@ -72,9 +75,7 @@ public class AnnotationService {
         if (taggToDelete != null) {
             taggingRepository.delete(taggToDelete);
         }
-        Long timestamp = System.currentTimeMillis();
-
-        tagg.setTimestamp(timestamp);
+        
         if (annotation.getNumericValue() != null) {
             if (annotation.getNumericValue().isInfinite() || annotation.getNumericValue().isNaN()) {
                 throw new RestException("Provide a numeric value or else use the Text field");
@@ -89,8 +90,8 @@ public class AnnotationService {
         taggingRepository.save(tagg);
         return getAnnotation(tagg);
     }
-
-
+    
+    
     public Set<Annotation> getAllAnnotations() {
         Set<Annotation> annotations = new HashSet<>();
         for (Tagging tagging : taggingRepository.findAll()) {
@@ -98,8 +99,8 @@ public class AnnotationService {
         }
         return annotations;
     }
-
-
+    
+    
     public Set<Annotation> getAnnotationsOfAsset(String assetUrn) {
         if (assetUrn.equals("*")) {
             return getAllAnnotations();
@@ -107,7 +108,7 @@ public class AnnotationService {
         Set<Annotation> annotations = taggingRepository.findByUrn(assetUrn).stream().map(this::getAnnotation).collect(Collectors.toSet());
         return annotations;
     }
-
+    
     public Annotation getAnnotationForAssetApplicationUserTag(String assetUrn, String application, String user, String tagUrn) {
         for (Tagging t : taggingRepository.findByUrn(assetUrn)) {
             if (t.getUser().equals(user) && t.getApplication().equals(application) && t.getTag().getUrn().equals(tagUrn)) {
@@ -116,7 +117,7 @@ public class AnnotationService {
         }
         throw new RestException("No Annotation Found");
     }
-
+    
     public Annotation getAnnotationForAssetApplicationUserTagDomain(String assetUrn, String application, String user, String tagDomain) {
         //todo add more
         for (Tagging t : taggingRepository.findByUrn(assetUrn)) {
@@ -128,7 +129,7 @@ public class AnnotationService {
         }
         throw new RestException("No Annotation Found");
     }
-
+    
     public void deleteAssetsAndAnnotations(String assetUrn) {
         try {
             if (assetUrn.equals("*"))
@@ -142,8 +143,8 @@ public class AnnotationService {
             throw new RestException("Delete All Asset/Annotations Failed" + e.getMessage());
         }
     }
-
-
+    
+    
     public Collection<Experiment> findApplicationsUsingTagDomain(String tagDomainUrn) {
         return new ArrayList<>();
     }

@@ -10,7 +10,9 @@ public class TagDTO {
     private String urn;
     private String name;
     private String user;
-
+    private Long created;
+    private Long modified;
+    
     public TagDTO() {
     }
 
@@ -51,7 +53,23 @@ public class TagDTO {
     public void setUser(String user) {
         this.user = user;
     }
-
+    
+    public Long getCreated() {
+        return created;
+    }
+    
+    public void setCreated(Long created) {
+        this.created = created;
+    }
+    
+    public Long getModified() {
+        return modified;
+    }
+    
+    public void setModified(Long modified) {
+        this.modified = modified;
+    }
+    
     @Override
     public String toString() {
         return "TagDTO{" +

@@ -28,4 +28,7 @@ public interface ExperimentTagDomainRepository extends CrudRepository<Experiment
     
     @CacheEvict(value = "ExperimentTagDomainCache", allEntries = true)
     void delete(Long id);
+    
+    @CacheEvict(value = "ExperimentTagDomainCache", allEntries = true)
+    void delete(ExperimentTagDomain experimentTagDomain);
 }

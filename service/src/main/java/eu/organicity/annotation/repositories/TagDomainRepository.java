@@ -19,8 +19,10 @@ public interface TagDomainRepository extends CrudRepository<TagDomain, Long> {
     @CacheEvict(value = "TagDomainCache", allEntries = true)
     <S extends TagDomain> S save(S entity);
     
-    
     @CacheEvict(value = "TagDomainCache", allEntries = true)
     void delete(Long id);
+    
+    @CacheEvict(value = "TagDomainCache", allEntries = true)
+    void delete(TagDomain tagDomain);
     
 }

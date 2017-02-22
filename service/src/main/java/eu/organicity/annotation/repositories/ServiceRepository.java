@@ -15,4 +15,7 @@ public interface ServiceRepository extends CrudRepository<Service, Long> {
     
     @CacheEvict(value = "ServiceCache", allEntries = true)
     void delete(Long id);
+    
+    @CacheEvict(value = "ServiceCache", allEntries = true)
+    void delete(Service service);
 }

@@ -14,6 +14,8 @@ public class TagDomainDTO {
     private String user;
     private Set<TagDTO> tags;
     private Set<ServiceDTO> services;
+    private Long created;
+    private Long modified;
 
     public TagDomainDTO() {
     }
@@ -72,7 +74,23 @@ public class TagDomainDTO {
     public void setUser(String user) {
         this.user = user;
     }
-
+    
+    public Long getCreated() {
+        return created;
+    }
+    
+    public void setCreated(Long created) {
+        this.created = created;
+    }
+    
+    public Long getModified() {
+        return modified;
+    }
+    
+    public void setModified(Long modified) {
+        this.modified = modified;
+    }
+    
     @Override
     public String toString() {
         return "TagDomainDTO{" +

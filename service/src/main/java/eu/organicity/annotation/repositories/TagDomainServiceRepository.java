@@ -28,4 +28,7 @@ public interface TagDomainServiceRepository extends CrudRepository<TagDomainServ
     
     @CacheEvict(value = "TagDomainServiceCache", allEntries = true)
     void delete(Long id);
+    
+    @CacheEvict(value = "TagDomainServiceCache", allEntries = true)
+    void delete(TagDomainService tagDomainService);
 }
