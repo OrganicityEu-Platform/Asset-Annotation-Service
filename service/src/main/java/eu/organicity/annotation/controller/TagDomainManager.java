@@ -502,7 +502,7 @@ public class TagDomainManager {
     
     //Show all available tag domains for application/experiment
     @RequestMapping(value = {"admin/experiments/{experimentUrn}/tagDomains"}, method = RequestMethod.GET) //todo
-    public final List<TagDomain> applicationGetTagDomains(@PathVariable("experimentUrn") String experimentUrn, Principal principal) {
+    public final List<TagDomainDTO> applicationGetTagDomains(@PathVariable("experimentUrn") String experimentUrn, Principal principal) {
         kpiService.addEvent(principal, "api:admin/experiments/tagDomains", "experimentUrn", experimentUrn);
         
         LOGGER.info("GET experimentGetTagDomains");
@@ -520,7 +520,7 @@ public class TagDomainManager {
             throw new RestException("Experimenter is not owning experiment");
         }
         
-        return experimentTagDomainRepository.findByExperiment(a).stream().map(ExperimentTagDomain::getTagDomain).collect(Collectors.toList());
+        return dtoService.toTagDomainListDTO(experimentTagDomainRepository.findByExperiment(a).stream().map(ExperimentTagDomain::getTagDomain).collect(Collectors.toList()));
     }
     
     
