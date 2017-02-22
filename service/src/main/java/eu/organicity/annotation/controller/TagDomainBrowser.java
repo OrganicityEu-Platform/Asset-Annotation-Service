@@ -1,5 +1,6 @@
 package eu.organicity.annotation.controller;
 
+import eu.organicity.annotation.common.dto.AnnotationDTO;
 import eu.organicity.annotation.common.dto.ExperimentDTO;
 import eu.organicity.annotation.common.dto.ServiceDTO;
 import eu.organicity.annotation.common.dto.TagDTO;
@@ -9,6 +10,7 @@ import eu.organicity.annotation.domain.ExperimentTagDomain;
 import eu.organicity.annotation.domain.Service;
 import eu.organicity.annotation.domain.Tag;
 import eu.organicity.annotation.domain.TagDomain;
+import eu.organicity.annotation.domain.Tagging;
 import eu.organicity.annotation.handlers.RestException;
 import eu.organicity.annotation.repositories.ExperimentRepository;
 import eu.organicity.annotation.repositories.ExperimentTagDomainRepository;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -163,6 +166,26 @@ public class TagDomainBrowser {
         }
         
         return dtoService.toTagDomainListDTO(experimentTagDomainRepository.findByExperiment(a).stream().map(ExperimentTagDomain::getTagDomain).collect(Collectors.toList()));
+    }
+    
+    @RequestMapping(value = {"experiments/{experimentUrn}/annotations"}, method = RequestMethod.GET)
+    public final Set<AnnotationDTO> experimentGetAnnotations(@PathVariable("experimentUrn") String experimentUrn, Principal principal) {
+        kpiService.addEvent(principal, "api:experimentTagDomains", "experimentUrn", experimentUrn);
+        Experiment a = experimentRepository.findByUrn(experimentUrn);
+        if (a == null) {
+            throw new RestException("Experiment Not Found");
+        }
+        
+        List<Tagging> totalTaggings = new ArrayList<>();
+        List<ExperimentTagDomain> etds = experimentTagDomainRepository.findByExperiment(a);
+        for (ExperimentTagDomain etd : etds) {
+            List<Tag> tags = tagRepository.findByTagDomain(etd.getTagDomain());
+            for (Tag tag : tags) {
+                totalTaggings.addAll(taggingRepository.findByTag(tag));
+            }
+            
+        }
+        return dtoService.toAssetListDTO(totalTaggings);
     }
     
     
