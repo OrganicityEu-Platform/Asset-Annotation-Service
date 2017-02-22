@@ -270,7 +270,7 @@ public class TagDomainManager {
         
         
         for (String tagUrn : tagUrnList.split(",")) {
-            tagUrn = tagUrn.replace("\"", "");
+            tagUrn = tagUrn.replace("\"", "").trim();
             Tag t = tagRepository.findByUrn(tagUrn);
             if (t == null) {
                 continue;
