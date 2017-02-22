@@ -3,7 +3,6 @@ package eu.organicity.annotation;
 import com.google.common.base.Predicate;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -20,7 +19,7 @@ import static springfox.documentation.builders.PathSelectors.regex;
 @EnableTransactionManagement
 @SpringBootApplication(scanBasePackages = {"eu.organicity.annotation.config", "eu.organicity.annotation.controller", "eu.organicity.annotation.dto.converter", "eu.organicity.annotation.handlers", "eu.organicity.annotation.service"})
 @EnableJpaRepositories(basePackages = "eu.organicity.annotation.repositories")
-@EnableCaching
+//@EnableCaching
 public class Application {
 
 
