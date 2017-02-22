@@ -3,7 +3,6 @@ package eu.organicity.annotation.domain;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -33,7 +32,7 @@ public class TagDomain {
     
     private String user;
     
-    @OneToMany(mappedBy = "tagDomain", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "tagDomain", fetch = FetchType.EAGER)
     private List<Tag> tags;
     
     @CreatedDate

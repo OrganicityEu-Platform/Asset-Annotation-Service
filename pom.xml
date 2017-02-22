@@ -15,6 +15,7 @@
         <module>android-client</module>
         <module>client</module>
         <module>service</module>
+        <module>example</module>
         <!--<module>integration-tests</module>-->
     </modules>
 

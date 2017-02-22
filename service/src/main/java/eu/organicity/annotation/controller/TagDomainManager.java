@@ -11,6 +11,7 @@ import eu.organicity.annotation.domain.Service;
 import eu.organicity.annotation.domain.Tag;
 import eu.organicity.annotation.domain.TagDomain;
 import eu.organicity.annotation.domain.TagDomainService;
+import eu.organicity.annotation.domain.Tagging;
 import eu.organicity.annotation.handlers.RestException;
 import eu.organicity.annotation.repositories.ExperimentRepository;
 import eu.organicity.annotation.repositories.ExperimentTagDomainRepository;
@@ -18,6 +19,7 @@ import eu.organicity.annotation.repositories.ServiceRepository;
 import eu.organicity.annotation.repositories.TagDomainRepository;
 import eu.organicity.annotation.repositories.TagDomainServiceRepository;
 import eu.organicity.annotation.repositories.TagRepository;
+import eu.organicity.annotation.repositories.TaggingRepository;
 import eu.organicity.annotation.service.AnnotationService;
 import eu.organicity.annotation.service.DTOService;
 import eu.organicity.annotation.service.KPIService;
@@ -52,6 +54,9 @@ public class TagDomainManager {
     
     @Autowired
     ServiceRepository serviceRepository;
+    
+    @Autowired
+    TaggingRepository taggingRepository;
     
     @Autowired
     ExperimentRepository experimentRepository;
@@ -118,7 +123,7 @@ public class TagDomainManager {
             LOGGER.info("adding tags");
             for (TagDTO tagDTO : dto.getTags()) {
                 LOGGER.info("adding tag " + tagDTO);
-                addTag2Domain(domain.getUrn(), tagDTO);
+                addTag2Domain(domain, tagDTO);
             }
         }
         
@@ -183,10 +188,12 @@ public class TagDomainManager {
             throw new RestException("TagDomain is used also from other experiments. Not possible to delete/update");
         }
         
-        if (d.getTags() != null && d.getTags().size() > 0) {
+        final List<Tag> tags = tagRepository.findByTagDomain(d);
+        
+        if (tags != null && !tags.isEmpty()) {
             LOGGER.error("TagDomain is not empty");
             //throw new RestException("TagDomain is not empty");
-            for (Tag tag : d.getTags()) {
+            for (final Tag tag : tags) {
                 domainRemoveTag(d, tag.getUrn());
             }
         }
@@ -207,8 +214,10 @@ public class TagDomainManager {
     public final TagDTO domainCreateTag(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody TagDTO tag, Principal principal) {
         kpiService.addEvent(principal, "api:admin/tagDomains/tags/add", "tagDomainUrn", tagDomainUrn, "tagUrn", tag.getUrn());
         
+        TagDomain d = tagDomainRepository.findByUrn(tagDomainUrn);
+        
         LOGGER.info("POST domainCreateTag");
-        Tag addedTag = addTag2Domain(tagDomainUrn, tag);
+        Tag addedTag = addTag2Domain(d, tag);
         LOGGER.info("addedTag:" + addedTag);
         return dtoService.toDTO(addedTag);
     }
@@ -217,10 +226,12 @@ public class TagDomainManager {
     public final Set<TagDTO> domainCreateTags(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody List<TagDTO> tags, Principal principal) {
         kpiService.addEvent(principal, "api:admin/tagDomains/tags/add", "tagDomainUrn", tagDomainUrn, "tags", tags);
         
+        TagDomain d = tagDomainRepository.findByUrn(tagDomainUrn);
+        
         LOGGER.info("POST domainCreateTags");
         Set<Tag> addedTags = new HashSet<>();
         for (final TagDTO tag : tags) {
-            addedTags.add(addTag2Domain(tagDomainUrn, tag));
+            addedTags.add(addTag2Domain(d, tag));
         }
         return dtoService.toTagSetDTO(addedTags);
     }
@@ -259,21 +270,25 @@ public class TagDomainManager {
         
         
         for (String tagUrn : tagUrnList.split(",")) {
-            
             tagUrn = tagUrn.replace("\"", "");
-            Set<Tag> ts = tagRepository.findAllByUrn(tagUrn);
-            for (Tag t : ts) {
-                if (t == null) {
-                    throw new RestException("Tag Not Found");
-                }
+            Tag t = tagRepository.findByUrn(tagUrn);
+            if (t == null) {
+                continue;
+            }
+            
+            try {
                 
-                try {
-                    LOGGER.info("Deleting tag: " + t.getId());
-                    tagRepository.delete(t.getId());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new RestException(e.getMessage());
-                }
+                LOGGER.info("Deleting taggings for " + t.getUrn());
+                List<Tagging> taggings = taggingRepository.findByTag(t);
+                taggingRepository.delete(taggings);
+                
+                LOGGER.info("Deleting tag: " + t.getId());
+                tagRepository.delete(t.getId());
+                
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RestException(e.getMessage());
             }
         }
         
@@ -607,8 +622,7 @@ public class TagDomainManager {
     
     //Add tag to domain
     
-    private Tag addTag2Domain(String tagDomainUrn, TagDTO dto) {
-        TagDomain d = tagDomainRepository.findByUrn(tagDomainUrn);
+    private Tag addTag2Domain(TagDomain d, TagDTO dto) {
         if (d == null) {
             LOGGER.error("TagDomain Not Found");
             throw new RestException("TagDomain Not Found");
@@ -620,7 +634,7 @@ public class TagDomainManager {
             throw new RestException("Not Authorized Access");
         }
         
-        if (ou.isTheOnlyExperimnterUsingTagDomain(annotationService.findApplicationsUsingTagDomain(tagDomainUrn))) {
+        if (ou.isTheOnlyExperimnterUsingTagDomain(annotationService.findApplicationsUsingTagDomain(d.getUrn()))) {
             LOGGER.error("TagDomain is used also from other experiments. Not possible to delete/update");
             throw new RestException("TagDomain is used also from other experiments. Not possible to delete/update");
         }
