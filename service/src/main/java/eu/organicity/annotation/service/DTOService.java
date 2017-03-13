@@ -213,4 +213,18 @@ public class DTOService {
         dto.setNumericValue(tagging.getNumericValue());
         return dto;
     }
+
+    public AnnotationDTO toAnnotationDTO(final Annotation tagging,final TagDomain tagDomain) {
+        AnnotationDTO dto = new AnnotationDTO();
+        dto.setAnnotationId(tagging.getAnnotationId());
+        dto.setApplication(tagging.getApplication());
+        dto.setAssetUrn(tagging.getAssetUrn());
+        dto.setDatetime(tagging.getDatetime());
+        dto.setUser(tagging.getUser());
+        dto.setTagUrn(tagging.getTagUrn());
+        dto.setTextValue(tagging.getTextValue());
+        dto.setNumericValue(tagging.getNumericValue());
+        dto.setTagDomain(toDTO(tagDomain));
+        return dto;
+    }
 }

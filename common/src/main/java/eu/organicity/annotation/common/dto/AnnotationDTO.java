@@ -13,6 +13,7 @@ public class AnnotationDTO {
     private Double numericValue;
     private String tagUrn;
     private String textValue;
+    private TagDomainDTO tagDomain;
     private String user;
 
     public Long getAnnotationId() {
@@ -77,6 +78,14 @@ public class AnnotationDTO {
 
     public void setUser(String user) {
         this.user = user;
+    }
+
+    public TagDomainDTO getTagDomain() {
+        return tagDomain;
+    }
+
+    public void setTagDomain(TagDomainDTO tagDomain) {
+        this.tagDomain = tagDomain;
     }
 
     @Override

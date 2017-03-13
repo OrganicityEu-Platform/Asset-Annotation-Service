@@ -1,17 +1,20 @@
 package eu.organicity.annotation.controller;
 
+import eu.organicity.annotation.common.dto.AnnotationDTO;
+import eu.organicity.annotation.common.dto.AssetAnnotationListDTO;
+import eu.organicity.annotation.common.dto.AssetAnnotationListItemDTO;
+import eu.organicity.annotation.common.dto.AssetListDTO;
 import eu.organicity.annotation.config.OrganicityAccount;
 import eu.organicity.annotation.domain.Annotation;
+import eu.organicity.annotation.domain.TagDomain;
 import eu.organicity.annotation.handlers.RestException;
+import eu.organicity.annotation.repositories.TagDomainRepository;
+import eu.organicity.annotation.repositories.TagRepository;
 import eu.organicity.annotation.repositories.TaggingRepository;
 import eu.organicity.annotation.service.AnnotationService;
 import eu.organicity.annotation.service.DTOService;
 import eu.organicity.annotation.service.KPIService;
 import eu.organicity.annotation.service.OrganicityUserDetailsService;
-import eu.organicity.annotation.common.dto.AnnotationDTO;
-import eu.organicity.annotation.common.dto.AssetAnnotationListDTO;
-import eu.organicity.annotation.common.dto.AssetAnnotationListItemDTO;
-import eu.organicity.annotation.common.dto.AssetListDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +37,10 @@ public class AnnotationController {
 
     @Autowired
     AnnotationService annotationService;
+    @Autowired
+    TagRepository tagRepository;
+    @Autowired
+    TagDomainRepository tagDomainRepository;
     @Autowired
     TaggingRepository taggingRepository;
     @Autowired
@@ -74,10 +81,14 @@ public class AnnotationController {
         return toDTO(annotationService.getAnnotationsOfAsset(assetUrn));
     }
 
+
+
     private Set<AnnotationDTO> toDTO(Set<Annotation> annotationsOfAsset) {
         final Set<AnnotationDTO> dtos = new HashSet<>();
         for (final Annotation annotation : annotationsOfAsset) {
-            dtos.add(dtoService.toAnnotationDTO(annotation));
+            String tag = annotation.getTagUrn();
+            TagDomain tagDomain = tagRepository.findByUrn(tag).getTagDomain();
+            dtos.add(dtoService.toAnnotationDTO(annotation,tagDomainRepository.findById(tagDomain.getId())));
         }
         return dtos;
     }
