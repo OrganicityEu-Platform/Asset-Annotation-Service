@@ -4,8 +4,11 @@ import eu.organicity.annotation.common.dto.ExperimentDTO;
 import eu.organicity.annotation.common.dto.ServiceDTO;
 import eu.organicity.annotation.common.dto.TagDTO;
 import eu.organicity.annotation.common.dto.TagDomainDTO;
+import eu.organicity.annotation.common.exception.BadArgumentsException;
 import eu.organicity.annotation.common.exception.ExistsException;
 import eu.organicity.annotation.common.exception.NotFoundException;
+import eu.organicity.annotation.common.exception.PermissionException;
+import eu.organicity.annotation.common.exception.UnknownException;
 import eu.organicity.annotation.config.OrganicityAccount;
 import eu.organicity.annotation.domain.Experiment;
 import eu.organicity.annotation.domain.ExperimentTagDomain;
@@ -14,7 +17,6 @@ import eu.organicity.annotation.domain.Tag;
 import eu.organicity.annotation.domain.TagDomain;
 import eu.organicity.annotation.domain.TagDomainService;
 import eu.organicity.annotation.domain.Tagging;
-import eu.organicity.annotation.handlers.RestException;
 import eu.organicity.annotation.repositories.ExperimentRepository;
 import eu.organicity.annotation.repositories.ExperimentTagDomainRepository;
 import eu.organicity.annotation.repositories.ServiceRepository;
@@ -85,7 +87,7 @@ public class TagDomainManager {
 
     //Create tagDomain
     @RequestMapping(value = {"admin/tagDomains"}, method = RequestMethod.POST)
-    public final TagDomainDTO domainCreate(@RequestBody TagDomainDTO dto, Principal principal) throws ExistsException, NotFoundException {
+    public final TagDomainDTO domainCreate(@RequestBody TagDomainDTO dto, Principal principal) throws ExistsException, NotFoundException, UnknownException, PermissionException {
         kpiService.addEvent(principal, "api:admin/tagDomains", "tagDomainUrn", dto.getUrn());
 
         LOGGER.info("POST domainCreate");
@@ -101,7 +103,7 @@ public class TagDomainManager {
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (!securityService.canCreate(ou)) {
             LOGGER.error("Not Authorized Access");
-            throw new RestException("Not Authorized Access");
+            throw new PermissionException("Not Authorized Access");
         }
         LOGGER.info("has access");
 
@@ -119,7 +121,7 @@ public class TagDomainManager {
             domain = tagDomainRepository.save(domain);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
-            throw new RestException(e.getMessage());
+            throw new UnknownException(e.getMessage());
         }
         if (dto.getTags() != null) {
             LOGGER.info("adding tags");
@@ -136,7 +138,7 @@ public class TagDomainManager {
 
     //Update tagDomain
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}"}, method = RequestMethod.POST)
-    public final TagDomainDTO domainUpdate(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody TagDomainDTO domain, Principal principal) {
+    public final TagDomainDTO domainUpdate(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody TagDomainDTO domain, Principal principal) throws UnknownException, NotFoundException, PermissionException {
         kpiService.addEvent(principal, "api:admin/tagDomains/update", "tagDomainUrn", domain.getUrn());
 
         LOGGER.info("POST domainUpdate");
@@ -144,17 +146,17 @@ public class TagDomainManager {
         TagDomain d = tagDomainRepository.findByUrn(tagDomainUrn);
         if (d == null) {
             LOGGER.error("TagDomain Not Found");
-            throw new RestException("TagDomain Not Found");
+            throw new NotFoundException("TagDomain Not Found");
         }
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (!securityService.canEdit(d, ou)) {
             LOGGER.error("Not Authorized Access");
-            throw new RestException("Not Authorized Access");
+            throw new PermissionException("Not Authorized Access");
         }
 
         if (ou.isTheOnlyExperimnterUsingTagDomain(annotationService.findApplicationsUsingTagDomain(tagDomainUrn))) {
             LOGGER.error("TagDomain is used also from other experiments. Not possible to delete/update");
-            throw new RestException("TagDomain is used also from other experiments. Not possible to delete/update");
+            throw new PermissionException("TagDomain is used also from other experiments. Not possible to delete/update");
         }
         d.setDescription(domain.getDescription());
         d.setUser(ou.getUser());
@@ -162,14 +164,14 @@ public class TagDomainManager {
             d = tagDomainRepository.save(d);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
-            throw new RestException(e.getMessage());
+            throw new UnknownException(e.getMessage());
         }
         return dtoService.toDTO(d);
     }
 
     //Delete tagDomain
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}"}, method = RequestMethod.DELETE)
-    public final void domainDelete(@PathVariable("tagDomainUrn") String tagDomainUrn, Principal principal) throws NotFoundException {
+    public final void domainDelete(@PathVariable("tagDomainUrn") String tagDomainUrn, Principal principal) throws NotFoundException, UnknownException, PermissionException {
         kpiService.addEvent(principal, "api:admin/tagDomains/delete", "tagDomainUrn", tagDomainUrn);
 
         LOGGER.info("DELETE domainDelete");
@@ -183,18 +185,17 @@ public class TagDomainManager {
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (!securityService.canEdit(d, ou)) {
             LOGGER.error("Not Authorized Access");
-            throw new RestException("Not Authorized Access");
+            throw new PermissionException("Not Authorized Access");
         }
         if (ou.isTheOnlyExperimnterUsingTagDomain(annotationService.findApplicationsUsingTagDomain(tagDomainUrn))) {
             LOGGER.error("TagDomain is used also from other experiments. Not possible to delete/update");
-            throw new RestException("TagDomain is used also from other experiments. Not possible to delete/update");
+            throw new PermissionException("TagDomain is used also from other experiments. Not possible to delete/update");
         }
 
         final List<Tag> tags = tagRepository.findByTagDomain(d);
 
         if (tags != null && !tags.isEmpty()) {
             LOGGER.error("TagDomain is not empty");
-            //throw new RestException("TagDomain is not empty");
             for (final Tag tag : tags) {
                 domainRemoveTag(d, tag.getUrn());
             }
@@ -204,7 +205,7 @@ public class TagDomainManager {
             tagDomainRepository.delete(d);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RestException(e.getMessage());
+            throw new UnknownException(e.getMessage());
         }
     }
 
@@ -213,7 +214,7 @@ public class TagDomainManager {
 
     //Add tag to domain
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/tag"}, method = RequestMethod.POST)
-    public final TagDTO domainCreateTag(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody TagDTO tag, Principal principal) throws NotFoundException {
+    public final TagDTO domainCreateTag(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody TagDTO tag, Principal principal) throws NotFoundException, UnknownException, PermissionException {
         kpiService.addEvent(principal, "api:admin/tagDomains/tags/add", "tagDomainUrn", tagDomainUrn, "tagUrn", tag.getUrn());
 
         TagDomain d = tagDomainRepository.findByUrn(tagDomainUrn);
@@ -225,7 +226,7 @@ public class TagDomainManager {
     }
 
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/tags"}, method = RequestMethod.POST)
-    public final Set<TagDTO> domainCreateTags(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody List<TagDTO> tags, Principal principal) throws NotFoundException {
+    public final Set<TagDTO> domainCreateTags(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody List<TagDTO> tags, Principal principal) throws NotFoundException, UnknownException, PermissionException {
         kpiService.addEvent(principal, "api:admin/tagDomains/tags/add", "tagDomainUrn", tagDomainUrn, "tags", tags);
 
         TagDomain d = tagDomainRepository.findByUrn(tagDomainUrn);
@@ -240,7 +241,7 @@ public class TagDomainManager {
 
     //delete Tag from TagDomain
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/tags"}, method = RequestMethod.DELETE)
-    public final void domainRemoveTag(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody String tagUrnList, Principal principal) throws ExistsException {
+    public final void domainRemoveTag(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody String tagUrnList, Principal principal) throws ExistsException, UnknownException, PermissionException {
         kpiService.addEvent(principal, "api:admin/tagDomains/tags/delete", "tagDomainUrn", tagDomainUrn, "tagUrn", tagUrnList);
 
         TagDomain d = tagDomainRepository.findByUrn(tagDomainUrn);
@@ -251,13 +252,13 @@ public class TagDomainManager {
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (!securityService.canEdit(d, ou)) {
             LOGGER.error("Not Authorized Access");
-            throw new RestException("Not Authorized Access");
+            throw new PermissionException("Not Authorized Access");
         }
 
         try {
             if (ou.isTheOnlyExperimnterUsingTagDomain(annotationService.findApplicationsUsingTagDomain(tagDomainUrn))) {
                 LOGGER.info("");
-                throw new RestException("TagDomain is used also from other experiments. Not possible to delete/update");
+                throw new PermissionException("TagDomain is used also from other experiments. Not possible to delete/update");
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
@@ -267,7 +268,7 @@ public class TagDomainManager {
     }
 
     //delete Tag from TagDomain
-    public final void domainRemoveTag(TagDomain d, String tagUrnList) {
+    public final void domainRemoveTag(TagDomain d, String tagUrnList) throws UnknownException {
         LOGGER.info("DELETE domainRemoveTag " + tagUrnList);
 
 
@@ -290,7 +291,7 @@ public class TagDomainManager {
 
             } catch (Exception e) {
                 e.printStackTrace();
-                throw new RestException(e.getMessage());
+                throw new UnknownException(e.getMessage());
             }
         }
 
@@ -312,7 +313,7 @@ public class TagDomainManager {
 
     //Associate TagDomain with Service
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/services"}, method = RequestMethod.POST)
-    public final TagDomainDTO serviceAddTagDomains(@RequestParam(value = "serviceUrn") String serviceUrn, @PathVariable("tagDomainUrn") String tagDomainUrn, Principal principal) throws ExistsException {
+    public final TagDomainDTO serviceAddTagDomains(@RequestParam(value = "serviceUrn") String serviceUrn, @PathVariable("tagDomainUrn") String tagDomainUrn, Principal principal) throws ExistsException, UnknownException, PermissionException {
         kpiService.addEvent(principal, "api:admin/tagDomains/services/add", "tagDomainUrn", tagDomainUrn, "serviceUrn", serviceUrn);
 
         LOGGER.info("POST serviceAddTagDomains");
@@ -328,7 +329,7 @@ public class TagDomainManager {
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (!securityService.canEdit(d, ou) || !securityService.canEdit(s, ou)) {
             LOGGER.error("Not Authorized Access");
-            throw new RestException("Not Authorized Access");
+            throw new PermissionException("Not Authorized Access");
         }
         try {
             TagDomainService ds = new TagDomainService();
@@ -337,13 +338,13 @@ public class TagDomainManager {
             return dtoService.toDTO(tagDomainServiceRepository.save(ds).getTagDomain());
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RestException(e.getMessage());
+            throw new UnknownException(e.getMessage());
         }
     }
 
     //Disassociate TagDomain with Service
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/services"}, method = RequestMethod.DELETE)
-    public final void serviceRemoveTagDomains(@RequestParam(value = "serviceUrn") String serviceUrn, @PathVariable("tagDomainUrn") String tagDomainUrn, Principal principal) throws ExistsException {
+    public final void serviceRemoveTagDomains(@RequestParam(value = "serviceUrn") String serviceUrn, @PathVariable("tagDomainUrn") String tagDomainUrn, Principal principal) throws ExistsException, PermissionException {
         kpiService.addEvent(principal, "api:admin/tagDomains/services/remove", "tagDomainUrn", tagDomainUrn, "serviceUrn", serviceUrn);
 
         LOGGER.info("DELETE serviceRemoveTagDomains");
@@ -359,7 +360,7 @@ public class TagDomainManager {
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (!securityService.canEdit(d, ou) || !securityService.canEdit(s, ou)) {
             LOGGER.error("Not Authorized Access");
-            throw new RestException("Not Authorized Access");
+            throw new PermissionException("Not Authorized Access");
         }
         TagDomainService ds = tagDomainServiceRepository.findByServiceAndTagDomain(s, d);
         tagDomainServiceRepository.delete(ds);
@@ -370,7 +371,7 @@ public class TagDomainManager {
 
     //Create Service
     @RequestMapping(value = {"admin/services"}, method = RequestMethod.POST)
-    public final ServiceDTO servicesCreate(@RequestBody ServiceDTO dto, Principal principal) throws ExistsException {
+    public final ServiceDTO servicesCreate(@RequestBody ServiceDTO dto, Principal principal) throws ExistsException, PermissionException {
         kpiService.addEvent(principal, "api:admin/services/create", "serviceUrn", dto.getUrn());
 
         LOGGER.info("POST servicesCreate");
@@ -384,7 +385,7 @@ public class TagDomainManager {
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (!securityService.canCreateService(ou)) {
             LOGGER.error("Not Authorized Access");
-            throw new RestException("Not Authorized Access");
+            throw new PermissionException("Not Authorized Access");
         }
         LOGGER.info("can create");
         s = new Service();
@@ -402,7 +403,7 @@ public class TagDomainManager {
 
     //Delete Service
     @RequestMapping(value = {"admin/services/{serviceUrn}"}, method = RequestMethod.DELETE)
-    public final void serviceDelete(@PathVariable("serviceUrn") String serviceUrn, Principal principal) throws ExistsException {
+    public final void serviceDelete(@PathVariable("serviceUrn") String serviceUrn, Principal principal) throws ExistsException, UnknownException, PermissionException {
         kpiService.addEvent(principal, "api:admin/services/delete", "serviceUrn", serviceUrn);
 
         LOGGER.info("DELETE serviceDelete");
@@ -414,13 +415,13 @@ public class TagDomainManager {
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (!securityService.canEdit(s, ou)) {
             LOGGER.error("Not Authorized Access");
-            throw new RestException("Not Authorized Access");
+            throw new PermissionException("Not Authorized Access");
         }
         try {
             serviceRepository.delete(s);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RestException(e.getMessage());
+            throw new UnknownException(e.getMessage());
         }
     }
 
@@ -429,13 +430,13 @@ public class TagDomainManager {
 
     //Create Experiment
     @RequestMapping(value = {"admin/experiments"}, method = RequestMethod.POST)
-    public final ExperimentDTO experimentsCreate(@RequestBody ExperimentDTO experimentDTO, Principal principal) throws ExistsException {
+    public final ExperimentDTO experimentsCreate(@RequestBody ExperimentDTO experimentDTO, Principal principal) throws ExistsException, UnknownException, PermissionException, BadArgumentsException {
         kpiService.addEvent(principal, "api:admin/experiments/create", "experimentUrn", experimentDTO.getUrn());
 
         System.out.println("POST experimentsCreate");
 
         if (experimentDTO.getId() != null) {
-            throw new RestException("Experiment Exception: Experiment.id has to be null");
+            throw new BadArgumentsException("Experiment Exception: Experiment.id has to be null");
         }
         Experiment a = experimentRepository.findByUrn(experimentDTO.getUrn());
         if (a != null) { //tagDomain Create
@@ -444,7 +445,7 @@ public class TagDomainManager {
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (ou == null || (!ou.isAdministrator() && !ou.isExperimenter())) {
             LOGGER.error("Not Authorized Access");
-            throw new RestException("Not Authorized Access");
+            throw new PermissionException("Not Authorized Access");
         }
 
         String tagDomainUrn = experimentDTO.getUrn().replaceAll(":entity:experiments:", ":tagDomain:experiments:");
@@ -465,7 +466,7 @@ public class TagDomainManager {
             domain = tagDomainRepository.save(domain);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
-            throw new RestException(e.getMessage());
+            throw new UnknownException(e.getMessage());
         }
 
         Experiment experiment = new Experiment();
@@ -483,7 +484,7 @@ public class TagDomainManager {
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RestException(e.getMessage());
+            throw new UnknownException(e.getMessage());
         }
         return dtoService.toDTO(experiment);
     }
@@ -491,7 +492,7 @@ public class TagDomainManager {
 
     //Delete Experiment
     @RequestMapping(value = {"admin/experiments/{experimentUrn}"}, method = RequestMethod.DELETE)
-    public final void experimentDelete(@PathVariable("experimentUrn") String experimentUrn, Principal principal) throws NotFoundException {
+    public final void experimentDelete(@PathVariable("experimentUrn") String experimentUrn, Principal principal) throws NotFoundException, UnknownException, PermissionException {
         kpiService.addEvent(principal, "api:admin/experiments/delete", "experimentUrn", experimentUrn);
 
         LOGGER.info("DELETE experimentDelete");
@@ -503,23 +504,23 @@ public class TagDomainManager {
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (ou == null || (!ou.isAdministrator() && !ou.isExperimenter())) {
             LOGGER.error("Not Authorized Access");
-            throw new RestException("Not Authorized Access");
+            throw new PermissionException("Not Authorized Access");
         }
         if (ou.ownsExperiment(experimentUrn)) {
-            throw new RestException("Experimenter is not owning experiment");
+            throw new PermissionException("Experimenter is not owning experiment");
         }
         //todo extra checks (e.g. existing taggings etc)
         try {
             experimentRepository.delete(a);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RestException(e.getMessage());
+            throw new UnknownException(e.getMessage());
         }
     }
 
     //Show all available tag domains for application/experiment
     @RequestMapping(value = {"admin/experiments/{experimentUrn}/tagDomains"}, method = RequestMethod.GET) //todo
-    public final List<TagDomainDTO> applicationGetTagDomains(@PathVariable("experimentUrn") String experimentUrn, Principal principal) throws NotFoundException {
+    public final List<TagDomainDTO> applicationGetTagDomains(@PathVariable("experimentUrn") String experimentUrn, Principal principal) throws NotFoundException, PermissionException {
         kpiService.addEvent(principal, "api:admin/experiments/tagDomains", "experimentUrn", experimentUrn);
 
         LOGGER.info("GET experimentGetTagDomains");
@@ -531,10 +532,10 @@ public class TagDomainManager {
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (ou == null || (!ou.isAdministrator() && !ou.isExperimenter())) {
             LOGGER.error("Not Authorized Access");
-            throw new RestException("Not Authorized Access");
+            throw new PermissionException("Not Authorized Access");
         }
         if (ou.ownsExperiment(experimentUrn)) {
-            throw new RestException("Experimenter is not owning experiment");
+            throw new PermissionException("Experimenter is not owning experiment");
         }
 
         return dtoService.toTagDomainListDTO(experimentTagDomainRepository.findByExperiment(a).stream().map(ExperimentTagDomain::getTagDomain).collect(Collectors.toList()));
@@ -542,13 +543,13 @@ public class TagDomainManager {
 
 
     @RequestMapping(value = {"admin/experiments/{experimentUrn}/tagDomains"}, method = RequestMethod.POST)
-    public final ExperimentDTO experimentAddTagDomains(@RequestParam(value = "tagDomainUrn", required = true) List<String> tagDomainUrns, @PathVariable("experimentUrn") String experimentUrn, Principal principal) throws NotFoundException {
+    public final ExperimentDTO experimentAddTagDomains(@RequestParam(value = "tagDomainUrn", required = true) List<String> tagDomainUrns, @PathVariable("experimentUrn") String experimentUrn, Principal principal) throws NotFoundException, UnknownException, PermissionException {
         kpiService.addEvent(principal, "api:admin/experiments/tagDomains/add", "experimentUrn", experimentUrn, "tagDomainUrns", tagDomainUrns);
 
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (ou == null || (!ou.isAdministrator() && !ou.isExperimenter())) {
             LOGGER.error("Not Authorized Access");
-            throw new RestException("Not Authorized Access");
+            throw new PermissionException("Not Authorized Access");
         }
 
         LOGGER.info("POST experimentAddTagDomains");
@@ -565,7 +566,7 @@ public class TagDomainManager {
             }
 
             if (ou.ownsExperiment(experimentUrn)) {
-                throw new RestException("Experimenter is not owning experiment");
+                throw new PermissionException("Experimenter is not owning experiment");
             }
 
             try {
@@ -578,7 +579,7 @@ public class TagDomainManager {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                throw new RestException(e.getMessage());
+                throw new UnknownException(e.getMessage());
             }
         }
 
@@ -587,13 +588,13 @@ public class TagDomainManager {
     }
 
     @RequestMapping(value = {"admin/experiments/{experimentUrn}/tagDomains"}, method = RequestMethod.DELETE)
-    public final void experimentRemoveTagDomains(@RequestParam(value = "tagDomainUrn", required = true) List<String> tagDomainUrns, @PathVariable("experimentUrn") String experimentUrn, Principal principal) throws NotFoundException {
+    public final void experimentRemoveTagDomains(@RequestParam(value = "tagDomainUrn", required = true) List<String> tagDomainUrns, @PathVariable("experimentUrn") String experimentUrn, Principal principal) throws NotFoundException, UnknownException, PermissionException {
         kpiService.addEvent(principal, "api:admin/experiments/tagDomains/remove", "experimentUrn", experimentUrn, "tagDomainUrns", tagDomainUrns);
 
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (ou == null || (!ou.isAdministrator() && !ou.isExperimenter())) {
             LOGGER.error("Not Authorized Access");
-            throw new RestException("Not Authorized Access");
+            throw new PermissionException("Not Authorized Access");
         }
 
         LOGGER.info("DELETE experimentRemoveTagDomains");
@@ -610,21 +611,21 @@ public class TagDomainManager {
             }
 
             if (ou.ownsExperiment(experimentUrn)) {
-                throw new RestException("Experimenter is not owning experiment");
+                throw new PermissionException("Experimenter is not owning experiment");
             }
             try {
                 ExperimentTagDomain etd = experimentTagDomainRepository.findByExperimentAndTagDomain(a, td);
                 experimentTagDomainRepository.delete(etd);
             } catch (Exception e) {
                 e.printStackTrace();
-                throw new RestException(e.getMessage());
+                throw new UnknownException(e.getMessage());
             }
         }
     }
 
     //Add tag to domain
 
-    private Tag addTag2Domain(TagDomain d, TagDTO dto) throws NotFoundException {
+    private Tag addTag2Domain(TagDomain d, TagDTO dto) throws NotFoundException, UnknownException, PermissionException {
         if (d == null) {
             LOGGER.error("TagDomain Not Found");
             throw new NotFoundException("TagDomain Not Found");
@@ -633,12 +634,12 @@ public class TagDomainManager {
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (!securityService.canEdit(d, ou)) {
             LOGGER.error("Not Authorized Access");
-            throw new RestException("Not Authorized Access");
+            throw new PermissionException("Not Authorized Access");
         }
 
         if (ou.isTheOnlyExperimnterUsingTagDomain(annotationService.findApplicationsUsingTagDomain(d.getUrn()))) {
             LOGGER.error("TagDomain is used also from other experiments. Not possible to delete/update");
-            throw new RestException("TagDomain is used also from other experiments. Not possible to delete/update");
+            throw new PermissionException("TagDomain is used also from other experiments. Not possible to delete/update");
         }
 
         Tag tag = tagRepository.findByUrn(dto.getUrn());
@@ -662,7 +663,7 @@ public class TagDomainManager {
             return tag;
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
-            throw new RestException(e.getMessage());
+            throw new UnknownException(e.getMessage());
         }
     }
 }
