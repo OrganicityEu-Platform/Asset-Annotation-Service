@@ -5,13 +5,13 @@ import eu.organicity.annotation.common.dto.ExperimentDTO;
 import eu.organicity.annotation.common.dto.ServiceDTO;
 import eu.organicity.annotation.common.dto.TagDTO;
 import eu.organicity.annotation.common.dto.TagDomainDTO;
+import eu.organicity.annotation.common.exception.NotFoundException;
 import eu.organicity.annotation.domain.Experiment;
 import eu.organicity.annotation.domain.ExperimentTagDomain;
 import eu.organicity.annotation.domain.Service;
 import eu.organicity.annotation.domain.Tag;
 import eu.organicity.annotation.domain.TagDomain;
 import eu.organicity.annotation.domain.Tagging;
-import eu.organicity.annotation.handlers.RestException;
 import eu.organicity.annotation.repositories.ExperimentRepository;
 import eu.organicity.annotation.repositories.ExperimentTagDomainRepository;
 import eu.organicity.annotation.repositories.ServiceRepository;
@@ -103,11 +103,11 @@ public class TagDomainBrowser {
     }
     
     @RequestMapping(value = {"tags/{tagUrn}"}, method = RequestMethod.GET)
-    public final TagDTO tags(@PathVariable("tagUrn") String tagUrn, Principal principal) {
+    public final TagDTO tags(@PathVariable("tagUrn") String tagUrn, Principal principal) throws NotFoundException {
         kpiService.addEvent(principal, "api:tag", "tagUrn", tagUrn);
         Tag t = tagRepository.findByUrn(tagUrn);
         if (t == null) {
-            throw new RestException("Tag Not Found");
+            throw new NotFoundException("Tag Not Found");
         }
         return dtoService.toDTO(t);
     }
@@ -120,21 +120,21 @@ public class TagDomainBrowser {
     }
     
     @RequestMapping(value = {"services/{serviceUrn}"}, method = RequestMethod.GET)
-    public final ServiceDTO services(@PathVariable("serviceUrn") String serviceUrn, Principal principal) {
+    public final ServiceDTO services(@PathVariable("serviceUrn") String serviceUrn, Principal principal) throws NotFoundException {
         kpiService.addEvent(principal, "api:service", "serviceUrn", serviceUrn);
         Service s = serviceRepository.findByUrn(serviceUrn);
         if (s == null) {
-            throw new RestException("Service Not Found");
+            throw new NotFoundException("Service Not Found");
         }
         return dtoService.toDTO(s);
     }
     
     @RequestMapping(value = {"services/{serviceUrn}/tagDomains"}, method = RequestMethod.GET)
-    public final List<TagDomainDTO> serviceGetTagDomains(@PathVariable("serviceUrn") String serviceUrn, Principal principal) {
+    public final List<TagDomainDTO> serviceGetTagDomains(@PathVariable("serviceUrn") String serviceUrn, Principal principal) throws NotFoundException {
         kpiService.addEvent(principal, "api:serviceTagDomains", "serviceUrn", serviceUrn);
         Service s = serviceRepository.findByUrn(serviceUrn);
         if (s == null) {
-            throw new RestException("Service Not Found");
+            throw new NotFoundException("Service Not Found");
         }
         return dtoService.toTagDomainListDTOFromTagDomainServices(tagDomainServiceRepository.findByService(s));
     }
@@ -148,32 +148,32 @@ public class TagDomainBrowser {
     }
     
     @RequestMapping(value = {"experiments/{experimentUrn}"}, method = RequestMethod.GET)
-    public final ExperimentDTO experiments(@PathVariable("experimentUrn") String experimentUrn, Principal principal) {
+    public final ExperimentDTO experiments(@PathVariable("experimentUrn") String experimentUrn, Principal principal) throws NotFoundException {
         kpiService.addEvent(principal, "api:experiments", "experimentUrn", experimentUrn);
         Experiment a = experimentRepository.findByUrn(experimentUrn);
         if (a == null) {
-            throw new RestException("Experiment Not Found");
+            throw new NotFoundException("Experiment Not Found");
         }
         return dtoService.toDTO(a);
     }
     
     @RequestMapping(value = {"experiments/{experimentUrn}/tagDomains"}, method = RequestMethod.GET)
-    public final List<TagDomainDTO> experimentGetTagDomains(@PathVariable("experimentUrn") String experimentUrn, Principal principal) {
+    public final List<TagDomainDTO> experimentGetTagDomains(@PathVariable("experimentUrn") String experimentUrn, Principal principal) throws NotFoundException {
         kpiService.addEvent(principal, "api:experimentTagDomains", "experimentUrn", experimentUrn);
         Experiment a = experimentRepository.findByUrn(experimentUrn);
         if (a == null) {
-            throw new RestException("Experiment Not Found");
+            throw new NotFoundException("Experiment Not Found");
         }
         
         return dtoService.toTagDomainListDTO(experimentTagDomainRepository.findByExperiment(a).stream().map(ExperimentTagDomain::getTagDomain).collect(Collectors.toList()));
     }
     
     @RequestMapping(value = {"experiments/{experimentUrn}/annotations"}, method = RequestMethod.GET)
-    public final Set<AnnotationDTO> experimentGetAnnotations(@PathVariable("experimentUrn") String experimentUrn, Principal principal) {
+    public final Set<AnnotationDTO> experimentGetAnnotations(@PathVariable("experimentUrn") String experimentUrn, Principal principal) throws NotFoundException {
         kpiService.addEvent(principal, "api:experimentTagDomains", "experimentUrn", experimentUrn);
         Experiment a = experimentRepository.findByUrn(experimentUrn);
         if (a == null) {
-            throw new RestException("Experiment Not Found");
+            throw new NotFoundException("Experiment Not Found");
         }
         
         List<Tagging> totalTaggings = new ArrayList<>();
