@@ -18,9 +18,6 @@ public class LogBrowser {
     @Autowired
     AccountingService accountingService;
 
-
-    // TAG DOMAIN METHODS-----------------------------------------------
-
     //Get All tagDomains
     @RequestMapping(value = {"logs"}, method = RequestMethod.GET)
     public final List<AccountingEntry> list() {
