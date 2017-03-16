@@ -6,6 +6,7 @@ import org.keycloak.adapters.springsecurity.KeycloakSecurityComponents;
 import org.keycloak.adapters.springsecurity.client.KeycloakClientRequestFactory;
 import org.keycloak.adapters.springsecurity.config.KeycloakWebSecurityConfigurerAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +24,9 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 @EnableWebSecurity
 @ComponentScan(basePackageClasses = KeycloakSecurityComponents.class)
 public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
+
+    @Value("${keycloak.location}")
+    protected String keycloakFile;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -64,7 +68,7 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
     @Override
     protected AdapterDeploymentContext adapterDeploymentContext() throws Exception {
         AdapterDeploymentContextFactoryBean factoryBean =
-                new AdapterDeploymentContextFactoryBean(new FileSystemResource("keycloak.json"));
+                new AdapterDeploymentContextFactoryBean(new FileSystemResource(keycloakFile));
         factoryBean.afterPropertiesSet();
         return factoryBean.getObject();
     }
