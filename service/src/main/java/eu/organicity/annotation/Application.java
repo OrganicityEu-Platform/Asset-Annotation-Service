@@ -5,6 +5,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.service.ApiInfo;
@@ -19,6 +21,8 @@ import static springfox.documentation.builders.PathSelectors.regex;
 @EnableTransactionManagement
 @SpringBootApplication(scanBasePackages = {"eu.organicity.annotation.config", "eu.organicity.annotation.controller", "eu.organicity.annotation.dto.converter", "eu.organicity.annotation.handlers", "eu.organicity.annotation.service"})
 @EnableJpaRepositories(basePackages = "eu.organicity.annotation.repositories")
+@EnableMongoRepositories(basePackages = "eu.organicity.annotation.mongo.repository")
+@EnableAsync
 //@EnableCaching
 public class Application {
 

@@ -458,7 +458,7 @@ public class TagDomainManager {
 
         TagDomain domain = new TagDomain();
         domain.setUrn(tagDomainUrn);
-        domain.setDescription("Experiment Tag Domain");
+        domain.setDescription(experimentDTO.getDescription() + " Tag Domain");
         domain.setTags(new ArrayList<>());
         domain.setUser(ou.getUser());
         try {
