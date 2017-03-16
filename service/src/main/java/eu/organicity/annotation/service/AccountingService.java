@@ -13,6 +13,7 @@ import javax.annotation.PostConstruct;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
 @Service
@@ -78,5 +79,9 @@ public class AccountingService {
         entry.setContext(context);
 
         accountingEntryRepository.save(entry);
+    }
+
+    public List<AccountingEntry> list() {
+        return accountingEntryRepository.findAll();
     }
 }
