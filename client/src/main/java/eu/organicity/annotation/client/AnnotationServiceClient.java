@@ -15,6 +15,10 @@ public class AnnotationServiceClient extends AnnotationServiceAndroidClient {
         super(token);
     }
 
+    public AnnotationServiceClient(final String client_id, final String client_secret, final String username, final String password) {
+        super(client_id, client_secret, username, password);
+    }
+
     public AnnotationServiceClient(final String token, final String baseUrl) {
         super(token, baseUrl);
     }
