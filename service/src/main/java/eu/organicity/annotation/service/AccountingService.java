@@ -29,6 +29,11 @@ public class AccountingService {
 
     @PostConstruct
     public void init() {
+        List<AccountingEntry> acc = accountingEntryRepository.findAll();
+        for (AccountingEntry accountingEntry : acc) {
+            LOGGER.info(accountingEntry.toString());
+        }
+
         final TimeZone tz = TimeZone.getTimeZone("UTC");
         dateFormatSeconds.setTimeZone(tz);
     }
