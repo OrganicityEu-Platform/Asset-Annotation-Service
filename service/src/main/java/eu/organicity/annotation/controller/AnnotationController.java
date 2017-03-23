@@ -11,10 +11,12 @@ import eu.organicity.annotation.handlers.RestException;
 import eu.organicity.annotation.repositories.TagDomainRepository;
 import eu.organicity.annotation.repositories.TagRepository;
 import eu.organicity.annotation.repositories.TaggingRepository;
+import eu.organicity.annotation.service.AccountingService;
 import eu.organicity.annotation.service.AnnotationService;
 import eu.organicity.annotation.service.DTOService;
 import eu.organicity.annotation.service.KPIService;
 import eu.organicity.annotation.service.OrganicityUserDetailsService;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,10 @@ import java.security.Principal;
 import java.util.HashSet;
 import java.util.Set;
 
+import static eu.organicity.annotation.service.AccountingService.CREATE_ACTION;
+import static eu.organicity.annotation.service.AccountingService.DELETE_ACTION;
+import static eu.organicity.annotation.service.AccountingService.READ_ACTION;
+
 @RestController
 public class AnnotationController {
     private static final Logger LOGGER = LoggerFactory.getLogger(AnnotationController.class);
@@ -46,14 +52,18 @@ public class AnnotationController {
     @Autowired
     KPIService kpiService;
     @Autowired
+    AccountingService accountingService;
+    @Autowired
     DTOService dtoService;
 
     // Annotation Tagging METHODS-----------------------------------------------
     //Create Tagging
+    @ApiOperation(value = "Create an Annotation", notes = "Provides means to create a new Annotation", nickname = "createAnnotation", response = Annotation.class)
     @RequestMapping(value = {"annotations/{assetUrn}"}, method = RequestMethod.POST)
     public final Annotation createAnnotation(@NotNull @PathVariable("assetUrn") String assetUrn,
                                              @NotNull @RequestBody Annotation annotation, Principal principal) {
         kpiService.addEvent(principal, "api:annotations/add", "assetUrn", assetUrn);
+        accountingService.addMethod(principal, CREATE_ACTION, "annotations/add", assetUrn, null);
 
         //Set of validations
         if (annotation.getAnnotationId() != null) throw new RestException("AnnotationID should be null");
@@ -71,10 +81,12 @@ public class AnnotationController {
         return annotationService.createOrUpdateTagging(annotation);
     }
 
+    @ApiOperation(value = "List Asset Annotations", notes = "Provides means to list all Annotations of a single Asset", nickname = "getAnnotations", response = AnnotationDTO[].class)
     @RequestMapping(value = {"annotations/{assetUrn}/all"}, method = RequestMethod.GET)
     public final Set<AnnotationDTO> getAnnotations(@PathVariable("assetUrn") String assetUrn, final HttpServletResponse response
             , Principal principal) {
         kpiService.addEvent(principal, "api:annotations", "assetUrn", assetUrn);
+        accountingService.addMethod(principal, READ_ACTION, "annotations", assetUrn, null);
 
         //todo show all public Annotations of asset add paging and sorting
         response.setHeader("Cache-Control", "no-cache");
@@ -95,32 +107,37 @@ public class AnnotationController {
 
 
     //Delete Tagging
+    @ApiOperation(value = "Delete Asset Annotation", notes = "Provides means to delete an Annotation of a single Asset", nickname = "deleteAnnotation", response = Annotation.class)
     @RequestMapping(value = {"annotations/{assetUrn}"}, method = RequestMethod.DELETE)
     public final Annotation deleteAnnotation(@PathVariable("assetUrn") String assetUrn, @RequestParam(value = "annotation", required = true) Annotation annotation
             , Principal principal) {
         kpiService.addEvent(principal, "api:annotations/delete", "assetUrn", assetUrn);
+        accountingService.addMethod(principal, DELETE_ACTION, "annotations/delete", assetUrn, null);
         throw new RestException("Not Implemented yet!");
     }
 
 
+    @ApiOperation(value = "List Annotations of an Experiment, User and Tag", notes = "Provides means to list all Annotations of a single Experiment, User and Tag", nickname = "getAnnotationForExperimentUserandTag", response = Annotation.class)
     @RequestMapping(value = {"annotations/"}, method = RequestMethod.GET) //todo fix
-    public final Annotation getAnnotationForApplicationUserandTag(@RequestParam(value = "assetUrn", required = true) String assetUrn,
-                                                                  @RequestParam(value = "experimentUrn", required = true) String experimentUrn,
-                                                                  @RequestParam(value = "tagUrn", required = true) String tagUrn,
-                                                                  @RequestParam(value = "user", required = true) String user
+    public final Annotation getAnnotationForExperimentUserandTag(@RequestParam(value = "assetUrn", required = true) String assetUrn,
+                                                                 @RequestParam(value = "experimentUrn", required = true) String experimentUrn,
+                                                                 @RequestParam(value = "tagUrn", required = true) String tagUrn,
+                                                                 @RequestParam(value = "user", required = true) String user
             , Principal principal
     ) {
         kpiService.addEvent(principal, "api:annotations/query");
+        accountingService.addMethod(principal, DELETE_ACTION, "annotations/query", assetUrn, null);
         return annotationService.getAnnotationForAssetApplicationUserTag(assetUrn, experimentUrn, user, tagUrn);
     }
 
 
+    @ApiOperation(value = "List Annotations of an Experiment", notes = "Provides means to list all Annotations of a single Experiment", nickname = "getAnnotationForExperiment", response = Annotation.class)
     @RequestMapping(value = {"annotations/{tagDomain}"}, method = RequestMethod.GET) //todo fix
-    public final Annotation getAnnotationForApplication(@RequestParam(value = "assetUrn", required = true) String assetUrn,
-                                                        @RequestParam(value = "experimentUrn", required = true) String experimentUrn,
-                                                        @NotNull @PathVariable(value = "tagDomain") String tagDomain,
-                                                        @RequestParam(value = "user", required = true) String user,
-                                                        final HttpServletResponse response
+    public final Annotation getAnnotationForExperiment(@RequestParam(value = "assetUrn", required = true) String assetUrn,
+                                                       @RequestParam(value = "experimentUrn", required = true) String experimentUrn,
+                                                       @NotNull @PathVariable(value = "tagDomain") String tagDomain,
+                                                       @RequestParam(value = "user", required = true) String user,
+                                                       final HttpServletResponse response
             , Principal principal
     ) {
         kpiService.addEvent(principal, "api:annotations", "tagDomain", tagDomain);
@@ -129,15 +146,18 @@ public class AnnotationController {
     }
 
 
+    @ApiOperation(value = "Delete all Annotations of an Asset", notes = "Provides means to delte all Annotations of a single Asset", nickname = "delete")
     @RequestMapping(value = {"admin/annotations/delete/{assetUrn}"}, method = RequestMethod.GET) //todo fix
     public final void delete(@PathVariable("assetUrn") String assetUrn, Principal principal) {
         kpiService.addEvent(principal, "api:annotations/delete", "assetUrn", assetUrn);
         annotationService.deleteAssetsAndAnnotations(assetUrn);
     }
 
+    @ApiOperation(value = "List Annotations of all Assets", notes = "Provides means to list all Annotations of all Assets", nickname = "getAnnotations", response = AnnotationDTO[].class)
     @RequestMapping(value = {"annotations/all"}, method = RequestMethod.GET)
     public final Set<AnnotationDTO> getAnnotations(final HttpServletResponse response, Principal principal) {
         kpiService.addEvent(principal, "api:annotations/all");
+        accountingService.addMethod(principal, READ_ACTION, "annotations/all");
 
         //todo show all public Annotations of asset add paging and sorting
         response.setHeader("Cache-Control", "no-cache");
@@ -149,6 +169,7 @@ public class AnnotationController {
     public final AssetAnnotationListDTO getAnnotations(final HttpServletResponse response, Principal principal,
                                                        @RequestBody final AssetListDTO assetListDTO) {
         kpiService.addEvent(principal, "api:annotations/all");
+
 
         final AssetAnnotationListDTO list = new AssetAnnotationListDTO();
         list.setAssetAnnotations(new HashSet<>());
