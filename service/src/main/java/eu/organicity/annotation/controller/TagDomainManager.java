@@ -24,6 +24,7 @@ import eu.organicity.annotation.repositories.TagDomainRepository;
 import eu.organicity.annotation.repositories.TagDomainServiceRepository;
 import eu.organicity.annotation.repositories.TagRepository;
 import eu.organicity.annotation.repositories.TaggingRepository;
+import eu.organicity.annotation.service.AccountingService;
 import eu.organicity.annotation.service.AnnotationService;
 import eu.organicity.annotation.service.DTOService;
 import eu.organicity.annotation.service.KPIService;
@@ -45,6 +46,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static eu.organicity.annotation.service.AccountingService.CREATE_ACTION;
+import static eu.organicity.annotation.service.AccountingService.DELETE_ACTION;
+import static eu.organicity.annotation.service.AccountingService.READ_ACTION;
+import static eu.organicity.annotation.service.AccountingService.UPDATE_ACTION;
 
 @RestController
 public class TagDomainManager {
@@ -76,6 +82,8 @@ public class TagDomainManager {
 
     @Autowired
     KPIService kpiService;
+    @Autowired
+    AccountingService accountingService;
 
     @Autowired
     DTOService dtoService;
@@ -89,6 +97,7 @@ public class TagDomainManager {
     @RequestMapping(value = {"admin/tagDomains"}, method = RequestMethod.POST)
     public final TagDomainDTO domainCreate(@RequestBody TagDomainDTO dto, Principal principal) throws ExistsException, NotFoundException, UnknownException, PermissionException {
         kpiService.addEvent(principal, "api:admin/tagDomains", "tagDomainUrn", dto.getUrn());
+        accountingService.addMethod(principal, CREATE_ACTION, "admin/tagDomains", dto.getUrn(), null);
 
         LOGGER.info("POST domainCreate");
 
@@ -140,6 +149,7 @@ public class TagDomainManager {
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}"}, method = RequestMethod.POST)
     public final TagDomainDTO domainUpdate(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody TagDomainDTO domain, Principal principal) throws UnknownException, NotFoundException, PermissionException {
         kpiService.addEvent(principal, "api:admin/tagDomains/update", "tagDomainUrn", domain.getUrn());
+        accountingService.addMethod(principal, UPDATE_ACTION, "admin/tagDomains/update", domain.getUrn(), null);
 
         LOGGER.info("POST domainUpdate");
 
@@ -173,6 +183,7 @@ public class TagDomainManager {
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}"}, method = RequestMethod.DELETE)
     public final void domainDelete(@PathVariable("tagDomainUrn") String tagDomainUrn, Principal principal) throws NotFoundException, UnknownException, PermissionException {
         kpiService.addEvent(principal, "api:admin/tagDomains/delete", "tagDomainUrn", tagDomainUrn);
+        accountingService.addMethod(principal, DELETE_ACTION, "admin/tagDomains/delete", tagDomainUrn, null);
 
         LOGGER.info("DELETE domainDelete");
 
@@ -215,7 +226,8 @@ public class TagDomainManager {
     //Add tag to domain
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/tag"}, method = RequestMethod.POST)
     public final TagDTO domainCreateTag(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody TagDTO tag, Principal principal) throws NotFoundException, UnknownException, PermissionException {
-        kpiService.addEvent(principal, "api:admin/tagDomains/tags/add", "tagDomainUrn", tagDomainUrn, "tagUrn", tag.getUrn());
+        kpiService.addEvent(principal, "api:admin/tagDomains/tag/add", "tagDomainUrn", tagDomainUrn, "tagUrn", tag.getUrn());
+        accountingService.addMethod(principal, CREATE_ACTION, "admin/tagDomains/tag/add", tag.getUrn(), null);
 
         TagDomain d = tagDomainRepository.findByUrn(tagDomainUrn);
 
@@ -228,6 +240,7 @@ public class TagDomainManager {
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/tags"}, method = RequestMethod.POST)
     public final Set<TagDTO> domainCreateTags(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody List<TagDTO> tags, Principal principal) throws NotFoundException, UnknownException, PermissionException {
         kpiService.addEvent(principal, "api:admin/tagDomains/tags/add", "tagDomainUrn", tagDomainUrn, "tags", tags);
+        accountingService.addMethod(principal, CREATE_ACTION, "admin/tagDomains/tags/add", tags.toString(), null);
 
         TagDomain d = tagDomainRepository.findByUrn(tagDomainUrn);
 
@@ -243,6 +256,7 @@ public class TagDomainManager {
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/tags"}, method = RequestMethod.DELETE)
     public final void domainRemoveTag(@PathVariable("tagDomainUrn") String tagDomainUrn, @RequestBody String tagUrnList, Principal principal) throws ExistsException, UnknownException, PermissionException {
         kpiService.addEvent(principal, "api:admin/tagDomains/tags/delete", "tagDomainUrn", tagDomainUrn, "tagUrn", tagUrnList);
+        accountingService.addMethod(principal, DELETE_ACTION, "admin/tagDomains/tags/delete", tagUrnList, null);
 
         TagDomain d = tagDomainRepository.findByUrn(tagDomainUrn);
         if (d == null) {
@@ -270,7 +284,6 @@ public class TagDomainManager {
     //delete Tag from TagDomain
     public final void domainRemoveTag(TagDomain d, String tagUrnList) throws UnknownException {
         LOGGER.info("DELETE domainRemoveTag " + tagUrnList);
-
 
         for (String tagUrn : tagUrnList.split(",")) {
             tagUrn = tagUrn.replace("\"", "").trim();
@@ -301,6 +314,7 @@ public class TagDomainManager {
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/services"}, method = RequestMethod.GET)
     public final List<ServiceDTO> tagDomainGetServices(@PathVariable("tagDomainUrn") String tagDomainUrn, Principal principal) throws ExistsException {
         kpiService.addEvent(principal, "api:admin/tagDomains/services", "tagDomainUrn", tagDomainUrn);
+        accountingService.addMethod(principal, READ_ACTION, "admin/tagDomains/services", tagDomainUrn, null);
 
         LOGGER.info("GET tagDomainGetServices");
 
@@ -315,6 +329,7 @@ public class TagDomainManager {
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/services"}, method = RequestMethod.POST)
     public final TagDomainDTO serviceAddTagDomains(@RequestParam(value = "serviceUrn") String serviceUrn, @PathVariable("tagDomainUrn") String tagDomainUrn, Principal principal) throws ExistsException, UnknownException, PermissionException {
         kpiService.addEvent(principal, "api:admin/tagDomains/services/add", "tagDomainUrn", tagDomainUrn, "serviceUrn", serviceUrn);
+        accountingService.addMethod(principal, CREATE_ACTION, "admin/tagDomains/services/add", tagDomainUrn, null);
 
         LOGGER.info("POST serviceAddTagDomains");
 
@@ -346,6 +361,7 @@ public class TagDomainManager {
     @RequestMapping(value = {"admin/tagDomains/{tagDomainUrn}/services"}, method = RequestMethod.DELETE)
     public final void serviceRemoveTagDomains(@RequestParam(value = "serviceUrn") String serviceUrn, @PathVariable("tagDomainUrn") String tagDomainUrn, Principal principal) throws ExistsException, PermissionException {
         kpiService.addEvent(principal, "api:admin/tagDomains/services/remove", "tagDomainUrn", tagDomainUrn, "serviceUrn", serviceUrn);
+        accountingService.addMethod(principal, DELETE_ACTION, "admin/tagDomains/services/remove", tagDomainUrn, null);
 
         LOGGER.info("DELETE serviceRemoveTagDomains");
 
@@ -373,6 +389,7 @@ public class TagDomainManager {
     @RequestMapping(value = {"admin/services"}, method = RequestMethod.POST)
     public final ServiceDTO servicesCreate(@RequestBody ServiceDTO dto, Principal principal) throws ExistsException, PermissionException {
         kpiService.addEvent(principal, "api:admin/services/create", "serviceUrn", dto.getUrn());
+        accountingService.addMethod(principal, CREATE_ACTION, "admin/services/create", dto.getUrn(), null);
 
         LOGGER.info("POST servicesCreate");
 
@@ -405,6 +422,7 @@ public class TagDomainManager {
     @RequestMapping(value = {"admin/services/{serviceUrn}"}, method = RequestMethod.DELETE)
     public final void serviceDelete(@PathVariable("serviceUrn") String serviceUrn, Principal principal) throws ExistsException, UnknownException, PermissionException {
         kpiService.addEvent(principal, "api:admin/services/delete", "serviceUrn", serviceUrn);
+        accountingService.addMethod(principal, DELETE_ACTION, "admin/services/delete", serviceUrn, null);
 
         LOGGER.info("DELETE serviceDelete");
 
@@ -432,6 +450,7 @@ public class TagDomainManager {
     @RequestMapping(value = {"admin/experiments"}, method = RequestMethod.POST)
     public final ExperimentDTO experimentsCreate(@RequestBody ExperimentDTO experimentDTO, Principal principal) throws ExistsException, UnknownException, PermissionException, BadArgumentsException {
         kpiService.addEvent(principal, "api:admin/experiments/create", "experimentUrn", experimentDTO.getUrn());
+        accountingService.addMethod(principal, CREATE_ACTION, "admin/experiments/create", experimentDTO.getUrn(), null);
 
         System.out.println("POST experimentsCreate");
 
@@ -494,6 +513,7 @@ public class TagDomainManager {
     @RequestMapping(value = {"admin/experiments/{experimentUrn}"}, method = RequestMethod.DELETE)
     public final void experimentDelete(@PathVariable("experimentUrn") String experimentUrn, Principal principal) throws NotFoundException, UnknownException, PermissionException {
         kpiService.addEvent(principal, "api:admin/experiments/delete", "experimentUrn", experimentUrn);
+        accountingService.addMethod(principal, DELETE_ACTION, "admin/experiments/delete", experimentUrn, null);
 
         LOGGER.info("DELETE experimentDelete");
 
@@ -522,6 +542,7 @@ public class TagDomainManager {
     @RequestMapping(value = {"admin/experiments/{experimentUrn}/tagDomains"}, method = RequestMethod.GET) //todo
     public final List<TagDomainDTO> applicationGetTagDomains(@PathVariable("experimentUrn") String experimentUrn, Principal principal) throws NotFoundException, PermissionException {
         kpiService.addEvent(principal, "api:admin/experiments/tagDomains", "experimentUrn", experimentUrn);
+        accountingService.addMethod(principal, READ_ACTION, "admin/experiments/tagDomains", experimentUrn, null);
 
         LOGGER.info("GET experimentGetTagDomains");
 
@@ -545,6 +566,7 @@ public class TagDomainManager {
     @RequestMapping(value = {"admin/experiments/{experimentUrn}/tagDomains"}, method = RequestMethod.POST)
     public final ExperimentDTO experimentAddTagDomains(@RequestParam(value = "tagDomainUrn", required = true) List<String> tagDomainUrns, @PathVariable("experimentUrn") String experimentUrn, Principal principal) throws NotFoundException, UnknownException, PermissionException {
         kpiService.addEvent(principal, "api:admin/experiments/tagDomains/add", "experimentUrn", experimentUrn, "tagDomainUrns", tagDomainUrns);
+        accountingService.addMethod(principal, CREATE_ACTION, "admin/experiments/tagDomains/add", experimentUrn, null);
 
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (ou == null || (!ou.isAdministrator() && !ou.isExperimenter())) {
@@ -590,6 +612,7 @@ public class TagDomainManager {
     @RequestMapping(value = {"admin/experiments/{experimentUrn}/tagDomains"}, method = RequestMethod.DELETE)
     public final void experimentRemoveTagDomains(@RequestParam(value = "tagDomainUrn", required = true) List<String> tagDomainUrns, @PathVariable("experimentUrn") String experimentUrn, Principal principal) throws NotFoundException, UnknownException, PermissionException {
         kpiService.addEvent(principal, "api:admin/experiments/tagDomains/remove", "experimentUrn", experimentUrn, "tagDomainUrns", tagDomainUrns);
+        accountingService.addMethod(principal, DELETE_ACTION, "admin/experiments/tagDomains/remove", experimentUrn, null);
 
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
         if (ou == null || (!ou.isAdministrator() && !ou.isExperimenter())) {

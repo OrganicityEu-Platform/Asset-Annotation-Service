@@ -21,6 +21,9 @@ public class AccountingService {
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountingService.class);
     private static final String SERVICE_NAME = "oc:annotations";
     public static final String READ_ACTION = "read";
+    public static final String CREATE_ACTION = "create";
+    public static final String UPDATE_ACTION = "update";
+    public static final String DELETE_ACTION = "delete";
 
     private SimpleDateFormat dateFormatSeconds = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
