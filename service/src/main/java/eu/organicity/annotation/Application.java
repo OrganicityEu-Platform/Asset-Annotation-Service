@@ -52,8 +52,8 @@ public class Application {
     }
 
     private ApiInfo apiInfo() {
-        return new ApiInfoBuilder().title("Organicity Tagging API")
-                .description("Organicity Tagging API")
+        return new ApiInfoBuilder().title("OrganiCity Annotation Service API")
+                .description("OrganiCity Annotation Service allows experimenters and participants to add Annotations in the form of Tags on Assets of the OrganiCity facility and Experiments.")
                 .termsOfServiceUrl("http://www.organicity.eu")
                 .version("0.1").build();
     }
