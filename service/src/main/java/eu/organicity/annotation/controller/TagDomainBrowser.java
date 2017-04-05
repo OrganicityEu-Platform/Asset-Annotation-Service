@@ -220,8 +220,12 @@ public class TagDomainBrowser {
     }
     
     
+    @ApiOperation(value = "Search in the TagDomains, Tags and Services for a set of keywords", notes = "Provides means to find all TagDomains that can possibly connected with the provided keyworks", nickname = "search", response = TagDomainDTO[].class)
     @RequestMapping(value = {"search"}, method = RequestMethod.GET)
-    public final List<TagDomainDTO> searchTagDomains(@RequestParam("query") List<String> query, Principal principal) throws NotFoundException {
+    public final List<TagDomainDTO> search(@RequestParam("query") List<String> query, Principal principal) throws NotFoundException {
+        kpiService.addEvent(principal, "api:search");
+        accountingService.addMethod(principal, READ_ACTION, "search");
+        
         final Set<TagDomain> domains = new HashSet<>();
         
         for (final String queryItem : query) {
