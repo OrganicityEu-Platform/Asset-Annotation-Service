@@ -11,6 +11,7 @@ import eu.organicity.annotation.domain.ExperimentTagDomain;
 import eu.organicity.annotation.domain.Service;
 import eu.organicity.annotation.domain.Tag;
 import eu.organicity.annotation.domain.TagDomain;
+import eu.organicity.annotation.domain.TagDomainService;
 import eu.organicity.annotation.domain.Tagging;
 import eu.organicity.annotation.repositories.ExperimentRepository;
 import eu.organicity.annotation.repositories.ExperimentTagDomainRepository;
@@ -219,9 +220,21 @@ public class TagDomainBrowser {
     }
     
     
-    @RequestMapping(value = {"tagDomains/search"}, method = RequestMethod.GET)
+    @RequestMapping(value = {"search"}, method = RequestMethod.GET)
     public final List<TagDomainDTO> searchTagDomains(@RequestParam("query") List<String> query, Principal principal) throws NotFoundException {
         final Set<TagDomain> domains = new HashSet<>();
+        
+        for (final String queryItem : query) {
+            final Set<Service> services = serviceRepository.findByDescriptionContaining(queryItem);
+            for (final Service service : services) {
+                final List<TagDomainService> tagDomainServices = tagDomainServiceRepository.findByService(service);
+                for (final TagDomainService tagDomainService : tagDomainServices) {
+                    if (tagDomainService.getTagDomain() != null && tagDomainService.getTagDomain().getId() != null) {
+                        domains.add(tagDomainRepository.findById(tagDomainService.getTagDomain().getId()));
+                    }
+                }
+            }
+        }
         
         for (final String queryItem : query) {
             final Set<TagDomain> currentDomains = tagDomainRepository.findByDescriptionContaining(queryItem);
