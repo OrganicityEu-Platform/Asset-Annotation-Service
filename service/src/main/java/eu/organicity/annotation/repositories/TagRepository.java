@@ -18,6 +18,8 @@ public interface TagRepository extends CrudRepository<Tag, Long> {
 //    @Cacheable(value = "TagCache")
     Set<Tag> findAllByUrn(String urn);
     
+    Set<Tag> findByNameContaining(final String name);
+    
 //    @Cacheable(value = "TagCache")
     List<Tag> findByTagDomain(TagDomain domain);
     

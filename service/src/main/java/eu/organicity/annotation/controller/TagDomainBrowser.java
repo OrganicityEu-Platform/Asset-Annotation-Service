@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
@@ -44,42 +45,42 @@ import static eu.organicity.annotation.service.AccountingService.READ_ACTION;
 @RestController
 public class TagDomainBrowser {
     private static final Logger LOGGER = LoggerFactory.getLogger(TagDomainBrowser.class);
-
+    
     @Autowired
     TagDomainRepository tagDomainRepository;
-
+    
     @Autowired
     TagRepository tagRepository;
-
+    
     @Autowired
     ServiceRepository serviceRepository;
-
+    
     @Autowired
     TaggingRepository taggingRepository;
-
+    
     @Autowired
     ExperimentRepository experimentRepository;
-
+    
     @Autowired
     TagDomainServiceRepository tagDomainServiceRepository;
-
+    
     @Autowired
     ExperimentTagDomainRepository experimentTagDomainRepository;
-
+    
     @Autowired
     AnnotationService annotationService;
-
+    
     @Autowired
     KPIService kpiService;
-
+    
     @Autowired
     AccountingService accountingService;
-
+    
     @Autowired
     DTOService dtoService;
-
+    
     // TAG DOMAIN METHODS-----------------------------------------------
-
+    
     //Get All tagDomains
     @ApiOperation(value = "List all TagDomains", notes = "Provides means to list all available TagDomains", nickname = "domainFindAll", response = TagDomainDTO[].class)
     @RequestMapping(value = {"tagDomains"}, method = RequestMethod.GET)
@@ -88,8 +89,8 @@ public class TagDomainBrowser {
         accountingService.addMethod(principal, READ_ACTION, "tagDomains");
         return dtoService.toTagDomainListDTO(tagDomainRepository.findAll());
     }
-
-
+    
+    
     //Get tagDomain
     @ApiOperation(value = "Get TagDomain", notes = "Provides means to list all properties of a single TagDomain", nickname = "domainFindByUrn", response = TagDomainDTO.class)
     @RequestMapping(value = {"tagDomains/{tagDomainUrn}"}, method = RequestMethod.GET)
@@ -98,7 +99,7 @@ public class TagDomainBrowser {
         accountingService.addMethod(principal, READ_ACTION, "domainFindByUrn", tagDomainUrn, null);
         return dtoService.toDTO(tagDomainRepository.findByUrn(tagDomainUrn));
     }
-
+    
     // TAG METHODS-----------------------------------------------
     @ApiOperation(value = "Get Tags of a TagDomain", notes = "Provides means to list all Tags of a single TagDomain", nickname = "domainGetTags", response = TagDTO[].class)
     @RequestMapping(value = {"tagDomains/{tagDomainUrn}/tags"}, method = RequestMethod.GET)
@@ -113,7 +114,7 @@ public class TagDomainBrowser {
             return new HashSet<>();
         }
     }
-
+    
     @ApiOperation(value = "Get a Tag", notes = "Provides means to list all properties of a single Tag", nickname = "tag", response = TagDTO.class)
     @RequestMapping(value = {"tags/{tagUrn}"}, method = RequestMethod.GET)
     public final TagDTO tag(@PathVariable("tagUrn") String tagUrn, Principal principal) throws NotFoundException {
@@ -125,7 +126,7 @@ public class TagDomainBrowser {
         }
         return dtoService.toDTO(t);
     }
-
+    
     // Services METHODS-----------------------------------------------
     @ApiOperation(value = "Get Services", notes = "Provides means to list all Services", nickname = "services", response = ServiceDTO[].class)
     @RequestMapping(value = {"services"}, method = RequestMethod.GET)
@@ -134,7 +135,7 @@ public class TagDomainBrowser {
         accountingService.addMethod(principal, READ_ACTION, "services");
         return dtoService.toOriginalServiceListDTO(serviceRepository.findAll());
     }
-
+    
     @ApiOperation(value = "Get a Service", notes = "Provides means to list all properties of a Service", nickname = "service", response = ServiceDTO.class)
     @RequestMapping(value = {"services/{serviceUrn}"}, method = RequestMethod.GET)
     public final ServiceDTO service(@PathVariable("serviceUrn") String serviceUrn, Principal principal) throws NotFoundException {
@@ -146,7 +147,7 @@ public class TagDomainBrowser {
         }
         return dtoService.toDTO(s);
     }
-
+    
     @ApiOperation(value = "Get TagDomains of a Service", notes = "Provides means to list all TagDomains of a single Service", nickname = "serviceGetTagDomains", response = TagDomainDTO[].class)
     @RequestMapping(value = {"services/{serviceUrn}/tagDomains"}, method = RequestMethod.GET)
     public final List<TagDomainDTO> serviceGetTagDomains(@PathVariable("serviceUrn") String serviceUrn, Principal principal) throws NotFoundException {
@@ -158,8 +159,8 @@ public class TagDomainBrowser {
         }
         return dtoService.toTagDomainListDTOFromTagDomainServices(tagDomainServiceRepository.findByService(s));
     }
-
-
+    
+    
     // Experiment Methods----------------------------------------------------------------------------------------------
     @ApiOperation(value = "Get all Experiments", notes = "Provides means to list all Experiments", nickname = "experiments", response = ExperimentDTO[].class)
     @RequestMapping(value = {"experiments"}, method = RequestMethod.GET)
@@ -168,7 +169,7 @@ public class TagDomainBrowser {
         accountingService.addMethod(principal, READ_ACTION, "experiments");
         return dtoService.toExperimentListDTO(experimentRepository.findAll());
     }
-
+    
     @ApiOperation(value = "Get an Experiment", notes = "Provides means to list all properties of an Experiment", nickname = "experiment", response = ExperimentDTO.class)
     @RequestMapping(value = {"experiments/{experimentUrn}"}, method = RequestMethod.GET)
     public final ExperimentDTO experiment(@PathVariable("experimentUrn") String experimentUrn, Principal principal) throws NotFoundException {
@@ -180,7 +181,7 @@ public class TagDomainBrowser {
         }
         return dtoService.toDTO(a);
     }
-
+    
     @ApiOperation(value = "Get the TagDomains of an Experiment", notes = "Provides means to list all TagDomains of an Experiment", nickname = "experimentGetTagDomains", response = TagDomainDTO[].class)
     @RequestMapping(value = {"experiments/{experimentUrn}/tagDomains"}, method = RequestMethod.GET)
     public final List<TagDomainDTO> experimentGetTagDomains(@PathVariable("experimentUrn") String experimentUrn, Principal principal) throws NotFoundException {
@@ -190,21 +191,21 @@ public class TagDomainBrowser {
         if (a == null) {
             throw new NotFoundException("Experiment Not Found");
         }
-
+        
         return dtoService.toTagDomainListDTO(experimentTagDomainRepository.findByExperiment(a).stream().map(ExperimentTagDomain::getTagDomain).collect(Collectors.toList()));
     }
-
+    
     @ApiOperation(value = "Get the Annotations of an Experiment", notes = "Provides means to list all Annotations of an Experiment", nickname = "experimentGetAnnotations", response = AnnotationDTO[].class)
     @RequestMapping(value = {"experiments/{experimentUrn}/annotations"}, method = RequestMethod.GET)
     public final Set<AnnotationDTO> experimentGetAnnotations(@PathVariable("experimentUrn") String experimentUrn, Principal principal) throws NotFoundException {
         kpiService.addEvent(principal, "api:experimentAnnotations", "experimentUrn", experimentUrn);
         accountingService.addMethod(principal, READ_ACTION, "experimentAnnotations", experimentUrn, null);
-
+        
         Experiment a = experimentRepository.findByUrn(experimentUrn);
         if (a == null) {
             throw new NotFoundException("Experiment Not Found");
         }
-
+        
         List<Tagging> totalTaggings = new ArrayList<>();
         List<ExperimentTagDomain> etds = experimentTagDomainRepository.findByExperiment(a);
         for (ExperimentTagDomain etd : etds) {
@@ -212,10 +213,31 @@ public class TagDomainBrowser {
             for (Tag tag : tags) {
                 totalTaggings.addAll(taggingRepository.findByTag(tag));
             }
-
+            
         }
         return dtoService.toAssetListDTO(totalTaggings);
     }
-
-
+    
+    
+    @RequestMapping(value = {"tagDomains/search"}, method = RequestMethod.GET)
+    public final List<TagDomainDTO> searchTagDomains(@RequestParam("query") List<String> query, Principal principal) throws NotFoundException {
+        final Set<TagDomain> domains = new HashSet<>();
+        
+        for (final String queryItem : query) {
+            final Set<TagDomain> currentDomains = tagDomainRepository.findByDescriptionContaining(queryItem);
+            domains.addAll(currentDomains);
+        }
+        
+        for (final String queryItem : query) {
+            final Set<Tag> tags = tagRepository.findByNameContaining(queryItem);
+            for (final Tag tag : tags) {
+                if (tag.getTagDomain() != null && tag.getTagDomain().getId() != null)
+                    domains.add(tagDomainRepository.findById(tag.getTagDomain().getId()));
+            }
+        }
+        
+        return dtoService.toTagDomainListDTO(domains);
+    }
+    
+    
 }

@@ -3,6 +3,8 @@ package eu.organicity.annotation.repositories;
 import eu.organicity.annotation.domain.TagDomain;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.Set;
+
 public interface TagDomainRepository extends CrudRepository<TagDomain, Long> {
     
 //    @Cacheable(value = "TagDomainCache")
@@ -10,6 +12,8 @@ public interface TagDomainRepository extends CrudRepository<TagDomain, Long> {
     
 //    @Cacheable(value = "TagDomainCache")
     TagDomain findById(Long id);
+    
+    Set<TagDomain> findByDescriptionContaining(String description);
     
 //    @Cacheable(value = "TagDomainCache")
     TagDomain findByUrn(String Urn);

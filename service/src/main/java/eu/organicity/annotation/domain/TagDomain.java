@@ -113,4 +113,22 @@ public class TagDomain {
         }
         return false;
     }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        
+        TagDomain tagDomain = (TagDomain) o;
+    
+        return urn.equals(tagDomain.urn);
+    
+    }
+    
+    @Override
+    public int hashCode() {
+        return urn.hashCode();
+    }
 }
