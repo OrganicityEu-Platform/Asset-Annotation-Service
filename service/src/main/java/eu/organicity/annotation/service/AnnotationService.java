@@ -26,12 +26,12 @@ import java.util.stream.Collectors;
 public class AnnotationService {
     @Autowired
     TaggingRepository taggingRepository;
-    
-    
     @Autowired
     TagRepository tagRepository;
     @Autowired
     TagDomainRepository tagDomainRepository;
+    @Autowired
+    OrionService orionService;
     
     public Annotation getAnnotation(Tagging t) {
         Annotation a = new Annotation();
@@ -88,6 +88,9 @@ public class AnnotationService {
         tagg.setUrn(annotation.getAssetUrn());
         tagg.setTag(tag);
         taggingRepository.save(tagg);
+        
+        orionService.updateAnnotations(annotation.getAssetUrn());
+        
         return getAnnotation(tagg);
     }
     
