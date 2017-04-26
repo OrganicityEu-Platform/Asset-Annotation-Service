@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,14 +16,7 @@ import java.util.Set;
 @Service
 public class OrionService {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrionService.class);
-    
-    @PostConstruct
-    public void init() {
-        for (Tagging tagging : taggingRepository.findAll()) {
-            updateAnnotations(tagging.getUrn());
-        }
-    }
-    
+
     @Autowired
     TaggingRepository taggingRepository;
     
