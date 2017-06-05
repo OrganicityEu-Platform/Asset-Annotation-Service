@@ -54,6 +54,11 @@ public class AnnotationServiceAndroidClient extends OrganicityServiceBaseClient 
         return restTemplate.getForObject(baseUrl + "annotations/all", AnnotationDTO[].class);
     }
 
+    public AnnotationDTO[] getAnnotationsOfAsset(final String assetUrn) {
+        refreshTokenIfNeeded();
+        return restTemplate.getForObject(baseUrl + "annotations/"+assetUrn+"/all", AnnotationDTO[].class);
+    }
+
     public ServiceDTO[] getServices() {
         refreshTokenIfNeeded();
         return restTemplate.getForObject(baseUrl + "services", ServiceDTO[].class);
@@ -92,6 +97,11 @@ public class AnnotationServiceAndroidClient extends OrganicityServiceBaseClient 
     public TagDTO[] getTags(final String tagDomainUrn) {
         refreshTokenIfNeeded();
         return restTemplate.getForObject(baseUrl + "tagDomains/" + tagDomainUrn + "/tags", TagDTO[].class);
+    }
+
+    public TagDTO getTag(final String tagUrn) {
+        refreshTokenIfNeeded();
+        return restTemplate.getForObject(baseUrl + "tags/" + tagUrn, TagDTO.class);
     }
 
     /**
