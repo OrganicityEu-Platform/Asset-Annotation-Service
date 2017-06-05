@@ -49,6 +49,14 @@ public class TagDomainTests {
     }
     
     @Test
+    public void testDelete() throws InterruptedException {
+
+        System.out.println("Removing domain:" + TAG_DOMAIN);
+        client.removeTagDomain(TAG_DOMAIN);
+
+    }
+    
+    @Test
     public void testCreateAll() throws InterruptedException {
         
         System.out.println("Removing domain:" + TAG_DOMAIN);
