@@ -463,7 +463,7 @@ public class TagDomainManager {
         kpiService.addEvent(principal, "api:admin/experiments/create", "experimentUrn", experimentDTO.getUrn());
         accountingService.addMethod(principal, CREATE_ACTION, "admin/experiments/create", experimentDTO.getUrn(), null);
 
-        System.out.println("POST experimentsCreate");
+        LOGGER.info("POST experimentsCreate");
 
         if (experimentDTO.getId() != null) {
             throw new BadArgumentsException("Experiment Exception: Experiment.id has to be null");
