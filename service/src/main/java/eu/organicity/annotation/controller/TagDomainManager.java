@@ -470,6 +470,7 @@ public class TagDomainManager {
         LOGGER.info(String.valueOf(experimentDTO.getCreated()));
         LOGGER.info(String.valueOf(experimentDTO.getModified()));
         LOGGER.info(String.valueOf(experimentDTO.getTagDomains()));
+        
         if (experimentDTO.getId() != null) {
             LOGGER.error("Experiment Exception: Experiment.id has to be null");
             throw new BadArgumentsException("Experiment Exception: Experiment.id has to be null");
@@ -486,7 +487,7 @@ public class TagDomainManager {
         }
 
         String tagDomainUrn = experimentDTO.getUrn().replaceAll(":entity:experiments:", ":tagDomain:experiments:");
-
+        LOGGER.info("creating: "+tagDomainUrn);
         TagDomain d = tagDomainRepository.findByUrn(tagDomainUrn);
         if (d != null) { //tagDomain Create
             LOGGER.error("TagDomain Exception: duplicate urn");
@@ -505,7 +506,8 @@ public class TagDomainManager {
             LOGGER.error(e.getMessage(), e);
             throw new UnknownException(e.getMessage());
         }
-
+        LOGGER.info("creating: "+experimentDTO.getUrn());
+    
         Experiment experiment = new Experiment();
         experiment.setId(null);
         experiment.setUrn(experimentDTO.getUrn());
@@ -523,7 +525,11 @@ public class TagDomainManager {
             LOGGER.error(e.getLocalizedMessage(),e);
             throw new UnknownException(e.getMessage());
         }
-        return dtoService.toDTO(experiment);
+        LOGGER.info("created: "+experiment);
+    
+        ExperimentDTO dto = dtoService.toDTO(experiment);
+        LOGGER.info("created: "+dto);
+        return dto;
     }
 
 
