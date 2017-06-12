@@ -463,8 +463,13 @@ public class TagDomainManager {
         LOGGER.info("POST experimentsCreate");
         kpiService.addEvent(principal, "api:admin/experiments/create", "experimentUrn", experimentDTO.getUrn());
         accountingService.addMethod(principal, CREATE_ACTION, "admin/experiments/create", experimentDTO.getUrn(), null);
-
-
+    
+        LOGGER.info(experimentDTO.getUrn());
+        LOGGER.info(experimentDTO.getDescription());
+        LOGGER.info(experimentDTO.getUser());
+        LOGGER.info(String.valueOf(experimentDTO.getCreated()));
+        LOGGER.info(String.valueOf(experimentDTO.getModified()));
+        LOGGER.info(String.valueOf(experimentDTO.getTagDomains()));
         if (experimentDTO.getId() != null) {
             LOGGER.error("Experiment Exception: Experiment.id has to be null");
             throw new BadArgumentsException("Experiment Exception: Experiment.id has to be null");
