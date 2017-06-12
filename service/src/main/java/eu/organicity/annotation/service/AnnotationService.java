@@ -1,5 +1,6 @@
 package eu.organicity.annotation.service;
 
+import eu.organicity.annotation.common.dto.AnnotationStatisticsDTO;
 import eu.organicity.annotation.domain.Annotation;
 import eu.organicity.annotation.domain.Experiment;
 import eu.organicity.annotation.domain.Tag;
@@ -150,5 +151,20 @@ public class AnnotationService {
     
     public Collection<Experiment> findApplicationsUsingTagDomain(String tagDomainUrn) {
         return new ArrayList<>();
+    }
+    
+    public AnnotationStatisticsDTO getAnnotationStatisticsOfAsset(String assetUrn) {
+        AnnotationStatisticsDTO dto = new AnnotationStatisticsDTO();
+        dto.setAssetUrn(assetUrn);
+    
+        dto.setAnnotationsCount(taggingRepository.countByUrn(assetUrn));
+        dto.setFirstAnnotation(taggingRepository.findMinCreatedDate(assetUrn).toEpochSecond() * 1000);
+        dto.setLastAnnotation(taggingRepository.findMaxLastModifiedDate(assetUrn).toEpochSecond() * 1000);
+        
+        dto.setGlobalAnnotationsCount(taggingRepository.count());
+        dto.setGlobalFirstAnnotation(taggingRepository.findMinCreatedDate().toEpochSecond() * 1000);
+        dto.setGlobalLastAnnotation(taggingRepository.findMaxLastModifiedDate().toEpochSecond() * 1000);
+        
+        return dto;
     }
 }
