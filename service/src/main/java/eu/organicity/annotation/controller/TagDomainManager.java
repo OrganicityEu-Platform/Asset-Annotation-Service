@@ -460,16 +460,18 @@ public class TagDomainManager {
     //Create Experiment
     @RequestMapping(value = {"admin/experiments"}, method = RequestMethod.POST)
     public final ExperimentDTO experimentsCreate(@RequestBody ExperimentDTO experimentDTO, Principal principal) throws ExistsException, UnknownException, PermissionException, BadArgumentsException {
+        LOGGER.info("POST experimentsCreate");
         kpiService.addEvent(principal, "api:admin/experiments/create", "experimentUrn", experimentDTO.getUrn());
         accountingService.addMethod(principal, CREATE_ACTION, "admin/experiments/create", experimentDTO.getUrn(), null);
 
-        LOGGER.info("POST experimentsCreate");
 
         if (experimentDTO.getId() != null) {
+            LOGGER.error("Experiment Exception: Experiment.id has to be null");
             throw new BadArgumentsException("Experiment Exception: Experiment.id has to be null");
         }
         Experiment a = experimentRepository.findByUrn(experimentDTO.getUrn());
         if (a != null) { //tagDomain Create
+            LOGGER.error("Experiment Exception: duplicate urn");
             throw new ExistsException("Experiment Exception: duplicate urn");
         }
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
@@ -513,7 +515,7 @@ public class TagDomainManager {
             experimentTagDomainRepository.save(etd);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error(e.getLocalizedMessage(),e);
             throw new UnknownException(e.getMessage());
         }
         return dtoService.toDTO(experiment);
