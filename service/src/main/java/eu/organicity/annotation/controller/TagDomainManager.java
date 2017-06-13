@@ -489,6 +489,7 @@ public class TagDomainManager {
         }
 
         String tagDomainUrn = experimentDTO.getUrn().replaceAll(":entity:experiments:", ":tagDomain:experiments:");
+        tagDomainUrn = experimentDTO.getUrn().replaceAll(":entity:experimenters:", ":tagDomain:experiments:");
         LOGGER.info("creating: "+tagDomainUrn);
         TagDomain d = tagDomainRepository.findByUrn(tagDomainUrn);
         if (d != null) { //tagDomain Create
