@@ -11,7 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 public class OrganicityUserDetailsService {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganicityUserDetailsService.class);
-
+    
     public static OrganicityAccount getCurrentUser() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
@@ -22,7 +22,7 @@ public class OrganicityUserDetailsService {
             } catch (Exception e) {
                 SecurityContextHolder.getContext().getAuthentication().setAuthenticated(false);
                 SecurityContextHolder.clearContext();
-                throw new AccessDeniedException("Access Denied::Not proper Organicity Token");
+                throw new AccessDeniedException("Access Denied::Not proper Organicity Token", e);
             }
         }
         return null;

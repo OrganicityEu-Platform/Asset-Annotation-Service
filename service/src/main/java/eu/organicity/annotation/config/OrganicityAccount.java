@@ -1,12 +1,10 @@
 package eu.organicity.annotation.config;
 
 import eu.organicity.annotation.domain.Experiment;
-import eu.organicity.annotation.service.ExperimentationService;
 import io.jsonwebtoken.Claims;
 import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Arrays;
@@ -27,8 +25,8 @@ public final class OrganicityAccount extends KeycloakPrincipal {
     private Collection<? extends GrantedAuthority> roles;
     private HashMap<String, eu.organicity.annotation.domain.experiment.Experiment> experiments = new HashMap<>();
     
-    @Autowired
-    ExperimentationService experimentationService;
+//    @Autowired
+//    ExperimentationService experimentationService;
     
     public OrganicityAccount(KeycloakPrincipal k, Collection<? extends GrantedAuthority> authorities) {
         super(k.getName(), k.getKeycloakSecurityContext());
@@ -48,14 +46,14 @@ public final class OrganicityAccount extends KeycloakPrincipal {
             throw e;
         }
         if (isExperimenter()) {
-            try {
-                eu.organicity.annotation.domain.experiment.Experiment[] exps = experimentationService.getExperiments(this.getUser());
-                for (eu.organicity.annotation.domain.experiment.Experiment e : exps) {
-                    experiments.put(e.getExperimentId(), e);
-                }
-            } catch (Exception e) {
-                LOGGER.error(e.getLocalizedMessage(), e);
-            }
+//            try {
+//                eu.organicity.annotation.domain.experiment.Experiment[] exps = experimentationService.getExperiments(this.getUser());
+//                for (eu.organicity.annotation.domain.experiment.Experiment e : exps) {
+//                    experiments.put(e.getExperimentId(), e);
+//                }
+//            } catch (Exception e) {
+//                LOGGER.error(e.getLocalizedMessage(), e);
+//            }
         }
     }
     
