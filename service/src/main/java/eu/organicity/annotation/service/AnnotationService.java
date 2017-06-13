@@ -162,6 +162,7 @@ public class AnnotationService {
         dto.setAssetUrn(assetUrn);
         
         dto.setAnnotationsCount(taggingRepository.countByUrn(assetUrn));
+        dto.setGlobalAnnotationsCount(taggingRepository.count());
         
         dto.setFirstAnnotation(taggingRepository.findFirstOrderByCreatedAsc(assetUrn).getCreated());
         dto.setLastAnnotation(taggingRepository.findFirstOrderByLastModifiedDesc(assetUrn).getLastModified());
