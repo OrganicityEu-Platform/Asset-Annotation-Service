@@ -480,7 +480,9 @@ public class TagDomainManager {
             LOGGER.error("Experiment Exception: duplicate urn");
             throw new ExistsException("Experiment Exception: duplicate urn");
         }
+        
         OrganicityAccount ou = OrganicityUserDetailsService.getCurrentUser();
+        LOGGER.info(ou.toString());
         if (ou == null || (!ou.isAdministrator() && !ou.isExperimenter())) {
             LOGGER.error("Not Authorized Access");
             throw new PermissionException("Not Authorized Access");

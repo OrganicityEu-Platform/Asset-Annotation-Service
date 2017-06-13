@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -47,8 +48,8 @@ public class AnnotationService {
         if (t.getTag() == null)
             throw new RestException("Null Tag Object");
         a.setTagUrn(t.getTag().getUrn());
-        if (t.getLastModifiedDate() != null) {
-            a.setDatetime("" + t.getLastModifiedDate());
+        if (t.getLastModified() != null) {
+            a.setDatetime(new Date(t.getLastModified()).toString());
         }
         return a;
     }
@@ -82,6 +83,8 @@ public class AnnotationService {
                 throw new RestException("Provide a numeric value or else use the Text field");
             }
         }
+        tagg.setCreated(System.currentTimeMillis());
+        tagg.setLastModified(System.currentTimeMillis());
         tagg.setNumericValue(annotation.getNumericValue());
         tagg.setTextValue(annotation.getTextValue());
         tagg.setUser(annotation.getUser()); //todo fix
@@ -154,16 +157,17 @@ public class AnnotationService {
     }
     
     public AnnotationStatisticsDTO getAnnotationStatisticsOfAsset(String assetUrn) {
-        AnnotationStatisticsDTO dto = new AnnotationStatisticsDTO();
-        dto.setAssetUrn(assetUrn);
-    
-        dto.setAnnotationsCount(taggingRepository.countByUrn(assetUrn));
-        dto.setFirstAnnotation(taggingRepository.findMinCreatedDate(assetUrn).toEpochSecond() * 1000);
-        dto.setLastAnnotation(taggingRepository.findMaxLastModifiedDate(assetUrn).toEpochSecond() * 1000);
+        final AnnotationStatisticsDTO dto = new AnnotationStatisticsDTO();
         
-        dto.setGlobalAnnotationsCount(taggingRepository.count());
-        dto.setGlobalFirstAnnotation(taggingRepository.findMinCreatedDate().toEpochSecond() * 1000);
-        dto.setGlobalLastAnnotation(taggingRepository.findMaxLastModifiedDate().toEpochSecond() * 1000);
+        dto.setAssetUrn(assetUrn);
+        
+        dto.setAnnotationsCount(taggingRepository.countByUrn(assetUrn));
+        
+        dto.setFirstAnnotation(taggingRepository.findFirstOrderByCreatedAsc(assetUrn).getCreated());
+        dto.setLastAnnotation(taggingRepository.findFirstOrderByLastModifiedDesc(assetUrn).getLastModified());
+        
+        dto.setGlobalFirstAnnotation(taggingRepository.findFirstOrderByCreatedAsc().getCreated());
+        dto.setGlobalLastAnnotation(taggingRepository.findFirstOrderByLastModifiedDesc().getLastModified());
         
         return dto;
     }

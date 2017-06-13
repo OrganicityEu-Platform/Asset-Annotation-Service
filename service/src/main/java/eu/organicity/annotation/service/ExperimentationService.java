@@ -8,20 +8,21 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import eu.organicity.annotation.domain.experiment.Experiment;
 import org.apache.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 
+@Service
 public class ExperimentationService {
-    final static String url = "http://experimenters.organicity.eu:8081/experiments-full/";
-
-
-    public static Experiment[] getExperiments(String experimenter) {
-
+    @Value("${oc.api.experimenters}")
+    private String baseUrl;
+    
+    
+    public Experiment[] getExperiments(String experimenter) {
+        
         HttpResponse<JsonNode> jsonResponse = null;
         try {
-            jsonResponse = Unirest.get(url + experimenter)
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
-                    .asObject(JsonNode.class);
+            jsonResponse = Unirest.get(baseUrl + "/experiments-full/" + experimenter).header("accept", "application/json").header("Content-Type", "application/json").asObject(JsonNode.class);
             if (jsonResponse.getStatus() == HttpStatus.SC_OK) {
                 Experiment[] e = null;
                 ObjectMapper mapper = new ObjectMapper();
@@ -35,10 +36,10 @@ public class ExperimentationService {
         } catch (UnirestException e) {
             e.printStackTrace();
         }
-
-
+        
+        
         return null;
     }
-
-
+    
+    
 }

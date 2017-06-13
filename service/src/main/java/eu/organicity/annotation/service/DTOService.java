@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -191,8 +192,8 @@ public class DTOService {
         dto.setAnnotationId(tagging.getId());
         dto.setApplication(tagging.getApplication());
         dto.setAssetUrn(tagging.getUrn());
-        if (tagging.getLastModifiedDate() != null) {
-            dto.setDatetime("" + tagging.getLastModifiedDate());
+        if (tagging.getLastModified() != null) {
+            dto.setDatetime(new Date(tagging.getLastModified()).toString());
         }
         dto.setUser(tagging.getUser());
         dto.setTagUrn(tagging.getTag().getUrn());

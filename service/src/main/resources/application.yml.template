@@ -1,0 +1,35 @@
+server:
+  port: 8084
+  contextPath: /
+
+mixpanel.token:
+
+spring:
+  datasource:
+    url: "jdbc:mysql://localhost:3306/database"
+    username: "username"
+    password: "password"
+    testWhileIdle: true
+    validationQuery: "SELECT 1"
+  data:
+    mongodb:
+      host: "host"
+      port: 27017
+      database: "database"
+      username: "username"
+      password: "password"
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5Dialect
+
+keycloak:
+  location: keycloak.json
+
+oc:
+  api:
+    experimenters: http://experimenters
