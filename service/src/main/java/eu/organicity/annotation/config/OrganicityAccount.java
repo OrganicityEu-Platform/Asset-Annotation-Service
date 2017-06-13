@@ -97,7 +97,7 @@ public final class OrganicityAccount extends KeycloakPrincipal {
     }
     
     public boolean ownsExperiment(String experimentId) {
-        if (isExperimenter() == false)
+        if (!isExperimenter())
             return false;
         return experiments.containsKey(experimentId);
     }
@@ -107,9 +107,9 @@ public final class OrganicityAccount extends KeycloakPrincipal {
             return false;
         }
         for (Experiment app : experiments) {
-            if (!ownsExperiment(app.getUrn())) {
-                return false;
-            }
+//            if (!ownsExperiment(app.getUrn())) {
+//                return false;
+//            }
         }
         return true;
     }

@@ -553,9 +553,9 @@ public class TagDomainManager {
             LOGGER.error("Not Authorized Access");
             throw new PermissionException("Not Authorized Access");
         }
-        if (ou.ownsExperiment(experimentUrn)) {
-            throw new PermissionException("Experimenter is not owning experiment");
-        }
+//        if (ou.ownsExperiment(experimentUrn)) {
+//            throw new PermissionException("Experimenter is not owning experiment");
+//        }
         //todo extra checks (e.g. existing taggings etc)
         try {
             experimentRepository.delete(a);
@@ -583,9 +583,9 @@ public class TagDomainManager {
             LOGGER.error("Not Authorized Access");
             throw new PermissionException("Not Authorized Access");
         }
-        if (ou.ownsExperiment(experimentUrn)) {
-            throw new PermissionException("Experimenter is not owning experiment");
-        }
+//        if (ou.ownsExperiment(experimentUrn)) {
+//            throw new PermissionException("Experimenter is not owning experiment");
+//        }
 
         return dtoService.toTagDomainListDTO(experimentTagDomainRepository.findByExperiment(a).stream().map(ExperimentTagDomain::getTagDomain).collect(Collectors.toList()));
     }
@@ -615,9 +615,9 @@ public class TagDomainManager {
                 throw new NotFoundException("TagDomain Not Found");
             }
 
-            if (ou.ownsExperiment(experimentUrn)) {
-                throw new PermissionException("Experimenter is not owning experiment");
-            }
+//            if (ou.ownsExperiment(experimentUrn)) {
+//                throw new PermissionException("Experimenter is not owning experiment");
+//            }
 
             try {
                 ExperimentTagDomain etd = experimentTagDomainRepository.findByExperimentAndTagDomain(a, td);
@@ -662,9 +662,9 @@ public class TagDomainManager {
                 throw new NotFoundException("TagDomain Not Found");
             }
 
-            if (ou.ownsExperiment(experimentUrn)) {
-                throw new PermissionException("Experimenter is not owning experiment");
-            }
+//            if (ou.ownsExperiment(experimentUrn)) {
+//                throw new PermissionException("Experimenter is not owning experiment");
+//            }
             try {
                 ExperimentTagDomain etd = experimentTagDomainRepository.findByExperimentAndTagDomain(a, td);
                 experimentTagDomainRepository.delete(etd);
