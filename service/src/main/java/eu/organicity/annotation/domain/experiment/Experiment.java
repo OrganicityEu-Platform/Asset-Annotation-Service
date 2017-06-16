@@ -25,6 +25,7 @@
 
 package eu.organicity.annotation.domain.experiment;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.gson.annotations.SerializedName;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -37,70 +38,72 @@ import java.util.Objects;
 /**
  * Experiment
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaClientCodegen", date = "2016-10-07T20:51:53.641+01:00")
 public class Experiment {
     @SerializedName("experimenterIds")
     private List<String> experimenterIds = new ArrayList<String>();
-
+    
     @SerializedName("experimentId")
     private String experimentId = null;
-
+    
     @SerializedName("name")
     private String name = null;
-
+    
     @SerializedName("registered")
     private Date registered = null;
-
+    
     @SerializedName("startDate")
     private Date startDate = null;
-
+    
     @SerializedName("endDate")
     private Date endDate = null;
-
+    
     @SerializedName("applications")
     private String[] applications = null;
-
+    
     @SerializedName("dataSources")
     private String[] dataSources = null;
+    
     /**
      * Gets or Sets status
      */
     public enum StatusEnum {
         @SerializedName("stopped")
         STOPPED("stopped"),
-
+        
         @SerializedName("running")
         RUNNING("running");
-
+        
         private String value;
-
+        
         StatusEnum(String value) {
             this.value = value;
         }
-
+        
         @Override
         public String toString() {
             return String.valueOf(value);
         }
     }
-
+    
     @SerializedName("status")
     private StatusEnum status = null;
-
+    
     @SerializedName("description")
     private String description = null;
-
-
+    
+    
     public Experiment experimenterIds(List<String> experimenterIds) {
         this.experimenterIds = experimenterIds;
         return this;
     }
-
+    
     public Experiment addExperimenterIdsItem(String experimenterIdsItem) {
         this.experimenterIds.add(experimenterIdsItem);
         return this;
     }
-
+    
     /**
      * Get experimenterIds
      *
@@ -110,16 +113,16 @@ public class Experiment {
     public List<String> getExperimenterIds() {
         return experimenterIds;
     }
-
+    
     public void setExperimenterIds(List<String> experimenterIds) {
         this.experimenterIds = experimenterIds;
     }
-
+    
     public Experiment experimentId(String experimentId) {
         this.experimentId = experimentId;
         return this;
     }
-
+    
     /**
      * Get experimentId
      *
@@ -129,16 +132,16 @@ public class Experiment {
     public String getExperimentId() {
         return experimentId;
     }
-
+    
     public void setExperimentId(String experimentId) {
         this.experimentId = experimentId;
     }
-
+    
     public Experiment name(String name) {
         this.name = name;
         return this;
     }
-
+    
     /**
      * Get name
      *
@@ -148,16 +151,16 @@ public class Experiment {
     public String getName() {
         return name;
     }
-
+    
     public void setName(String name) {
         this.name = name;
     }
-
+    
     public Experiment registered(Date registered) {
         this.registered = registered;
         return this;
     }
-
+    
     /**
      * Get registered
      *
@@ -167,16 +170,16 @@ public class Experiment {
     public Date getRegistered() {
         return registered;
     }
-
+    
     public void setRegistered(Date registered) {
         this.registered = registered;
     }
-
+    
     public Experiment startDate(Date startDate) {
         this.startDate = startDate;
         return this;
     }
-
+    
     /**
      * Get startDate
      *
@@ -186,16 +189,16 @@ public class Experiment {
     public Date getStartDate() {
         return startDate;
     }
-
+    
     public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
-
+    
     public Experiment endDate(Date endDate) {
         this.endDate = endDate;
         return this;
     }
-
+    
     /**
      * Get endDate
      *
@@ -205,16 +208,16 @@ public class Experiment {
     public Date getEndDate() {
         return endDate;
     }
-
+    
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
-
+    
     public Experiment status(StatusEnum status) {
         this.status = status;
         return this;
     }
-
+    
     /**
      * Get status
      *
@@ -224,16 +227,16 @@ public class Experiment {
     public StatusEnum getStatus() {
         return status;
     }
-
+    
     public void setStatus(StatusEnum status) {
         this.status = status;
     }
-
+    
     public Experiment description(String description) {
         this.description = description;
         return this;
     }
-
+    
     /**
      * Get description
      *
@@ -243,28 +246,28 @@ public class Experiment {
     public String getDescription() {
         return description;
     }
-
+    
     public void setDescription(String description) {
         this.description = description;
     }
-
-
+    
+    
     public String[] getApplications() {
         return applications;
     }
-
+    
     public void setApplications(String[] applications) {
         this.applications = applications;
     }
-
+    
     public String[] getDataSources() {
         return dataSources;
     }
-
+    
     public void setDataSources(String[] dataSources) {
         this.dataSources = dataSources;
     }
-
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -274,27 +277,20 @@ public class Experiment {
             return false;
         }
         Experiment experiment = (Experiment) o;
-        return Objects.equals(this.experimenterIds, experiment.experimenterIds) &&
-                Objects.equals(this.experimentId, experiment.experimentId) &&
-                Objects.equals(this.name, experiment.name) &&
-                Objects.equals(this.registered, experiment.registered) &&
-                Objects.equals(this.startDate, experiment.startDate) &&
-                Objects.equals(this.endDate, experiment.endDate) &&
-                Objects.equals(this.status, experiment.status) &&
-                Objects.equals(this.description, experiment.description) ;
-
+        return Objects.equals(this.experimenterIds, experiment.experimenterIds) && Objects.equals(this.experimentId, experiment.experimentId) && Objects.equals(this.name, experiment.name) && Objects.equals(this.registered, experiment.registered) && Objects.equals(this.startDate, experiment.startDate) && Objects.equals(this.endDate, experiment.endDate) && Objects.equals(this.status, experiment.status) && Objects.equals(this.description, experiment.description);
+        
     }
-
+    
     @Override
     public int hashCode() {
         return Objects.hash(experimenterIds, experimentId, name, registered, startDate, endDate, status, description);
     }
-
+    
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("class Experiment {\n");
-
+        
         sb.append("    experimenterIds: ").append(toIndentedString(experimenterIds)).append("\n");
         sb.append("    experimentId: ").append(toIndentedString(experimentId)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
@@ -303,11 +299,11 @@ public class Experiment {
         sb.append("    endDate: ").append(toIndentedString(endDate)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
-
+        
         sb.append("}");
         return sb.toString();
     }
-
+    
     /**
      * Convert the given object to string with each line indented by 4 spaces
      * (except the first line).
