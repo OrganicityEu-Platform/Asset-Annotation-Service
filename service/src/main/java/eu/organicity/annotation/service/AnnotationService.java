@@ -153,8 +153,15 @@ public class AnnotationService {
         dto.setAnnotationsCount(taggingRepository.countByUrn(assetUrn));
         dto.setGlobalAnnotationsCount(taggingRepository.count());
         
-        dto.setFirstAnnotation(taggingRepository.findFirstOrderByCreatedAsc(assetUrn).getCreated());
-        dto.setLastAnnotation(taggingRepository.findFirstOrderByLastModifiedDesc(assetUrn).getLastModified());
+        if (dto.getAnnotationsCount() > 0) {
+            Tagging firstOfAsset = taggingRepository.findFirstOrderByCreatedAsc(assetUrn);
+            dto.setFirstAnnotation(firstOfAsset.getCreated());
+            Tagging lastOfAsset = taggingRepository.findFirstOrderByLastModifiedDesc(assetUrn);
+            dto.setLastAnnotation(lastOfAsset.getLastModified());
+        } else {
+            dto.setLastAnnotation(0);
+            dto.setFirstAnnotation(0);
+        }
         
         dto.setGlobalFirstAnnotation(taggingRepository.findFirstOrderByCreatedAsc().getCreated());
         dto.setGlobalLastAnnotation(taggingRepository.findFirstOrderByLastModifiedDesc().getLastModified());
