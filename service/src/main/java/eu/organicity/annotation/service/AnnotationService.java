@@ -60,22 +60,10 @@ public class AnnotationService {
             throw new RestException("Provide a valid tag urn");
         TagDomain td = tagDomainRepository.findById(tag.getTagDomain().getId());
         
-        Tagging tagg = new Tagging();
-        Boolean exists = false;
-        Tagging taggToDelete = null;
-        for (Tagging t : taggingRepository.findByUrn(annotation.getAssetUrn())) {
-            TagDomain tdT = tagDomainRepository.findById(t.getTag().getTagDomain().getId());
-            if (t.getTag().getUrn().equals(tag.getUrn()) && t.getUrn().equals(annotation.getAssetUrn()) && t.getApplication().equals(annotation.getApplication()) && t.getUser().equals(annotation.getUser())) {
-                tagg = t;
-                exists = true;
-                break;
-            }
-            if (tdT.getUrn().equals(td.getUrn())) { //There is a tagging
-                taggToDelete = t;
-            }
-        }
-        if (taggToDelete != null) {
-            taggingRepository.delete(taggToDelete);
+        
+        Tagging tagg = taggingRepository.findByUrnAndUserAndTag(annotation.getAssetUrn(), annotation.getUser(), tag);
+        if (tagg == null) {
+            tagg = new Tagging();
         }
         
         if (annotation.getNumericValue() != null) {

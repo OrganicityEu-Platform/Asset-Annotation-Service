@@ -31,6 +31,8 @@ public interface TaggingRepository extends CrudRepository<Tagging, Long> {
 //    @Query("select min(t.createdDate) from Tagging t where t.urn= ?1")
 //    Tagging findMinCreatedDate(String urn);
     
+    Tagging findByUrnAndUserAndTag(String urn, String user, Tag tag);
+    
     List<Tagging> findByUrn(String urn);
     
     List<Tagging> findByTag(Tag t);
