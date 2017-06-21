@@ -13,6 +13,9 @@ public class AnnotationStatisticsDTO {
     private long globalAnnotationsCount;
     private long globalLastAnnotation;
     private long globalFirstAnnotation;
+    private long totalRates;
+    private long globalTotalRates;
+    private double assetRate;
     
     public String getAssetUrn() {
         return assetUrn;
@@ -70,4 +73,27 @@ public class AnnotationStatisticsDTO {
         this.globalFirstAnnotation = globalFirstAnnotation;
     }
     
+    public long getTotalRates() {
+        return totalRates;
+    }
+    
+    public void setTotalRates(long totalRates) {
+        this.totalRates = totalRates;
+    }
+    
+    public long getGlobalTotalRates() {
+        return globalTotalRates;
+    }
+    
+    public void setGlobalTotalRates(long globalTotalRates) {
+        this.globalTotalRates = globalTotalRates;
+    }
+    
+    public double getAssetRate() {
+        return assetRate;
+    }
+    
+    public void setAssetRate(double assetRate) {
+        this.assetRate = assetRate;
+    }
 }
