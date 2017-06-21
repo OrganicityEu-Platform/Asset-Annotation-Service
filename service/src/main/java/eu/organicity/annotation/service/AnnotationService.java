@@ -64,6 +64,7 @@ public class AnnotationService {
         Tagging tagg = taggingRepository.findByUrnAndUserAndTag(annotation.getAssetUrn(), annotation.getUser(), tag);
         if (tagg == null) {
             tagg = new Tagging();
+            tagg.setCreated(System.currentTimeMillis());
         }
         
         if (annotation.getNumericValue() != null) {
@@ -71,7 +72,7 @@ public class AnnotationService {
                 throw new RestException("Provide a numeric value or else use the Text field");
             }
         }
-        tagg.setCreated(System.currentTimeMillis());
+        
         tagg.setLastModified(System.currentTimeMillis());
         tagg.setNumericValue(annotation.getNumericValue());
         tagg.setTextValue(annotation.getTextValue());
