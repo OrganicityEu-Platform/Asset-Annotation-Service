@@ -159,6 +159,22 @@ public class AnnotationService {
         dto.setGlobalFirstAnnotation(taggingRepository.findFirstOrderByCreatedAsc().getCreated());
         dto.setGlobalLastAnnotation(taggingRepository.findFirstOrderByLastModifiedDesc().getLastModified());
         
+        Tag tag = tagRepository.findByUrn("urn:oc:tag:Reliability:Score");
+        dto.setTotalRates(taggingRepository.countByUrnAndTag(assetUrn, tag));
+        dto.setGlobalTotalRates(taggingRepository.countByTag(tag));
+        List<Tagging> tags = taggingRepository.findByUrnAndTag(assetUrn, tag);
+        double count = 0.0;
+        long nums = 0L;
+        for (Tagging tagging : tags) {
+            count += tagging.getNumericValue();
+            nums++;
+        }
+        if (nums == 0) {
+            dto.setAssetRate(0);
+        } else {
+            dto.setAssetRate(count / nums);
+        }
+        
         return dto;
     }
 }
