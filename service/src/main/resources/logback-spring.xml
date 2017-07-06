@@ -1,0 +1,79 @@
+<configuration>
+
+    <springProfile name="default,production">
+
+        <springProperty scope="context" name="LOG_PATH" source="log.path"/>
+
+        <appender name="OC_AS_ALL" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOG_PATH}/annotation-service.log</file>
+            <encoder>
+                <pattern>[%d{ISO8601}] %p %t %c{1}:%L - %m%n</pattern>
+            </encoder>
+            <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+                <fileNamePattern>${FILE_LOG_PATTERN}.%i</fileNamePattern>
+                <minIndex>1</minIndex>
+                <maxIndex>5</maxIndex>
+            </rollingPolicy>
+            <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+                <maxFileSize>5MB</maxFileSize>
+            </triggeringPolicy>
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <level>DEBUG</level>
+            </filter>
+        </appender>
+
+        <root level="ERROR"> <!-- ERROR, ALL, INFO, WARN-->
+            <appender-ref ref="OC_AS_ALL"/>
+        </root>
+        <logger name="eu.oc.annotations" level="DEBUG">
+            <appender-ref ref="OC_AS_ALL"/>
+        </logger>
+
+        <appender name="OC_AS_SPRING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOG_PATH}/spring.log</file>
+            <encoder>
+                <pattern>[%d{ISO8601}] %p %t %c{1}:%L - %m%n</pattern>
+            </encoder>
+            <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+                <fileNamePattern>${FILE_LOG_PATTERN}.%i</fileNamePattern>
+                <minIndex>1</minIndex>
+                <maxIndex>5</maxIndex>
+            </rollingPolicy>
+            <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+                <maxFileSize>5MB</maxFileSize>
+            </triggeringPolicy>
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <level>INFO</level>
+            </filter>
+        </appender>
+
+        <logger name="org.springframework.jdbc" level="DEBUG">
+            <appender-ref ref="OC_AS_SPRING"/>
+        </logger>
+        <logger name="org.springframework.data.jpa" level="DEBUG">
+            <appender-ref ref="OC_AS_SPRING"/>
+        </logger>
+
+        <appender name="OC_AS_KEYCLOAK" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOG_PATH}/keycloak.log</file>
+            <encoder>
+                <pattern>[%d{ISO8601}] %p %t %c{1}:%L - %m%n</pattern>
+            </encoder>
+            <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+                <fileNamePattern>${FILE_LOG_PATTERN}.%i</fileNamePattern>
+                <minIndex>1</minIndex>
+                <maxIndex>5</maxIndex>
+            </rollingPolicy>
+            <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+                <maxFileSize>5MB</maxFileSize>
+            </triggeringPolicy>
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <level>DEBUG</level>
+            </filter>
+        </appender>
+
+        <logger name="org.keycloak" level="DEBUG">
+            <appender-ref ref="OC_AS_KEYCLOAK"/>
+        </logger>
+    </springProfile>
+</configuration>

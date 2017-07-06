@@ -4,18 +4,24 @@ import eu.organicity.annotation.config.OrganicityAccount;
 import eu.organicity.annotation.service.OrganicityUserDetailsService;
 import org.json.JSONObject;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 
-@RestController
+@Controller
 public class OrganicityProfileController {
+    
+    @RequestMapping(value = {"/"}, method = RequestMethod.GET)
+    public final String home() {
+        return "redirect:/swagger-ui.html";
+    }
 
-
+    @ResponseBody
     @RequestMapping(value = {"OrganicityProfile"}, method = RequestMethod.GET)
     public final String profile() {
         JSONObject jsonObject = new JSONObject();
