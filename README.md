@@ -5,8 +5,9 @@ Organicity Assets.
 
 More details on usage and specification:
 
-- Annotation Service Documentation: https://github.com/OrganicityEu/organicityeu.github.io/blob/master/doc/AssetAnnotationService.md 
-- Annotation Service Endpoint: http://annotations.organicity.eu:8084/ 
-- Annotation Service Swagger UI: http://annotations.organicity.eu:8084/swagger-ui.html 
-- Annotation Service Swagger Documentation: https://organicityeu.github.io/api/Annotation.html 
+- Annotation Service Documentation: https://docs.organicity.eu/annotations/tutorials/HowToCreateAnnotationTags/
+- Annotation Service Documentation: https://docs.organicity.eu/annotations/tutorials/HowToAnnotateAnAsset/
+- Annotation Service Endpoint: https://annotations.organicity.eu/ 
+- Annotation Service Swagger UI: http://annotations.organicity.eu/swagger-ui.html 
+- Annotation Service Swagger Documentation: https://docs.organicity.eu/annotations/AssetAnnotationService/
 
