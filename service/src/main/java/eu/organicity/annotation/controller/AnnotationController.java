@@ -123,7 +123,7 @@ public class AnnotationController {
     }
     
     
-    @ApiOperation(value = "Show Asset Annotation Statistics", notes = "Provides means to retrieve statistics about the Annotations of a single Asset", nickname = "getAnnotations", response = AnnotationStatisticsDTO.class)
+    @ApiOperation(value = "Show Asset Annotation Statistics", notes = "Provides means to retrieve statistics about the Annotations of a single Asset", nickname = "getAnnotations", response = AnnotationStatisticsDTO.class, hidden = true)
     @RequestMapping(value = {"annotations/{assetUrn}/statistics"}, method = RequestMethod.GET)
     public final AnnotationStatisticsDTO getAnnotationStatistics(@PathVariable("assetUrn") String assetUrn, final HttpServletResponse response, Principal principal) {
         
