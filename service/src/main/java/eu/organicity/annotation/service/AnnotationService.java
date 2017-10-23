@@ -107,7 +107,7 @@ public class AnnotationService {
     
     public Annotation getAnnotationForAssetApplicationUserTag(String assetUrn, String application, String user, String tagUrn) {
         for (Tagging t : taggingRepository.findByUrn(assetUrn)) {
-            if (t.getUser().equals(user) && t.getApplication().equals(application) && t.getTag().getUrn().equals(tagUrn)) {
+            if ((user == null || t.getUser().equals(user)) && (application == null || t.getApplication().equals(application)) && (tagUrn == null || t.getTag().getUrn().equals(tagUrn))) {
                 return getAnnotation(t);
             }
         }
@@ -117,7 +117,7 @@ public class AnnotationService {
     public Annotation getAnnotationForAssetApplicationUserTagDomain(String assetUrn, String application, String user, String tagDomain) {
         //todo add more
         for (Tagging t : taggingRepository.findByUrn(assetUrn)) {
-            if (t.getUser().equals(user) && t.getApplication().equals(application)) {
+            if ((user == null || t.getUser().equals(user)) && (application == null || t.getApplication().equals(application))) {
                 TagDomain td = tagDomainRepository.findById(t.getTag().getTagDomain().getId());
                 if (td.getUrn().equals(tagDomain))
                     return getAnnotation(t);
