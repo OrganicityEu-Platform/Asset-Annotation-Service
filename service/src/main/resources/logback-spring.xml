@@ -1,8 +1,10 @@
-<configuration>
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
 
     <springProfile name="default,production">
 
         <springProperty scope="context" name="LOG_PATH" source="log.path"/>
+        <property name="FILE_LOG_PATTERN" value="[%d{ISO8601}] %p %t %c{1}:%L - %m%n"/>
 
         <appender name="OC_AS_ALL" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <file>${LOG_PATH}/annotation-service.log</file>
@@ -10,7 +12,7 @@
                 <pattern>[%d{ISO8601}] %p %t %c{1}:%L - %m%n</pattern>
             </encoder>
             <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-                <fileNamePattern>${FILE_LOG_PATTERN}.%i</fileNamePattern>
+                <fileNamePattern>${LOG_PATH}/annotation-service.log.%i</fileNamePattern>
                 <minIndex>1</minIndex>
                 <maxIndex>5</maxIndex>
             </rollingPolicy>
@@ -25,7 +27,7 @@
         <root level="ERROR"> <!-- ERROR, ALL, INFO, WARN-->
             <appender-ref ref="OC_AS_ALL"/>
         </root>
-        <logger name="eu.oc.annotations" level="DEBUG">
+        <logger name="eu.organicity.annotation" level="DEBUG">
             <appender-ref ref="OC_AS_ALL"/>
         </logger>
 
@@ -35,7 +37,7 @@
                 <pattern>[%d{ISO8601}] %p %t %c{1}:%L - %m%n</pattern>
             </encoder>
             <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-                <fileNamePattern>${FILE_LOG_PATTERN}.%i</fileNamePattern>
+                <fileNamePattern>${LOG_PATH}/spring.log.%i</fileNamePattern>
                 <minIndex>1</minIndex>
                 <maxIndex>5</maxIndex>
             </rollingPolicy>
@@ -60,7 +62,7 @@
                 <pattern>[%d{ISO8601}] %p %t %c{1}:%L - %m%n</pattern>
             </encoder>
             <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-                <fileNamePattern>${FILE_LOG_PATTERN}.%i</fileNamePattern>
+                <fileNamePattern>${LOG_PATH}/keycloak.log.%i</fileNamePattern>
                 <minIndex>1</minIndex>
                 <maxIndex>5</maxIndex>
             </rollingPolicy>
@@ -75,5 +77,14 @@
         <logger name="org.keycloak" level="DEBUG">
             <appender-ref ref="OC_AS_KEYCLOAK"/>
         </logger>
+    </springProfile>
+
+
+    <springProfile name="test">
+        <property name="CONSOLE_LOG_PATTERN" value="[%d{ISO8601}] %p %t %c{1}:%L - %m%n"/>
+        <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+        <root level="DEBUG">
+            <appender-ref ref="CONSOLE"/>
+        </root>
     </springProfile>
 </configuration>
