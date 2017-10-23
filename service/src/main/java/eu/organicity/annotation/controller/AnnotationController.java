@@ -134,7 +134,7 @@ public class AnnotationController {
     
     //Delete Tagging
     
-    @ApiOperation(value = "Delete Asset Annotation", notes = "Provides means to delete an Annotation of a single Asset", nickname = "deleteAnnotation", response = Annotation.class)
+    @ApiOperation(value = "Delete Asset Annotation", notes = "Provides means to delete an Annotation of a single Asset", nickname = "deleteAnnotation", response = Annotation.class, hidden = true)
     @RequestMapping(value = {"annotations/{assetUrn}"}, method = RequestMethod.DELETE)
     public final Annotation deleteAnnotation(@PathVariable("assetUrn") String assetUrn, @RequestParam(value = "annotation", required = true) Annotation annotation, Principal principal) {
         kpiService.addEvent(principal, "api:annotations/delete", "assetUrn", assetUrn);
@@ -142,7 +142,7 @@ public class AnnotationController {
         throw new RestException("Not Implemented yet!");
     }
     
-    @ApiOperation(value = "Delete all Annotations of an Asset", notes = "Provides means to delte all Annotations of a single Asset", nickname = "delete")
+    @ApiOperation(value = "Delete all Annotations of an Asset", notes = "Provides means to delte all Annotations of a single Asset", nickname = "delete", hidden = true)
     @RequestMapping(value = {"admin/annotations/delete/{assetUrn}"}, method = RequestMethod.GET) //todo fix
     public final void delete(@PathVariable("assetUrn") String assetUrn, Principal principal) {
         kpiService.addEvent(principal, "api:annotations/delete", "assetUrn", assetUrn);
