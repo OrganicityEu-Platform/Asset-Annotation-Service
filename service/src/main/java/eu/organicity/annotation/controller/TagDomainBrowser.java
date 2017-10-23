@@ -88,7 +88,20 @@ public class TagDomainBrowser {
     public final List<TagDomainDTO> domainFindAll(Principal principal) {
         kpiService.addEvent(principal, "api:tagDomains");
         accountingService.addMethod(principal, READ_ACTION, "tagDomains");
-        return dtoService.toTagDomainListDTO(tagDomainRepository.findAll());
+        
+        //filter viewed domains
+        final ArrayList<TagDomain> results = new ArrayList<>();
+        for (final TagDomain tagDomain : tagDomainRepository.findAll()) {
+            if (!tagDomain.getUrn().contains("urn:oc:tagDomain:experiments:")) {
+                results.add(tagDomain);
+            } else {
+                if (principal != null && principal.getName().equals(tagDomain.getUser())) {
+                    results.add(tagDomain);
+                }
+            }
+        }
+        
+        return dtoService.toTagDomainListDTO(results);
     }
     
     
