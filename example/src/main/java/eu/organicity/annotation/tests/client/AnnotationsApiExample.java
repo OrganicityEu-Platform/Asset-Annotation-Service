@@ -3,6 +3,7 @@ package eu.organicity.annotation.tests.client;
 
 import eu.organicity.annotation.client.AnnotationServiceClient;
 import eu.organicity.annotation.common.dto.AnnotationDTO;
+import eu.organicity.annotation.common.dto.CreateAnnotationDTO;
 import eu.organicity.annotation.common.dto.TagDTO;
 import eu.organicity.annotation.common.dto.TagDomainDTO;
 
@@ -36,7 +37,7 @@ public class AnnotationsApiExample {
         System.out.println(domain.getTags());
         
         
-        final AnnotationDTO dto = new AnnotationDTO();
+        final CreateAnnotationDTO dto = new CreateAnnotationDTO();
         dto.setAssetUrn("urn:my:asset");
         dto.setTagUrn(tagList.iterator().next().getUrn());
         dto.setTextValue("my tag message");

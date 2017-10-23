@@ -1,6 +1,7 @@
 package eu.organicity.annotation.service;
 
 import eu.organicity.annotation.common.dto.AnnotationStatisticsDTO;
+import eu.organicity.annotation.common.dto.CreateAnnotationDTO;
 import eu.organicity.annotation.domain.Annotation;
 import eu.organicity.annotation.domain.Experiment;
 import eu.organicity.annotation.domain.Tag;
@@ -54,7 +55,7 @@ public class AnnotationService {
         return a;
     }
     
-    public Annotation createOrUpdateTagging(Annotation annotation) {
+    public Annotation createOrUpdateTagging(CreateAnnotationDTO annotation) {
         Tag tag = tagRepository.findByUrn(annotation.getTagUrn());
         if (tag == null)
             throw new RestException("Provide a valid tag urn");

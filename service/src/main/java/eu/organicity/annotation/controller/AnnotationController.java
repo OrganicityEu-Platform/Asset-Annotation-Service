@@ -5,6 +5,7 @@ import eu.organicity.annotation.common.dto.AnnotationStatisticsDTO;
 import eu.organicity.annotation.common.dto.AssetAnnotationListDTO;
 import eu.organicity.annotation.common.dto.AssetAnnotationListItemDTO;
 import eu.organicity.annotation.common.dto.AssetListDTO;
+import eu.organicity.annotation.common.dto.CreateAnnotationDTO;
 import eu.organicity.annotation.domain.Annotation;
 import eu.organicity.annotation.domain.TagDomain;
 import eu.organicity.annotation.handlers.RestException;
@@ -59,15 +60,12 @@ public class AnnotationController {
     //Create Tagging
     @ApiOperation(value = "Create an Annotation", notes = "Provides means to create a new Annotation", nickname = "createAnnotation", response = Annotation.class)
     @RequestMapping(value = {"annotations/{assetUrn}"}, method = RequestMethod.POST)
-    public final Annotation createAnnotation(@NotNull @PathVariable("assetUrn") String assetUrn, @NotNull @RequestBody Annotation annotation, Principal principal) {
+    public final Annotation createAnnotation(@NotNull @PathVariable("assetUrn") String assetUrn,
+                                             @NotNull @RequestBody CreateAnnotationDTO annotation, Principal principal) {
         kpiService.addEvent(principal, "api:annotations/add", "assetUrn", assetUrn);
         accountingService.addMethod(principal, CREATE_ACTION, "annotations/add", assetUrn, null);
         
         //Set of validations
-        if (annotation.getAnnotationId() != null)
-            throw new RestException("AnnotationID should be null");
-        if (annotation.getDatetime() != null)
-            throw new RestException("Datetime should be null");
         if (annotation.getTagUrn() == null)
             throw new RestException("TagUrn should not be null");
         if (annotation.getApplication() == null)

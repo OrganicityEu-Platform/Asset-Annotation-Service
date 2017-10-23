@@ -1,6 +1,7 @@
 package eu.organicity.annotation.android.client;
 
 import eu.organicity.annotation.common.dto.AnnotationDTO;
+import eu.organicity.annotation.common.dto.CreateAnnotationDTO;
 import eu.organicity.annotation.common.dto.ExperimentDTO;
 import eu.organicity.annotation.common.dto.ServiceDTO;
 import eu.organicity.annotation.common.dto.TagDTO;
@@ -135,11 +136,11 @@ public class AnnotationServiceAndroidClient extends OrganicityServiceBaseClient 
      * @param annotationDTO the {@link AnnotationDTO} to add
      * @return the added {@link AnnotationDTO}
      */
-    public AnnotationDTO postAnnotation(final AnnotationDTO annotationDTO) {
+    public AnnotationDTO postAnnotation(final CreateAnnotationDTO annotationDTO) {
         refreshTokenIfNeeded();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<AnnotationDTO> entity = new HttpEntity<>(annotationDTO, headers);
+        HttpEntity<CreateAnnotationDTO> entity = new HttpEntity<>(annotationDTO, headers);
         return restTemplate.exchange(baseUrl + "annotations/" + annotationDTO.getAssetUrn(), HttpMethod.POST, entity, AnnotationDTO.class).getBody();
     }
 
