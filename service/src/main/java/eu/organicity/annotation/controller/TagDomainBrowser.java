@@ -114,6 +114,81 @@ public class TagDomainBrowser {
         return dtoService.toDTO(tagDomainRepository.findByUrn(tagDomainUrn));
     }
     
+    //Get tagDomains suggested for an Asset
+    @ApiOperation(value = "Get TagDomains for Asset", notes = "Provides means to list proposed TagDomains for a specific Asset", nickname = "domainsFindByAssetUrn", response = TagDomainDTO.class)
+    @RequestMapping(value = {"tagDomains/asset/{asset}"}, method = RequestMethod.GET)
+    public final Set<TagDomainDTO> domainsFindByAssetUrn(@PathVariable("asset") String assetUrn, Principal principal) {
+        //kpiService.addEvent(principal, "api:tagDomain", "tagDomainUrn", tagDomainUrn);
+        //accountingService.addMethod(principal, READ_ACTION, "domainFindByUrn", tagDomainUrn, null);
+        Set<TagDomainDTO> dto = new HashSet<>();
+        if (assetUrn.startsWith("urn:oc:entity:experimenters:")) {
+            try {
+                final String experimentId = assetUrn.split(":")[5];
+                dto.add(getTagDomain("urn:oc:tagDomain:experiments:" + experimentId));
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+            }
+            
+            if (dto.isEmpty()) {
+                try {
+                    final String experimentId = assetUrn.split(":")[5];
+                    dto.addAll(getExperimentTagDomains(experimentId));
+                } catch (Exception e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
+            }
+            
+            if (dto.isEmpty()) {
+                try {
+                    final String experimenterId = assetUrn.split(":")[4];
+                    dto.addAll(getUserTagDomains(experimenterId));
+                } catch (Exception e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
+            }
+        } else {
+            //city asset
+            if (assetUrn.contains("traffic")) {
+                dto.add(dtoService.toDTO(tagDomainRepository.findByUrn("urn:oc:tagDomain:TrafficLevel")));
+            } else if (assetUrn.contains("bikestation")) {
+                dto.add(dtoService.toDTO(tagDomainRepository.findByUrn("urn:oc:tagDomain:EmptyStation")));
+            } else if (assetUrn.contains("luminosity")) {
+                dto.add(dtoService.toDTO(tagDomainRepository.findByUrn("urn:oc:tagDomain:LightLevel")));
+            } else if (assetUrn.contains("noise")) {
+                dto.add(dtoService.toDTO(tagDomainRepository.findByUrn("urn:oc:tagDomain:AnomalyDetection")));
+            }
+        }
+        
+        //last chance
+        if (dto.isEmpty()) {
+            dto.add(getTagDomain("urn:oc:tagDomain:AnomalyDetection"));
+        }
+        return dto;
+    }
+    
+    private Set<TagDomainDTO> getUserTagDomains(final String experimenterId) {
+        final Set<TagDomainDTO> dto = new HashSet<>();
+        final Set<TagDomain> tagDomains = tagDomainRepository.findByUser(experimenterId);
+        for (final TagDomain tagDomain : tagDomains) {
+            dto.add(dtoService.toDTO(tagDomain));
+        }
+        return dto;
+    }
+    
+    private Set<TagDomainDTO> getExperimentTagDomains(final String experimentId) {
+        final Set<TagDomainDTO> dto = new HashSet<>();
+        final Experiment experiment = experimentRepository.findByUrn("urn:oc:entity:experiments:" + experimentId);
+        final List<ExperimentTagDomain> expT = experimentTagDomainRepository.findByExperiment(experiment);
+        for (final ExperimentTagDomain experimentTagDomain : expT) {
+            dto.add(dtoService.toDTO(tagDomainRepository.findById(experimentTagDomain.getId())));
+        }
+        return dto;
+    }
+    
+    private TagDomainDTO getTagDomain(final String tagDomainUrn) {
+        return dtoService.toDTO(tagDomainRepository.findByUrn(tagDomainUrn));
+    }
+    
     // TAG METHODS-----------------------------------------------
     @ApiOperation(value = "Get Tags of a TagDomain", notes = "Provides means to list all Tags of a single TagDomain", nickname = "domainGetTags", response = TagDTO[].class)
     @RequestMapping(value = {"tagDomains/{tagDomainUrn}/tags"}, method = RequestMethod.GET)

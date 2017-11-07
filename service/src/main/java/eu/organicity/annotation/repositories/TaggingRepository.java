@@ -37,6 +37,9 @@ public interface TaggingRepository extends CrudRepository<Tagging, Long> {
     
     List<Tagging> findByUrn(String urn);
     
+    @Query(value = "SELECT * FROM annotation where urn like ?1", nativeQuery = true)
+    List<Tagging> findByUrnLike(String urn);
+    
     List<Tagging> findByTag(Tag t);
     
     List<Tagging> findByUrnAndTag(String urn, Tag t);

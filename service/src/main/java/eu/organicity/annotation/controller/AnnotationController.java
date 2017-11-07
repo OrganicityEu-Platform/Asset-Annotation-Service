@@ -6,6 +6,7 @@ import eu.organicity.annotation.common.dto.AssetAnnotationListDTO;
 import eu.organicity.annotation.common.dto.AssetAnnotationListItemDTO;
 import eu.organicity.annotation.common.dto.AssetListDTO;
 import eu.organicity.annotation.common.dto.CreateAnnotationDTO;
+import eu.organicity.annotation.common.dto.TagDomainStatisticsDTO;
 import eu.organicity.annotation.domain.Annotation;
 import eu.organicity.annotation.domain.TagDomain;
 import eu.organicity.annotation.handlers.RestException;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -83,7 +85,7 @@ public class AnnotationController {
     }
     
     @ApiOperation(value = "List Asset Annotations", notes = "Provides means to list all Annotations of a single Asset", nickname = "getAnnotations", response = AnnotationDTO[].class)
-    @RequestMapping(value = {"annotations/{assetUrn}", "annotations/{assetUrn}/all"}, method = RequestMethod.GET)
+    @RequestMapping(value = {"annotations/{assetUrn}/all"}, method = RequestMethod.GET)
     public final Set<AnnotationDTO> getAnnotations(@PathVariable("assetUrn") String assetUrn, final HttpServletResponse response, Principal principal) {
         kpiService.addEvent(principal, "api:annotations", "assetUrn", assetUrn);
         accountingService.addMethod(principal, READ_ACTION, "annotations", assetUrn, null);
@@ -120,6 +122,43 @@ public class AnnotationController {
         kpiService.addEvent(principal, "api:annotations", "tagDomain", tagDomain);
         response.setHeader("Cache-Control", "no-cache");
         return annotationService.getAnnotationForAssetApplicationUserTagDomain(assetUrn, experimentUrn, user, tagDomain);
+    }
+    
+    @ApiOperation(value = "Find Annotations of a TagDomain by Asset Pattern",
+            notes = "Provides means to list all Annotations of a single TagDomain and filter them using a Asset Urn", nickname = "getAnnotationForAssetByPattern", response = Annotation.class)
+    @RequestMapping(value = {"annotations/{tagDomain}/like"}, method = RequestMethod.GET)
+    public final Set<AnnotationDTO> getAnnotationForAssetByPattern(
+            @RequestParam(value = "assetUrn", required = true) String assetUrn,
+            @NotNull @PathVariable(value = "tagDomain") String tagDomain,
+            final HttpServletResponse response, Principal principal) {
+        response.setHeader("Cache-Control", "no-cache");
+        final Set<AnnotationDTO> dto = new HashSet<>();
+        for (final Annotation annotation : annotationService.getAnnotationsForAssetLike(assetUrn, tagDomain)) {
+            dto.add(dtoService.toAnnotationDTO(annotation));
+        }
+        return dto;
+    }
+    
+    @ApiOperation(value = "Get Annotations Statistics for a TagDomain by Asset Pattern",
+            notes = "Provides means to list all Annotations of a single TagDomain and filter them using a Asset Urn together with statistics for the Annotations", nickname = "getAnnotationForAssetByPatternStatistics", response = Annotation.class)
+    @RequestMapping(value = {"annotations/{tagDomain}/like/stats"}, method = RequestMethod.GET)
+    public final TagDomainStatisticsDTO getAnnotationForAssetByPatternStatistics(
+            @RequestParam(value = "assetUrn", required = true) String assetUrn,
+            @NotNull @PathVariable(value = "tagDomain") String tagDomain,
+            final HttpServletResponse response, Principal principal) {
+        response.setHeader("Cache-Control", "no-cache");
+        final TagDomainStatisticsDTO tds = new TagDomainStatisticsDTO();
+        tds.setUrn(tagDomain);
+        tds.setCounts(new HashMap<>());
+        tds.setAnnotations(new HashSet<>());
+        for (final Annotation annotation : annotationService.getAnnotationsForAssetLike(assetUrn, tagDomain)) {
+            tds.getAnnotations().add(dtoService.toAnnotationDTO(annotation));
+            if (!tds.getCounts().containsKey(annotation.getTagUrn())){
+                tds.getCounts().put(annotation.getTagUrn(),0L);
+            }
+            tds.getCounts().put(annotation.getTagUrn(), tds.getCounts().get(annotation.getTagUrn()) + 1);
+        }
+        return tds;
     }
     
     

@@ -61,8 +61,14 @@ public class AnnotationService {
             throw new RestException("Provide a valid tag urn");
         TagDomain td = tagDomainRepository.findById(tag.getTagDomain().getId());
         
+        Tagging tagg = null;
+        for (Tag tag1 : td.getTags()) {
+            Tagging cTagging = taggingRepository.findByUrnAndUserAndTag(annotation.getAssetUrn(), annotation.getUser(), tag1);
+            if (cTagging != null) {
+                tagg = cTagging;
+            }
+        }
         
-        Tagging tagg = taggingRepository.findByUrnAndUserAndTag(annotation.getAssetUrn(), annotation.getUser(), tag);
         if (tagg == null) {
             tagg = new Tagging();
             tagg.setCreated(System.currentTimeMillis());
@@ -117,7 +123,7 @@ public class AnnotationService {
     
     public Annotation getAnnotationForAssetApplicationUserTagDomain(String assetUrn, String application, String user, String tagDomain) {
         //todo add more
-        for (Tagging t : taggingRepository.findByUrn(assetUrn)) {
+        for (Tagging t : taggingRepository.findByUrnLike("%"+assetUrn+"%")) {
             if ((user == null || t.getUser().equals(user)) && (application == null || t.getApplication().equals(application))) {
                 TagDomain td = tagDomainRepository.findById(t.getTag().getTagDomain().getId());
                 if (td.getUrn().equals(tagDomain))
@@ -125,6 +131,17 @@ public class AnnotationService {
             }
         }
         throw new RestException("No Annotation Found");
+    }
+    
+    public Set<Annotation> getAnnotationsForAssetLike(String assetUrn, String tagDomain) {
+        Set<Annotation> annotationSet = new HashSet<>();
+        for (Tagging t : taggingRepository.findByUrnLike("%"+assetUrn+"%")) {
+            TagDomain td = tagDomainRepository.findById(t.getTag().getTagDomain().getId());
+            if (td.getUrn().equals(tagDomain)){
+                annotationSet.add(getAnnotation(t));
+            }
+        }
+        return annotationSet;
     }
     
     public void deleteAssetsAndAnnotations(String assetUrn) {

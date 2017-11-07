@@ -7,24 +7,20 @@ import java.util.Set;
 
 public interface TagDomainRepository extends CrudRepository<TagDomain, Long> {
     
-//    @Cacheable(value = "TagDomainCache")
     Iterable<TagDomain> findAll();
     
-//    @Cacheable(value = "TagDomainCache")
     TagDomain findById(Long id);
     
     Set<TagDomain> findByDescriptionContaining(String description);
     
-//    @Cacheable(value = "TagDomainCache")
     TagDomain findByUrn(String Urn);
     
-//    @CacheEvict(value = "TagDomainCache", allEntries = true)
+    Set<TagDomain> findByUser(String user);
+    
     <S extends TagDomain> S save(S entity);
     
-//    @CacheEvict(value = "TagDomainCache", allEntries = true)
     void delete(Long id);
     
-//    @CacheEvict(value = "TagDomainCache", allEntries = true)
     void delete(TagDomain tagDomain);
     
 }
